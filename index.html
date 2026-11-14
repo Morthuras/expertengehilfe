@@ -247,6 +247,19 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .kv dd { margin: 0; text-align: right; font: 500 16px var(--font-mono); font-variant-numeric: tabular-nums; }
 .kv dd.big { font-family: var(--font-display); font-weight: 700; font-size: 30px; color: var(--signal); line-height: 1; }
 
+/* Startseite: Fusszeile ganz unten */
+#view-start { display: flex; flex-direction: column; gap: 14px; min-height: calc(100vh - 110px); min-height: calc(100dvh - 110px); }
+.start-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; padding-top: 12px; }
+.start-foot .stand { margin: 0; background: var(--surface); padding: 4px 10px; border-radius: 6px; text-shadow: none; }
+.btn-ext {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 18px; border-radius: 8px;
+  background: var(--surface); color: var(--signal); border: 1px solid var(--signal); font-weight: 600; font-size: 15px; text-decoration: none;
+}
+.btn-ext small { font: 500 12px var(--font-mono); color: var(--muted); }
+.btn-ext::after { content: "↗"; }
+.btn-ext:hover { background: var(--signal-soft); }
+.btn-ext:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+
 /* Zentralachsanhänger */
 .modes.za-n { grid-template-columns: repeat(3, 1fr); }
 .lk-top.za-top { grid-template-columns: minmax(150px, 1fr) repeat(4, minmax(0, 1fr)); }
@@ -461,7 +474,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <span class="tile-go">Öffnen</span>
       </a>
     </div>
-    <p class="stand">Stand: 14.11.2026</p>
+    <div class="start-foot">
+      <a class="btn-ext" href="https://www.fedlex.admin.ch/eli/cc/1995/4425_4425_4425/de" target="_blank" rel="noopener">VTS auf fedlex öffnen <small>SR 741.41</small></a>
+      <p class="stand">Stand: 14.11.2026</p>
+    </div>
   </section>
 
   <!-- ===================== Kupplung ===================== -->
