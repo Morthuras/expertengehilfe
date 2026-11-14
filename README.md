@@ -1,4 +1,6 @@
-# Verkehrsrechner
+# Kleiner Expertengehilfe
+
+*by Georg Winklmeier*
 
 Rechner für Fahrzeugtechnik in der Schweiz, als Web-App im Browser – ohne Installation, auf PC und iPad.
 
