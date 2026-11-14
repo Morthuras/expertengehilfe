@@ -265,6 +265,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
 /* Sattelschlepper */
 .modes.ss-n { grid-template-columns: repeat(2, 1fr); }
+.lk-top.ss-top { grid-template-columns: minmax(180px, 1fr) minmax(0, 1fr) minmax(0, 1.4fr); }
+@media (max-width: 760px) { .lk-top.ss-top { grid-template-columns: 1fr 1fr; } .lk-top.ss-top > .field:first-child { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .lk-top.ss-top { grid-template-columns: 1fr; } }
 .axtab.ss-tab { --axcols: 34px minmax(0, 1fr) minmax(0, 1fr) repeat(3, minmax(46px, .5fr)); }
 @media (max-width: 1100px) and (min-width: 761px) { .axtab.ss-tab { --axcols: 28px minmax(0, 1fr) minmax(0, 1fr) repeat(3, 44px); gap: 6px; } }
 @media (max-width: 520px) { .axtab.ss-tab { --axcols: 26px minmax(0, 1fr) minmax(0, 1fr) repeat(3, 40px); } }
@@ -790,12 +793,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <label for="ss-x">Abstand x</label>
           <div class="input-unit"><input id="ss-x" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
           <span class="hint">Mitte hinteres Achspaket bis Königszapfen, nach vorne positiv</span>
-          <span class="err" hidden></span>
-        </div>
-        <div class="field" id="f-ss-s">
-          <label for="ss-s">Sattellast beladen</label>
-          <div class="input-unit"><input id="ss-s" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
-          <span class="hint">Leer lassen = grösstmögliche Sattellast</span>
           <span class="err" hidden></span>
         </div>
       </div>
@@ -1546,7 +1543,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
     }
   }
-  ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x); ssBind("ss-s", ssDef.s);
+  ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x);
   ssBind("ss-tleer", "7000"); ssBind("ss-tsl", "2000"); ssBind("ss-tgg", "39000");
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
@@ -1600,8 +1597,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var n = ssN, ok = true, v = {};
     function get(id, opts) { var r = parseVal($(id), opts); var f = $("f-" + id); if (f) showErr(f, r); ok = ok && r.ok; return r; }
     var gar = get("ss-gar", { positive: true }), x = get("ss-x");
-    var sIn = parseVal($("ss-s"), { nonneg: true }); showErr($("f-ss-s"), sIn.empty ? { ok: true } : sIn);
-    if (!sIn.ok && !sIn.empty) ok = false;
     var ax = [], sp = [0, 0, 0];
     for (var i = 0; i < n; i++) {
       var l = get("ss-leer" + i, { positive: true }), g = get("ss-schild" + i, { positive: true });
@@ -1643,13 +1638,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var L = L0, M = M0;
     if (L1.capped && M1.v > M0.v) { L = L1; M = M1; }
 
-    var useInput = sIn.ok && !sIn.empty;
-    var S = useInput ? sIn.v : M.v;
-    $("ss-s-label").textContent = useInput ? "Sattellast (Eingabe)" : "Grösstmögliche Sattellast";
+    var S = M.v;
     $("ss-smax").innerHTML = kg(S) + " <small>kg</small>";
-    $("ss-gov").textContent = useInput
-      ? "Grösstmögliche Sattellast: " + kg(M.v) + " kg (begrenzt durch " + M.by + ")."
-      : "Begrenzt durch: " + M.by + ".";
+    $("ss-gov").textContent = "Begrenzt durch: " + M.by + ".";
 
     // Achslasten beladen
     var rows = '<tr><th>Achse</th><th class="r">leer</th><th class="r">+ Sattellast</th><th class="r">beladen</th><th class="r">zulässig</th><th></th></tr>';
