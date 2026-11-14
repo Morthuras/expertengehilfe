@@ -715,6 +715,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Abs. 1:</b> 2 Achsen 18 t, 3 Achsen 25 t (26 t nach Bst. f), 4 Achsen 32 t, mehr als 4 Achsen 40 t. Alternativer Antrieb: plus Mehrgewicht, höchstens 1 t, emissionsfrei höchstens 2 t.</li>
           <li><b>Einzelachsen (Abs. 2):</b> nicht angetrieben 10 t, angetrieben 11,5 t. Massgebend ist der kleinere Wert aus Herstellerschild und Grenzwert.</li>
           <li><b>Doppel- und Dreifachachsen:</b> zulässig ist die Summe der zulässigen Einzelachslasten, höchstens aber der Grenzwert nach Art. 95 Abs. 2. Der kleinere Wert ist massgebend.</li>
+          <li><b>Ziffer 243:</b> Eine Doppel- oder Dreifachachse wird nur eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen. Ist die Summe kleiner oder gleich, genügen die Einzelachsen.</li>
           <li><b>Achsgruppen:</b> Achsen mit weniger als 1,80 m Abstand bilden eine Gruppe. Doppelachse: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t, mit Bst. f 19 t.</li>
           <li><b>Dreifachachse:</b> Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Nur ein Abstand darf über 1,40 m liegen. Sonst rechnet die App die drei Achsen als Doppelachse plus Einzelachse und nimmt die ungünstigere Aufteilung.</li>
           <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder jede Antriebsachse doppelbereift und höchstens 9,5 t je Achse. Liegen die Achslasten schon bei höchstens 9,5 t, gilt der höhere Grenzwert direkt. Liegen sie darüber, setzt die App die Achsen nur dann auf 9500 kg, wenn das ein höheres Gesamtgewicht ergibt.</li>
@@ -1217,7 +1218,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         var d = doubleUnit(u.idx);
         units.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v,
           why: d.v < d.lim.v ? "Summe Einzelachsen" : "VTS Art. 95 " + d.lim.ref + " (Abstand " + fmt(d.sp / 1000, 2) + " m)" });
-        entries.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v, grp: true });
+        entries.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v, grp: true, sum: d.sum });
       } else if (u.type === "triple") {
         var i0 = u.idx[0], i1 = u.idx[1], i2 = u.idx[2];
         var p1 = doubleUnit([i0, i1]), p2 = doubleUnit([i1, i2]);
@@ -1225,9 +1226,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         var tl = tripleLimit(maxSp);
         var tsum = single[i0].v + single[i1].v + single[i2].v;
         var tv = Math.min(tl.v, tsum);
-        entries.push({ label: ord(i0) + "+" + ord(i1) + " Achse", kind: "Doppelachse", v: p1.v, grp: true });
-        entries.push({ label: ord(i1) + "+" + ord(i2) + " Achse", kind: "Doppelachse", v: p2.v, grp: true });
-        entries.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv, grp: true });
+        entries.push({ label: ord(i0) + "+" + ord(i1) + " Achse", kind: "Doppelachse", v: p1.v, grp: true, sum: p1.sum });
+        entries.push({ label: ord(i1) + "+" + ord(i2) + " Achse", kind: "Doppelachse", v: p2.v, grp: true, sum: p2.sum });
+        entries.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv, grp: true, sum: tsum });
         units.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv,
           why: tv < tl.v ? "Summe Einzelachsen" :"VTS Art. 95 " + tl.ref + " (grösserer Abstand " + fmt(maxSp / 1000, 2) + " m)" });
       } else if (u.type === "split3") {
@@ -1235,8 +1236,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         var q1 = doubleUnit([j0, j1]), q2 = doubleUnit([j1, j2]);
         var optA = q1.v + single[j2].v, optB = single[j0].v + q2.v;
         warns.push("Achsen " + ord(j0) + "–" + ord(j2) + ": beide Abstände über 1,40 m, keine Dreifachachse. Gerechnet mit der ungünstigeren Aufteilung Doppelachse plus Einzelachse.");
-        entries.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, grp: true });
-        entries.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, grp: true });
+        entries.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, grp: true, sum: q1.sum });
+        entries.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, grp: true, sum: q2.sum });
         if (optA <= optB) {
           units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, why: "Aufteilung (" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) });
           units.push({ label: ord(j2) + " Achse", kind: "Einzelachse", v: single[j2].v, why: single[j2].why });
@@ -1255,7 +1256,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     else legal = { v: 40000, ref: "Abs. 1 Bst. h" };
 
     var singleEntries = single.map(function (s, i) { return { label: ord(i) + " Achse", kind: "", v: s.v, grp: false }; });
-    return { single: single, units: units, entries: singleEntries.concat(entries), total: total, legal: legal, capped: reduced };
+    // Gruppen nur eintragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen
+    var grpEntries = entries.filter(function (e) { return e.v < e.sum; });
+    return { single: single, units: units, entries: singleEntries.concat(grpEntries), total: total, legal: legal, capped: reduced };
   }
 
   function computeLK() {
