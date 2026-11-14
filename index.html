@@ -279,6 +279,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 @media (max-width: 520px) { .ss-trl { grid-template-columns: 1fr; } }
 .group { display: grid; gap: 10px; }
 .group-label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.lims { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13.5px; }
+.lims li { display: grid; grid-template-columns: 16px 1fr; gap: 6px; color: var(--muted); }
+.lims li::before { content: "▸"; color: var(--signal); }
+.lims li b { color: var(--ink); font-weight: 600; }
 .tbl td.ok { color: var(--ok); font-weight: 600; }
 .tbl td.bad { color: var(--warn); font-weight: 600; }
 .tbl tr.sum td { border-top: 2px solid var(--line); font-weight: 600; }
@@ -843,7 +847,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <span class="answer-label" id="ss-s-label">Grösstmögliche Sattellast</span>
           <div class="answer" id="ss-smax">–</div>
           <span class="status" id="ss-status" hidden></span>
-          <p class="answer-note" id="ss-gov"></p>
+          <ul class="lims" id="ss-gov"></ul>
           <div class="tbl-wrap"><table class="tbl" id="ss-tbl"></table></div>
           <span class="answer-label" style="margin-top:6px">VTS Art. 39 Abs. 2 und 3</span>
           <div class="tbl-wrap"><table class="tbl" id="ss-a39"></table></div>
@@ -1634,7 +1638,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     var out = ["ss-smax"];
     if (!ok) {
-      $("ss-smax").textContent = "–"; $("ss-gov").textContent = "Bitte die Felder links ausfüllen.";
+      $("ss-smax").textContent = "–"; $("ss-gov").innerHTML = "<li><span>Bitte die Felder links ausfüllen.</span></li>";
       $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-gzgnote").textContent = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
       return;
     }
@@ -1662,7 +1666,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     var S = M.v;
     $("ss-smax").innerHTML = kg(S) + " <small>kg</small>";
-    $("ss-gov").textContent = "Begrenzt durch: " + M.by + ".";
 
     // Achslasten beladen
     var rows = '<tr><th>Achse</th><th class="r">leer</th><th class="r">+ Sattellast</th><th class="r">beladen</th><th class="r">zulässig</th><th></th></tr>';
@@ -1736,6 +1739,26 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     if (!kw.ok) gzNote += (gzNote ? " · " : "") + "Ohne Motorleistung ist Art. 97 nicht geprüft.";
     $("ss-gzgnote").textContent = gzNote;
+
+    // Begrenzungen: welche Gewichte wodurch beschränkt wurden
+    var lims = [];
+    var byDetail = M.by === "Gesamtgewicht" ? L.gg.why
+      : M.by === "Vorderachse" ? L.lim[0].why
+      : M.by.indexOf("Doppelachse") === 0 ? (L.grp && L.grp.v < L.grp.lim ? "Summe Einzelachsen" : "VTS Art. 95 " + (L.grp ? L.grp.ref : ""))
+      : (function () { var i = parseInt(M.by, 10) - 1; return L.lim[i] ? L.lim[i].why : ""; })();
+    lims.push("<b>Sattellast " + kg(S) + " kg</b>: begrenzt durch " + M.by + " (" + byDetail + ")");
+    ax.forEach(function (a, i) {
+      if (L.lim[i].v < a.schild) lims.push("<b>" + (i + 1) + ". Achse " + kg(L.lim[i].v) + " kg</b> statt Schild " + kg(a.schild) + " kg: " + L.lim[i].why);
+    });
+    if (L.grp) {
+      lims.push(L.grp.v < L.grp.sum
+        ? "<b>Doppelachse 2.+3. " + kg(L.grp.v) + " kg</b> statt Summe " + kg(L.grp.sum) + " kg: VTS Art. 95 " + L.grp.ref
+        : "<b>Doppelachse 2.+3. " + kg(L.grp.v) + " kg</b>: Summe der Einzelachsen (Grenzwert " + L.grp.ref.replace("Abs. 2 ", "") + " " + kg(L.grp.lim) + " kg nicht massgebend)");
+    }
+    if (L.gg.v < gar.v) lims.push("<b>Gesamtgewicht " + kg(L.gg.v) + " kg</b> statt Garantiegewicht " + kg(gar.v) + " kg: " + L.gg.why);
+    var gzGov = gc.filter(function (c) { return c.v === gzMax; }).map(function (c) { return c.t; }).join(" und ");
+    lims.push("<b>Gesamtzugsgewicht " + kg(gzMax) + " kg</b>: begrenzt durch " + gzGov);
+    $("ss-gov").innerHTML = lims.map(function (t) { return "<li><span>" + t + "</span></li>"; }).join("");
     if (!ax.some(function (a) { return a.drv; })) a39ok = false;
 
     var st = $("ss-status"); st.hidden = false;
