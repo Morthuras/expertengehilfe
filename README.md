@@ -11,6 +11,7 @@ Rechner für Fahrzeugtechnik in der Schweiz, als Web-App im Browser – ohne Ins
 | Anhängerkupplung: Mindest-D-Wert und maximale Anhängelast | UN ECE R55 |
 | Felgen und Spur: Mindest-Einpresstiefe, Distanzscheiben, resultierende Spur (VA/HA) | höchstens 1 % Spuränderung pro Rad |
 | Achslasten LKW: zulässiges Gesamtgewicht und Einträge Ziffer 243 (2–5 Achsen) | VTS Art. 95 |
+| Zentralachsanhänger: Stützlast aus der Nutzlast, X-Wert der Ladefläche, Nutzlast (1–3 Achsen) | Richtwert 10 % bzw. 1000 kg |
 
 ## Dateien
 
