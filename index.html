@@ -733,7 +733,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Doppel- und Dreifachachsen:</b> zulässig ist die Summe der zulässigen Einzelachslasten, höchstens aber der Grenzwert nach Art. 95 Abs. 2. Der kleinere Wert ist massgebend.</li>
           <li><b>Achsgruppen:</b> Achsen mit weniger als 1,80 m Abstand bilden eine Gruppe. Doppelachse: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t, mit Bst. f 19 t.</li>
           <li><b>Dreifachachse:</b> Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Nur ein Abstand darf über 1,40 m liegen. Sonst rechnet die App die drei Achsen als Doppelachse plus Einzelachse und nimmt die ungünstigere Aufteilung.</li>
-          <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder alle betroffenen Antriebsachsen doppelbereift mit höchstens 9,5 t je Achse. Im zweiten Fall setzt die App diese Achsen auf 9500 kg, aber nur, wenn das ein höheres Gesamtgewicht ergibt.</li>
+          <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder jede Antriebsachse doppelbereift und höchstens 9,5 t je Achse. Liegen die Achslasten schon bei höchstens 9,5 t, gilt der höhere Grenzwert direkt. Liegen sie darüber, setzt die App die Achsen nur dann auf 9500 kg, wenn das ein höheres Gesamtgewicht ergibt.</li>
           <li>Nicht abgedeckt: Gesellschaftswagen (19,5 t), Gelenkbusse, unbegleiteter kombinierter Verkehr (44 t), Anfahrhilfen, land- und forstwirtschaftliche Fahrzeuge.</li>
         </ul>
       </div>
@@ -1188,7 +1188,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     function markDoubleCap(idx, s) {
       if (s < 1300 || s >= 1800) return;
       var f = condF(ax, idx);
-      if (!f.a && f.b && capOn) f.drivers.forEach(function (i) { cap[i] = true; });
+      // Variante 2 von Bst. f: Achslasten der Doppelachse auf 9,5 t je Achse begrenzen (nur im Durchgang mit Kappung)
+      if (!f.a && f.b && capOn) idx.forEach(function (i) { cap[i] = true; });
     }
     plan.forEach(function (u) {
       if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);
@@ -1206,17 +1207,19 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
 
     // Einzelachsen
+    var reduced = false;
     var single = ax.slice(0, n).map(function (a, i) {
       var lim = singleLimit(a.drv);
       var v = Math.min(a.load, lim.v), why = a.load <= lim.v ? "Herstellerschild" : "VTS Art. 95 " + lim.ref;
-      if (cap[i] && v > 9500) { v = 9500; why = "9,5 t je Achse für Bst. f"; }
+      if (cap[i] && v > 9500) { v = 9500; why = "9,5 t je Achse für Bst. f"; reduced = true; }
       return { v: v, why: why, lim: lim };
     });
 
     function doubleUnit(idx) {
       var s = sp[idx[1]];
       var f = condF(ax, idx);
-      var qual = s >= 1300 && s < 1800 && (f.a || (f.b && idx.filter(function (i) { return ax[i].drv; }).every(function (i) { return cap[i]; })));
+      // Bst. f: Antriebsachse doppelbereift + Luftfederung, ODER jede Antriebsachse doppelbereift und keine Achse über 9,5 t
+      var qual = s >= 1300 && s < 1800 && (f.a || (f.b && idx.every(function (i) { return single[i].v <= 9500; })));
       var lim = doubleLimit(s, qual);
       var sum = single[idx[0]].v + single[idx[1]].v;
       return { v: Math.min(lim.v, sum), lim: lim, sum: sum, sp: s };
@@ -1268,7 +1271,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     else legal = { v: 40000, ref: "Abs. 1 Bst. h" };
 
     var singleEntries = single.map(function (s, i) { return { label: ord(i) + " Achse", kind: "", v: s.v, grp: false }; });
-    return { single: single, units: units, entries: singleEntries.concat(entries), total: total, legal: legal, capped: Object.keys(cap).length > 0 };
+    return { single: single, units: units, entries: singleEntries.concat(entries), total: total, legal: legal, capped: reduced };
   }
 
   function computeLK() {
@@ -1331,7 +1334,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       return '<div class="cand' + (c.v === minV ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === minV ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
     }).join("");
 
-    if (res.capped) warns.push("Antriebsachsen auf 9500 kg begrenzt, damit Bst. f (höherer Grenzwert) gilt.");
+    if (res.capped) warns.push("Achslasten auf 9500 kg je Achse begrenzt, damit Bst. f (höherer Grenzwert) gilt.");
     if (mehr.v > bonusMax && bonusMax) warns.push("Mehrgewicht über " + kg(bonusMax) + " kg: Zuschlag auf " + kg(bonusMax) + " kg begrenzt.");
     res.single.forEach(function (s, i) {
       if (ax[i].load > s.lim.v) warns.push(ord(i) + " Achse: Herstellerschild " + kg(ax[i].load) + " kg über Grenzwert, auf " + kg(s.lim.v) + " kg begrenzt.");
