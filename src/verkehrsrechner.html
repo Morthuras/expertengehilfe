@@ -789,7 +789,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <div class="in">
           <div class="axtab ss-tab" id="ss-axles"><!-- per Script --></div>
           <div class="group">
-            <div class="group-label">Fahrzeugkombination · für Gesamtzugsgewicht und VTS Art. 39 Abs. 3</div>
+            <div class="group-label">Fahrzeugkombination · für das Gesamtzugsgewicht</div>
             <div class="ss-trl">
               <div class="field" id="f-ss-kw">
                 <label for="ss-kw">Motorleistung</label>
@@ -806,27 +806,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
                 <label class="tog" style="max-width:120px"><input type="checkbox" id="ss-kv" aria-label="Unbegleiteter kombinierter Verkehr (44 t)"><span aria-hidden="true"></span></label>
               </div>
             </div>
-            <details class="more" id="more-sstrl" style="border-top:0">
-            <summary style="padding-inline:0">Auflieger-Daten eingeben</summary>
-            <div class="ss-trl">
-              <div class="field" id="f-ss-tleer">
-                <label for="ss-tleer">Auflieger leer</label>
-                <div class="input-unit"><input id="ss-tleer" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
-                <span class="err" hidden></span>
-              </div>
-              <div class="field" id="f-ss-tsl">
-                <label for="ss-tsl">Sattellast Auflieger leer</label>
-                <div class="input-unit"><input id="ss-tsl" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
-                <span class="err" hidden></span>
-              </div>
-              <div class="field" id="f-ss-tgg">
-                <label for="ss-tgg">Auflieger Gesamtgewicht</label>
-                <div class="input-unit"><input id="ss-tgg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
-                <span class="err" hidden></span>
-              </div>
-            </div>
-            </details>
-            <span class="hint">Alle Felder sind freiwillig. Leere Felder werden bei der Prüfung übersprungen.</span>
+            <span class="hint">Motorleistung und Gesamtzugsgewicht Schild sind freiwillig. Leere Felder werden übersprungen.</span>
           </div>
         </div>
 
@@ -864,10 +844,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
           <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f).</li>
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
-          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und zusätzlich beladen.</li>
-          <li><b>Fahrzeugkombination (Abs. 3):</b> Leer = Antriebsachsen inklusive Anteil der leeren Sattellast des Aufliegers, geteilt durch Schlepper leer + Auflieger leer. Beladen = Antriebsachsen mit der Sattellast oben, geteilt durch Schlepper leer + Gesamtgewicht des Aufliegers. Die Lenkachse (Abs. 2) wird nur für den Sattelschlepper geprüft.</li>
-          <li><b>Höchstmögliches Gesamtzugsgewicht</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (40 t, im kombinierten Verkehr 44 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %), VTS Art. 97 Abs. 2 Bst. a (Motorleistung ÷ 5,0 kW je t, nur wenn eingegeben) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
-          <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Achslasten des Aufliegers.</li>
+          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und zusätzlich beladen.</li>          <li><b>Höchstmögliches Gesamtzugsgewicht</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (40 t, im kombinierten Verkehr 44 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %), VTS Art. 97 Abs. 2 Bst. a (Motorleistung ÷ 5,0 kW je t, nur wenn eingegeben) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
+          <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Daten des Aufliegers.</li>
         </ul>
       </div>
     </details>
@@ -1558,9 +1536,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
     }
   }
-  ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x);
-  ssBind("ss-tleer", "7000"); ssBind("ss-tsl", "2000"); ssBind("ss-tgg", "32500");
-  ssBind("ss-kw", "330"); ssBind("ss-gzg", "40000"); ssBind("ss-kv", false, true);
+  ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x);  ssBind("ss-kw", "330"); ssBind("ss-gzg", "40000"); ssBind("ss-kv", false, true);
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
@@ -1687,29 +1663,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       "<tr><td>Sattelschlepper leer</td>" + cell(A0.lenk, 20) + cell(A0.adh, 25) + "</tr>" +
       "<tr><td>Sattelschlepper beladen</td>" + cell(A1.lenk, 20) + cell(A1.adh, 25) + "</tr>";
 
-    // Fahrzeugkombination (Art. 39 Abs. 3): nur wenn Auflieger-Daten vorhanden
-    var tl = parseVal($("ss-tleer"), { positive: true }), tsl = parseVal($("ss-tsl"), { nonneg: true }), tgg = parseVal($("ss-tgg"), { positive: true });
-    showErr($("f-ss-tleer"), tl.empty ? { ok: true } : tl); showErr($("f-ss-tsl"), tsl.empty ? { ok: true } : tsl); showErr($("f-ss-tgg"), tgg.empty ? { ok: true } : tgg);
-    var K0 = null, K1 = null;
-    function drvShare(sl) { // Anteil einer Sattellast auf die angetriebenen Achsen
-      return ax.reduce(function (t, a, i) { return t + (a.drv ? (i === 0 ? sl * fF : sl * fR / rear.length) : 0); }, 0);
-    }
-    if (tl.ok && tsl.ok) {
-      var d0 = A0.drv + drvShare(tsl.v), t0 = leerTot + tl.v;
-      K0 = { drv: d0, tot: t0, adh: d0 / t0 * 100 };
-      a39rows += '<tr><td>Kombination leer</td><td class="r">–</td>' + cell(K0.adh, 25) + "</tr>";
-    }
-    if (tgg.ok) {
-      var t1 = leerTot + tgg.v;
-      K1 = { drv: A1.drv, tot: t1, adh: A1.drv / t1 * 100 };
-      a39rows += '<tr><td>Kombination beladen</td><td class="r">–</td>' + cell(K1.adh, 25) + "</tr>";
-    }
     $("ss-a39").innerHTML = a39rows;
 
     // Höchstmögliches Gesamtzugsgewicht
     var kw = parseVal($("ss-kw"), { positive: true }), gzs = parseVal($("ss-gzg"), { positive: true });
     showErr($("f-ss-kw"), kw.empty ? { ok: true } : kw); showErr($("f-ss-gzg"), gzs.empty ? { ok: true } : gzs);
-    var kv = $("ss-kv").checked, gzFail = false;
+    var kv = $("ss-kv").checked;
     var gc = [
       { t: "SVG Art. 9 Abs. 1", s: kv ? "kombinierter Verkehr" : "Fahrzeugkombination", v: kv ? 44000 : 40000 },
       { t: "VTS Art. 39 Abs. 3", s: "Adhäsion beladen " + kg(Math.round(A1.drv)) + " kg ÷ 25 %", v: Math.floor(A1.drv / 0.25) }
@@ -1721,14 +1680,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     $("ss-gzgc").innerHTML = gc.map(function (c) {
       return '<div class="cand' + (c.v === gzMax ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === gzMax ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
     }).join("");
-    var gzNote = "";
-    if (tgg.ok) {
-      var gzIst = leerTot + tgg.v, gzOk = gzIst <= gzMax;
-      if (!gzOk) gzFail = true;
-      gzNote = "Mit diesem Auflieger: " + kg(leerTot) + " + " + kg(tgg.v) + " = " + kg(gzIst) + " kg " + (gzOk ? "✓ eingehalten" : "✗ " + kg(gzIst - gzMax) + " kg zu viel");
-    }
-    if (!kw.ok) gzNote += (gzNote ? " · " : "") + "Ohne Motorleistung ist Art. 97 nicht geprüft.";
-    $("ss-gzgnote").textContent = gzNote;
+    $("ss-gzgnote").textContent = kw.ok ? "" : "Ohne Motorleistung ist Art. 97 nicht geprüft.";
 
     // Begrenzungen: welche Gewichte wodurch beschränkt wurden
     var lims = [];
@@ -1752,9 +1704,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     if (!ax.some(function (a) { return a.drv; })) a39ok = false;
 
     var st = $("ss-status"); st.hidden = false;
-    st.className = "status " + (allOk && a39ok && !gzFail ? "ok" : "warn");
+    st.className = "status " + (allOk && a39ok ? "ok" : "warn");
     st.textContent = !allOk ? "Grenze überschritten" : !a39ok ? "Achslasten eingehalten, Art. 39 nicht erfüllt"
-      : gzFail ? "Gesamtzugsgewicht mit diesem Auflieger zu hoch" : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
+      : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
 
     var warns = [];
     if (X <= 0) warns.push("x ist 0 oder negativ: Der Königszapfen liegt hinter der Mitte des Achspakets, die Vorderachse wird entlastet.");
@@ -1777,11 +1729,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       M.cands.map(function (c) { return "  " + c.name + ": " + kg(Math.max(0, Math.floor(c.v))) + " kg"; }).join("\n") + "\n" +
       '<span class="k">Art. 39: Lenkachse / Gesamt, angetriebene Achsen / Gesamt</span>\n' +
       "  leer:     " + kg(ax[0].leer) + " / " + kg(A0.tot) + " = " + fmt(A0.lenk, 1) + " %   " + kg(A0.drv) + " / " + kg(A0.tot) + " = " + fmt(A0.adh, 1) + " %\n" +
-      "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %" +
-      (K0 ? "\n" + '<span class="k">Kombination leer: Antriebsachsen (inkl. Anteil Sattellast leer) / (Schlepper leer + Auflieger leer)</span>\n' +
-        "  " + kg(Math.round(K0.drv)) + " / " + kg(Math.round(K0.tot)) + " = " + fmt(K0.adh, 1) + " %" : "") +
-      (K1 ? "\n" + '<span class="k">Kombination beladen: Antriebsachsen beladen / (Schlepper leer + Auflieger Gesamtgewicht)</span>\n' +
-        "  " + kg(Math.round(K1.drv)) + " / " + kg(Math.round(K1.tot)) + " = " + fmt(K1.adh, 1) + " %" : "");
+      "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %";
   }
   (function () { var s = Number(load("ss-n")); ssSetN(s === 3 ? 3 : 2); })();
 
