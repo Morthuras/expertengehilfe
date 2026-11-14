@@ -236,6 +236,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
 /* Zentralachsanhänger */
 .modes.za-n { grid-template-columns: repeat(3, 1fr); }
+.lk-top.za-top { grid-template-columns: minmax(150px, 1fr) repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) { .lk-top.za-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .lk-top.za-top { grid-template-columns: 1fr; } }
 .za-nl { display: block; min-height: 54px; display: flex; align-items: center; font-size: 21px; }
 .za-fig { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 8px; }
 .za-fig svg { width: 100%; height: auto; display: block; }
@@ -720,6 +723,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="input-unit"><input id="za-lg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
           <span class="err" hidden></span>
         </div>
+        <div class="field" id="f-za-sl">
+          <label for="za-sl">Stützlast leer</label>
+          <div class="input-unit"><input id="za-sl" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+          <span class="hint">0, wenn unbekannt</span>
+          <span class="err" hidden></span>
+        </div>
         <div class="field">
           <span class="row-label">Nutzlast</span>
           <output class="val za-nl" id="za-nl">–</output>
@@ -755,14 +764,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
             <label for="za-li">Ladeflächen-Innenlänge</label>
             <div class="input-unit"><input id="za-li" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
             <span class="err" hidden></span>
-          </div>
-          <div class="field" id="f-za-sl">
-            <label for="za-sl">Stützlast leer</label>
-            <div class="input-unit"><input id="za-sl" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
-            <span class="hint">Stützlast des leeren Anhängers, z. B. gewogen. 0 eingeben, wenn unbekannt.</span>
-            <span class="err" hidden></span>
-          </div>
-          <div class="za-fig" aria-hidden="true"><svg id="za-svg" viewBox="0 0 600 150" preserveAspectRatio="xMidYMid meet"></svg></div>
+          </div>          <div class="za-fig" aria-hidden="true"><svg id="za-svg" viewBox="0 0 600 150" preserveAspectRatio="xMidYMid meet"></svg></div>
         </div>
 
         <div class="out" aria-live="polite">
