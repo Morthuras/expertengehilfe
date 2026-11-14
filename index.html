@@ -533,6 +533,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <div class="answer" id="res-value">–</div>
         <span class="status warn" id="res-status" hidden></span>
         <p class="answer-note" id="res-note"></p>
+        <dl class="kv" id="res-kv" hidden>
+          <dt>Gesamtzugsgewicht <small style="display:block;font-size:12px">T + R</small></dt><dd class="big" id="res-gzg">–</dd>
+        </dl>
         <div class="formula" id="res-formula" aria-label="Rechenweg"></div>
       </div>
     </form>
@@ -890,6 +893,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     $("res-value").textContent = "–";
     $("res-note").textContent = "Werte links eingeben.";
     $("res-formula").textContent = "";
+    $("res-kv").hidden = true;
     kStatus("");
   }
   function computeK() {
@@ -903,6 +907,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       var T = t.v / 1000, R = r.v / 1000;
       $("res-value").innerHTML = fmt(Dup, 2) + " <small>kN</small>";
       $("res-note").textContent = "Die Kupplung muss mindestens diesen D-Wert haben.";
+      $("res-gzg").textContent = fmt(t.v + r.v, 0) + " kg";
+      $("res-kv").hidden = false;
       kStatus("");
       $("res-formula").innerHTML =
         '<span class="k">D = g · T · R / (T + R)</span>\n' +
@@ -912,6 +918,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       var d = parseVal($("in-d"), { positive: true });
       showErr($("f-d"), d);
       if (!t.ok || !d.ok) return kEmpty();
+      $("res-kv").hidden = true;
       var Rkg = maxTrailer(t.v, d.v), T2 = t.v / 1000, gT = G * T2;
       if (!isFinite(Rkg)) {
         $("res-value").textContent = "unbegrenzt";
