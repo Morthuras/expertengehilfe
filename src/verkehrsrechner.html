@@ -225,7 +225,31 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .start-head h2, .start-head p { text-shadow: 0 0 12px var(--bg), 0 0 4px var(--bg); }
 .start-head h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 30px; }
 .start-head p { margin: 0; color: var(--muted); max-width: 65ch; }
-.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: baseline; margin: 0; }
+.kv dt { font-size: 14px; color: var(--muted); }
+.kv dt small { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font: 500 16px var(--font-mono); font-variant-numeric: tabular-nums; }
+.kv dd.big { font-family: var(--font-display); font-weight: 700; font-size: 30px; color: var(--signal); line-height: 1; }
+
+/* Zentralachsanhänger */
+.modes.za-n { grid-template-columns: repeat(3, 1fr); }
+.za-nl { display: block; min-height: 54px; display: flex; align-items: center; font-size: 21px; }
+.za-fig { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 8px; }
+.za-fig svg { width: 100%; height: auto; display: block; }
+.za-fig .ground { stroke: var(--line); stroke-width: 2; }
+.za-fig .body { fill: var(--signal-soft); stroke: var(--signal); stroke-width: 1.5; }
+.za-fig .bar { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.za-fig .wheel { fill: var(--ink); }
+.za-fig .hub { fill: var(--surface); }
+.za-fig .ball { fill: var(--warn); }
+.za-fig .dim { stroke: var(--muted); stroke-width: 1; fill: none; }
+.za-fig .mark { stroke: var(--signal); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.za-fig .cog { fill: var(--warn); }
+.za-fig text { fill: var(--muted); font: 500 11px var(--font-mono); }
+.za-fig text.em { fill: var(--signal); font-weight: 600; }
 .stand { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); text-shadow: 0 0 8px var(--bg); }
 .tile {
   display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; text-decoration: none; color: var(--ink);
@@ -251,7 +275,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   background: var(--signal); color: var(--signal-ink); font-weight: 600; font-size: 15px; text-decoration: none;
 }
 .btn-back::before { content: "←"; }
-@media (max-width: 900px) { .tiles { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } .tile { min-height: 0; } }
 @media (prefers-reduced-motion: reduce) { .tile:active { transform: none; } }
 
@@ -410,6 +433,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <h3>Achslasten LKW</h3>
         <p>Zulässiges Gesamtgewicht und Einträge für Ziffer 243 bei 2 bis 5 Achsen.</p>
         <span class="tile-meta">VTS Art. 95</span>
+        <span class="tile-go">Öffnen</span>
+      </a>
+      <a class="tile" href="#zentralachs">
+        <h3>Zentralachsanhänger</h3>
+        <p>Stützlast aus der Nutzlast, X-Wert der Ladefläche und Nutzlast bei 1 bis 3 Achsen.</p>
+        <span class="tile-meta">max. 10 % bzw. 1000 kg</span>
         <span class="tile-go">Öffnen</span>
       </a>
     </div>
@@ -658,6 +687,109 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Dreifachachse:</b> Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Nur ein Abstand darf über 1,40 m liegen. Sonst rechnet die App die drei Achsen als Doppelachse plus Einzelachse und nimmt die ungünstigere Aufteilung.</li>
           <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder alle betroffenen Antriebsachsen doppelbereift mit höchstens 9,5 t je Achse. Im zweiten Fall setzt die App diese Achsen auf 9500 kg, aber nur, wenn das ein höheres Gesamtgewicht ergibt.</li>
           <li>Nicht abgedeckt: Gesellschaftswagen (19,5 t), Gelenkbusse, unbegleiteter kombinierter Verkehr (44 t), Anfahrhilfen, land- und forstwirtschaftliche Fahrzeuge.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+  </section>
+
+  <!-- ===================== Zentralachsanhänger ===================== -->
+  <section class="panel" id="view-zentralachs" aria-labelledby="t-za" hidden>
+    <div class="panel-head">
+      <h2 id="t-za">Zentralachsanhänger</h2>
+      <span class="eyebrow">Stützlast · Lage Ladefläche · Nutzlast</span>
+    </div>
+
+    <form id="za" novalidate>
+      <div class="lk-top za-top">
+        <div class="field">
+          <span class="row-label" id="za-n-label">Anzahl Achsen</span>
+          <div class="modes za-n" role="radiogroup" aria-labelledby="za-n-label" id="za-n">
+            <button type="button" role="radio" data-n="1">1</button>
+            <button type="button" role="radio" data-n="2">2</button>
+            <button type="button" role="radio" data-n="3">3</button>
+          </div>
+        </div>
+        <div class="field" id="f-za-gg">
+          <label for="za-gg">Gesamtgewicht</label>
+          <div class="input-unit"><input id="za-gg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+          <span class="err" hidden></span>
+        </div>
+        <div class="field" id="f-za-lg">
+          <label for="za-lg">Leergewicht</label>
+          <div class="input-unit"><input id="za-lg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+          <span class="err" hidden></span>
+        </div>
+        <div class="field">
+          <span class="row-label">Nutzlast</span>
+          <output class="val za-nl" id="za-nl">–</output>
+        </div>
+      </div>
+
+      <div class="split lk-split">
+        <div class="in">
+          <div class="field" id="f-za-a">
+            <label for="za-a">Kugelpfanne bis 1. Achse</label>
+            <div class="input-unit"><input id="za-a" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
+            <span class="err" hidden></span>
+          </div>
+          <div class="row2 za-sp">
+            <div class="field" id="f-za-s1">
+              <label for="za-s1">Achsabstand 1.–2. Achse</label>
+              <div class="input-unit"><input id="za-s1" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
+              <span class="err" hidden></span>
+            </div>
+            <div class="field" id="f-za-s2">
+              <label for="za-s2">Achsabstand 2.–3. Achse</label>
+              <div class="input-unit"><input id="za-s2" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
+              <span class="err" hidden></span>
+            </div>
+          </div>
+          <div class="field" id="f-za-b">
+            <label for="za-b">Mitte Achsaggregat bis Ende Ladefläche</label>
+            <div class="input-unit"><input id="za-b" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
+            <span class="hint" id="za-b-hint">Bei einer Achse: von der Achse bis zum hinteren Ende der Ladefläche</span>
+            <span class="err" hidden></span>
+          </div>
+          <div class="field" id="f-za-li">
+            <label for="za-li">Ladeflächen-Innenlänge</label>
+            <div class="input-unit"><input id="za-li" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
+            <span class="err" hidden></span>
+          </div>
+          <div class="za-fig" aria-hidden="true"><svg id="za-svg" viewBox="0 0 600 150" preserveAspectRatio="xMidYMid meet"></svg></div>
+        </div>
+
+        <div class="out" aria-live="polite">
+          <span class="answer-label">Stützlast aus der Nutzlast</span>
+          <div class="answer" id="za-s">–</div>
+          <span class="status" id="za-status" hidden></span>
+          <dl class="kv">
+            <dt>X-Wert <small style="display:block;font-size:12px">Mitte Ladefläche zu Mitte Achsaggregat</small></dt><dd class="big" id="za-x">–</dd>
+            <dt>Lage</dt><dd id="za-xdir">–</dd>
+            <dt>L (Kugelpfanne bis Mitte Achsaggregat)</dt><dd id="za-l">–</dd>
+            <dt>Nutzlast</dt><dd id="za-nl2">–</dd>
+            <dt>Anteil am Gesamtgewicht</dt><dd id="za-pct">–</dd>
+            <dt>Richtwert Zentralachsanhänger <small style="display:block;font-size:12px">10 % GG, höchstens 1000 kg</small></dt><dd id="za-lim">–</dd>
+          </dl>
+          <ul class="warns" id="za-warns" hidden></ul>
+          <details class="more" id="more-zaweg" style="border-top:0">
+            <summary style="padding-inline:0">Rechenweg anzeigen</summary>
+            <div class="formula" id="za-formula"></div>
+          </details>
+        </div>
+      </div>
+    </form>
+
+    <details class="more" id="more-za">
+      <summary>Grundlage und Annahmen</summary>
+      <div class="notes">
+        <ul>
+          <li><b>Nutzlast</b> = Gesamtgewicht − Leergewicht.</li>
+          <li><b>L</b> = Kugelpfanne bis Mitte Achsaggregat. Die Mitte liegt zwischen erster und letzter Achse, bei einer Achse auf der Achse.</li>
+          <li><b>X-Wert</b> = Mitte Achsaggregat bis Ende Ladefläche − Innenlänge / 2. Negativ heisst: Die Ladeflächenmitte liegt vor dem Achsaggregat, Richtung Zugfahrzeug.</li>
+          <li><b>Stützlast aus der Nutzlast</b> = Nutzlast · (Innenlänge / 2 − Mitte Achsaggregat bis Ende Ladefläche) / L. Die Nutzlast ist dabei gleichmässig über die Innenlänge verteilt.</li>
+          <li>Die Stützlast des leeren Anhängers ist nicht enthalten. Für die gesamte Stützlast kommt sie dazu.</li>
+          <li>Richtwert: Bei einem Zentralachsanhänger beträgt die Stützlast höchstens 10 % des Gesamtgewichts bzw. 1000 kg (der kleinere Wert). Die zulässige Stützlast von Kupplung und Zugfahrzeug gilt zusätzlich.</li>
         </ul>
       </div>
     </details>
@@ -1179,6 +1311,132 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   });
   (function () { var s = Number(load("lk-n")); lkSetN(s >= 2 && s <= 5 ? s : lkDefaults.n); })();
 
+  /* ---------------- Zentralachsanhänger ---------------- */
+  var zaDef = { n: 2, gg: "3500", lg: "900", a: "3000", s1: "800", s2: "800", b: "1700", li: "4000" };
+  var zaN = zaDef.n;
+  ["gg", "lg", "a", "s1", "s2", "b", "li"].forEach(function (k) {
+    var id = "za-" + k, el = $(id), s = load(id);
+    el.value = (s !== null) ? s : zaDef[k];
+    el.addEventListener("input", function () { store(id, el.value); computeZA(); });
+    el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
+  });
+  function zaSetN(n) {
+    zaN = n; store("za-n", String(n));
+    document.querySelectorAll("#za-n button").forEach(function (b) {
+      var on = Number(b.dataset.n) === n;
+      b.setAttribute("aria-checked", on ? "true" : "false");
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    $("f-za-s1").hidden = n < 2;
+    $("f-za-s2").hidden = n < 3;
+    $("za-b-hint").textContent = n === 1 ? "Von der Achse bis zum hinteren Ende der Ladefläche" : "Von der Mitte zwischen erster und letzter Achse bis zum hinteren Ende der Ladefläche";
+    computeZA();
+  }
+  document.querySelectorAll("#za-n button").forEach(function (b) {
+    b.addEventListener("click", function () { zaSetN(Number(b.dataset.n)); });
+  });
+  $("za").addEventListener("submit", function (e) { e.preventDefault(); });
+
+  // Reine Rechenfunktion (alle Längen in mm, Gewichte in kg)
+  function zaCalc(p) {
+    var axles = [p.a];
+    if (p.n >= 2) axles.push(p.a + p.s1);
+    if (p.n >= 3) axles.push(p.a + p.s1 + p.s2);
+    var first = axles[0], last = axles[axles.length - 1];
+    var L = (first + last) / 2;                 // Mitte Achsaggregat
+    var xEnd = L + p.b, xStart = xEnd - p.li, xC = xEnd - p.li / 2;
+    var X = xC - L;                             // = b − Li/2 ; negativ = vor dem Aggregat
+    var nl = p.gg - p.lg;
+    var S = nl * (L - xC) / L;                  // = nl · (Li/2 − b) / L
+    return { axles: axles, L: L, xEnd: xEnd, xStart: xStart, xC: xC, X: X, nl: nl, S: S };
+  }
+
+  function zaDraw(p, r) {
+    var svg = $("za-svg");
+    var minX = Math.min(0, r.xStart), maxX = Math.max(r.xEnd, r.axles[r.axles.length - 1]);
+    var span = maxX - minX || 1, W = 600, pad = 24, k = (W - 2 * pad) / span;
+    var X = function (mm) { return pad + (mm - minX) * k; };
+    var gy = 112, wr = 13, deckY = 62, deckH = 18;
+    var s = "";
+    s += '<line class="ground" x1="0" y1="' + (gy + wr) + '" x2="' + W + '" y2="' + (gy + wr) + '"/>';
+    s += '<line class="bar" x1="' + X(0) + '" y1="' + (deckY + deckH - 4) + '" x2="' + X(Math.max(r.xStart, r.axles[0] - 600)) + '" y2="' + (deckY + deckH - 4) + '"/>';
+    s += '<rect class="body" x="' + X(r.xStart) + '" y="' + deckY + '" width="' + Math.max(2, (r.xEnd - r.xStart) * k) + '" height="' + deckH + '" rx="2"/>';
+    r.axles.forEach(function (ax) {
+      s += '<circle class="wheel" cx="' + X(ax) + '" cy="' + gy + '" r="' + wr + '"/><circle class="hub" cx="' + X(ax) + '" cy="' + gy + '" r="4"/>';
+      s += '<line class="dim" x1="' + X(ax) + '" y1="' + (deckY + deckH) + '" x2="' + X(ax) + '" y2="' + (gy - wr) + '"/>';
+    });
+    s += '<circle class="ball" cx="' + X(0) + '" cy="' + (deckY + deckH - 4) + '" r="5"/>';
+    // Mitte Achsaggregat und Mitte Ladefläche
+    s += '<line class="mark" x1="' + X(r.L) + '" y1="22" x2="' + X(r.L) + '" y2="' + (gy + wr) + '"/>';
+    s += '<path class="cog" d="M' + X(r.xC) + ' ' + (deckY - 2) + ' l-6 -10 h12 z"/>';
+    // Masslinien oben
+    s += '<line class="dim" x1="' + X(0) + '" y1="30" x2="' + X(r.L) + '" y2="30"/>';
+    s += '<text x="' + ((X(0) + X(r.L)) / 2) + '" y="26" text-anchor="middle">L ' + kg(r.L) + '</text>';
+    s += '<line class="dim" x1="' + X(r.L) + '" y1="48" x2="' + X(r.xC) + '" y2="48"/>';
+    s += '<text class="em" x="' + X(r.xC) + '" y="44" text-anchor="' + (r.X < 0 ? "end" : "start") + '">X ' + (r.X < 0 ? "−" : "+") + kg(Math.abs(r.X)) + '</text>';
+    s += '<text x="' + ((X(r.xStart) + X(r.xEnd)) / 2) + '" y="' + (deckY + deckH + 14) + '" text-anchor="middle">Innenlänge ' + kg(p.li) + '</text>';
+    svg.innerHTML = s;
+  }
+
+  function computeZA() {
+    var v = {}, ok = true;
+    function get(k, opts) {
+      var r = parseVal($("za-" + k), opts); showErr($("f-za-" + k), r);
+      ok = ok && r.ok; v[k] = r.ok ? r.v : 0;
+    }
+    get("gg", { positive: true }); get("lg", { positive: true });
+    get("a", { positive: true });
+    if (zaN >= 2) get("s1", { positive: true }); else { v.s1 = 0; showErr($("f-za-s1"), { ok: true }); }
+    if (zaN >= 3) get("s2", { positive: true }); else { v.s2 = 0; showErr($("f-za-s2"), { ok: true }); }
+    get("b"); get("li", { positive: true });
+
+    var clear = function () {
+      ["za-s", "za-x", "za-xdir", "za-l", "za-nl2", "za-pct", "za-lim"].forEach(function (id) { $(id).textContent = "–"; });
+      $("za-status").hidden = true; $("za-warns").hidden = true; $("za-formula").textContent = ""; $("za-svg").innerHTML = "";
+    };
+    if (v.gg && v.lg && v.gg > v.lg) $("za-nl").textContent = kg(v.gg - v.lg) + " kg"; else $("za-nl").textContent = "–";
+    if (!ok) return clear();
+
+    var warns = [];
+    if (v.lg >= v.gg) { warns.push("Leergewicht ist gleich gross wie oder grösser als das Gesamtgewicht."); }
+    var p = { n: zaN, gg: v.gg, lg: v.lg, a: v.a, s1: v.s1, s2: v.s2, b: v.b, li: v.li };
+    var r = zaCalc(p);
+    if (r.xStart < 0) warns.push("Die Ladefläche würde vor der Kugelpfanne beginnen. Bitte Masse prüfen.");
+    if (r.xEnd < r.axles[r.axles.length - 1]) warns.push("Die Ladefläche endet vor der letzten Achse. Bitte Masse prüfen.");
+
+    var S = r.S, lim = Math.min(0.10 * v.gg, 1000);
+    $("za-s").innerHTML = (S < 0 ? "−" : "") + kg(Math.abs(Math.round(S))) + " <small>kg</small>";
+    $("za-x").textContent = (r.X < 0 ? "−" : r.X > 0 ? "+" : "±") + kg(Math.abs(r.X)) + " mm";
+    $("za-xdir").textContent = r.X < 0 ? "vor dem Achsaggregat (Richtung Kupplung)" : r.X > 0 ? "hinter dem Achsaggregat" : "genau über dem Achsaggregat";
+    $("za-l").textContent = kg(r.L) + " mm";
+    $("za-nl2").textContent = kg(r.nl) + " kg";
+    $("za-pct").textContent = fmt(S / v.gg * 100, 1) + " %";
+    $("za-lim").textContent = kg(lim) + " kg";
+
+    var st = $("za-status");
+    st.hidden = false;
+    if (S < 0) { st.className = "status warn"; st.textContent = "Negative Stützlast: Deichsel wird angehoben"; }
+    else if (S > lim + 1e-9) { st.className = "status warn"; st.textContent = "Über dem Richtwert um " + kg(Math.round(S - lim)) + " kg"; }
+    else { st.className = "status ok"; st.textContent = "Innerhalb des Richtwerts"; }
+
+    $("za-warns").innerHTML = warns.map(function (w) { return "<li>" + w + "</li>"; }).join("");
+    $("za-warns").hidden = !warns.length;
+
+    var axTxt = r.axles.map(function (x, i) { return (i + 1) + ". Achse " + kg(x); }).join(", ");
+    $("za-formula").innerHTML =
+      '<span class="k">Achsen ab Kugelpfanne: ' + axTxt + ' mm</span>\n' +
+      '<span class="k">Nutzlast = GG − LG</span>\n' +
+      "         = " + kg(v.gg) + " − " + kg(v.lg) + " = " + kg(r.nl) + " kg\n" +
+      '<span class="k">L        = Mitte zwischen erster und letzter Achse</span>\n' +
+      "         = " + kg(r.L) + " mm\n" +
+      '<span class="k">X        = b − Li / 2</span>\n' +
+      "         = " + kg(v.b) + " − " + kg(v.li / 2) + " = " + (r.X < 0 ? "−" : "") + kg(Math.abs(r.X)) + " mm\n" +
+      '<span class="k">Stützlast = Nutzlast · (Li / 2 − b) / L = Nutzlast · (−X) / L</span>\n' +
+      "         = " + kg(r.nl) + " · " + (r.X > 0 ? "−" : "") + kg(Math.abs(r.X)) + " / " + kg(r.L) + " = " + fmt(S, 1) + " kg";
+    zaDraw(p, r);
+  }
+  (function () { var s = Number(load("za-n")); zaSetN(s >= 1 && s <= 3 ? s : zaDef.n); })();
+
   /* ---------------- Aufklappbereiche merken ---------------- */
   document.querySelectorAll("details.more").forEach(function (d) {
     if (load("open-" + d.id) === "1") d.open = true;
@@ -1186,8 +1444,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   });
 
   /* ---------------- Navigation ---------------- */
-  var views = ["start", "kupplung", "felgen", "achslasten"];
-  var titles = { start: "Verkehrsrechner", kupplung: "Anhängerkupplung · Verkehrsrechner", felgen: "Felgen und Spur · Verkehrsrechner", achslasten: "Achslasten LKW · Verkehrsrechner" };
+  var views = ["start", "kupplung", "felgen", "achslasten", "zentralachs"];
+  var titles = { start: "Verkehrsrechner", kupplung: "Anhängerkupplung · Verkehrsrechner", felgen: "Felgen und Spur · Verkehrsrechner", achslasten: "Achslasten LKW · Verkehrsrechner", zentralachs: "Zentralachsanhänger · Verkehrsrechner" };
   var current = null;
   function show(h) {
     if (views.indexOf(h) < 0) h = "start";
