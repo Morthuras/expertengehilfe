@@ -1638,15 +1638,15 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     // Achslasten beladen
     var rows = '<tr><th>Achse</th><th class="r">leer</th><th class="r">+ Sattellast</th><th class="r">beladen</th><th class="r">zulässig</th><th></th></tr>';
     var allOk = true;
-    function row(label, leer, add, lim, why, cls) {
+    function row(label, leer, add, lim, why, cls, ohneLeer) {
       var bel = leer + add, okk = bel <= lim + 0.5; if (!okk) allOk = false;
-      return '<tr class="' + (cls || "") + '"><td>' + label + '</td><td class="r">' + kg(leer) + '</td><td class="r">' + kg(Math.round(add)) + '</td><td class="r">' + kg(Math.round(bel)) +
+      return '<tr class="' + (cls || "") + '"><td>' + label + '</td><td class="r">' + (ohneLeer ? "" : kg(leer)) + '</td><td class="r">' + kg(Math.round(add)) + '</td><td class="r">' + kg(Math.round(bel)) +
         '</td><td class="r" title="' + why + '">' + kg(lim) + '</td><td class="' + (okk ? "ok" : "bad") + '">' + (okk ? "✓" : "über " + kg(Math.round(bel - lim))) + '</td></tr>';
     }
     rows += row("1. Achse (vorne)", ax[0].leer, S * fF, L.lim[0].v, L.lim[0].why);
     rear.forEach(function (i) { rows += row((i + 1) + ". Achse", ax[i].leer, S * fR / rear.length, L.lim[i].v, L.lim[i].why); });
     if (L.grp) rows += row("2.+3. Achse (Doppelachse, " + fmt(L.grp.sp / 1000, 2) + " m, " + L.grp.ref.replace("Abs. 2 ", "") + ")", leerRear, S * fR, L.grp.v,
-      L.grp.v < L.grp.lim ? "Summe Einzelachsen" : "VTS Art. 95 " + L.grp.ref);
+      L.grp.v < L.grp.lim ? "Summe Einzelachsen" : "VTS Art. 95 " + L.grp.ref, "", true);
     rows += row("Gesamt", leerTot, S, L.gg.v, L.gg.why, "sum");
     $("ss-tbl").innerHTML = rows;
 
