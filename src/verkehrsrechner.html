@@ -1,0 +1,1213 @@
+<title>Verkehrsrechner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: kompakte Kopfzeile mit Rechner-Umschalter; im Querformat Eingaben links, Resultate rechts auf einem Bildschirm, Vorder- und Hinterachse als Spalten nebeneinander. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --ink: #142233;
+  --muted: #5a6878;
+  --line: #d8dee6;
+  --signal: #0b57a4;        /* Signalblau, wie Hinweistafeln */
+  --signal-soft: #e3edf8;
+  --signal-ink: #ffffff;
+  --warn: #a8321f;
+  --warn-soft: #fbe7e3;
+  --ok: #1f7a4a;
+  --ok-soft: #e1f3e8;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151d; --surface: #17202b; --ink: #e6ecf3; --muted: #9aa8b8; --line: #2a3644;
+    --signal: #5ea2e8; --signal-soft: #1a2c42; --signal-ink: #0b1622;
+    --warn: #f08a76; --warn-soft: #3a1d18; --ok: #5cc98e; --ok-soft: #15301f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151d; --surface: #17202b; --ink: #e6ecf3; --muted: #9aa8b8; --line: #2a3644;
+  --signal: #5ea2e8; --signal-soft: #1a2c42; --signal-ink: #0b1622;
+  --warn: #f08a76; --warn-soft: #3a1d18; --ok: #5cc98e; --ok-soft: #15301f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap {
+  max-width: 1400px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px 28px;
+  display: grid; gap: 14px;
+}
+
+/* Kopfzeile */
+header.app { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.mark {
+  width: 34px; height: 34px; border-radius: 6px; background: var(--signal);
+  color: var(--signal-ink); display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 18px;
+}
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 23px; letter-spacing: .01em; }
+
+nav.tools {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px;
+}
+nav.tools a {
+  text-decoration: none; color: var(--muted); font-weight: 600; font-size: 15px; text-align: center;
+  padding: 10px 18px; border-radius: 7px; min-height: 46px; display: grid; place-items: center; white-space: nowrap;
+}
+nav.tools a[aria-current="page"] { background: var(--signal); color: var(--signal-ink); }
+nav.tools a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--signal); outline-offset: 2px; }
+
+/* Panel */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.panel-head { padding: 16px 20px 14px; display: flex; align-items: baseline; justify-content: space-between; gap: 6px 16px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.panel-head h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 24px; text-wrap: balance; }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; }
+.split > * { padding: 20px; min-width: 0; display: grid; gap: 16px; align-content: start; }
+.split > * + * { border-left: 1px solid var(--line); }
+.split > .out { background: color-mix(in srgb, var(--bg) 45%, var(--surface)); border-radius: 0 0 12px 0; }
+
+.modes {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 4px; gap: 4px;
+}
+.modes button {
+  font: 600 15px/1.2 var(--font-body); color: var(--muted); background: transparent;
+  border: 0; border-radius: 6px; padding: 10px; cursor: pointer; min-height: 48px;
+}
+.modes button[aria-selected="true"] { background: var(--signal); color: var(--signal-ink); }
+
+/* Eingaben */
+.field { display: grid; gap: 6px; }
+.field label, .row-label { font-weight: 600; font-size: 14px; }
+.hint { color: var(--muted); font-size: 13px; }
+.input-unit { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; min-width: 0; }
+.input-unit:focus-within { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.input-unit input {
+  flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink);
+  font: 500 21px/1 var(--font-mono); font-variant-numeric: tabular-nums;
+  padding: 12px; min-height: 54px; outline: none;
+}
+.input-unit .unit {
+  display: grid; place-items: center; padding: 0 12px; background: var(--bg);
+  color: var(--muted); font: 500 14px var(--font-mono); border-left: 1px solid var(--line);
+}
+.invalid .input-unit { border-color: var(--warn); }
+.err { color: var(--warn); font-size: 13px; }
+
+/* Resultate */
+.answer-label { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.answer {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(44px, 7vw, 64px);
+  line-height: 1; color: var(--signal); font-variant-numeric: tabular-nums;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+}
+.answer small { font-family: var(--font-mono); font-weight: 500; font-size: 18px; color: var(--muted); }
+.answer-note { font-size: 14px; color: var(--muted); margin: 0; }
+
+.status {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  font-size: 13.5px; font-weight: 600; background: var(--signal-soft); color: var(--signal); justify-self: start;
+}
+.status.warn { background: var(--warn-soft); color: var(--warn); }
+.status.ok { background: var(--ok-soft); color: var(--ok); }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+
+.formula {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px;
+  font: 400 13px/1.7 var(--font-mono); font-variant-numeric: tabular-nums; overflow-x: auto; white-space: pre;
+}
+.formula .k { color: var(--muted); }
+
+details.more { border-top: 1px solid var(--line); }
+details.more > summary {
+  cursor: pointer; list-style: none; padding: 14px 20px; font-weight: 600; font-size: 14px; color: var(--signal);
+  display: flex; align-items: center; gap: 8px; min-height: 48px;
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "▸"; transition: transform .15s; }
+details.more[open] > summary::before { transform: rotate(90deg); }
+.notes { padding: 0 20px 18px; color: var(--muted); font-size: 13.5px; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 90ch; }
+.notes b { color: var(--ink); font-weight: 600; }
+
+/* Felgen: Tabelle mit Spalten Bezeichnung | VA | HA */
+.axgrid {
+  display: grid; grid-template-columns: minmax(120px, .9fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 12px; align-items: center;
+}
+.axgrid .head { font: 700 13px var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.axgrid .head .tag { font: 600 12px var(--font-mono); letter-spacing: 0; color: var(--signal-ink); background: var(--signal); border-radius: 4px; padding: 2px 6px; }
+.axgrid .sec {
+  grid-column: 1 / -1; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+  font-weight: 600; padding: 8px 0 4px; border-bottom: 1px solid var(--line);
+}
+.axgrid .sec:first-of-type { padding-top: 0; }
+.axgrid .cell { display: grid; gap: 4px; min-width: 0; }
+.axgrid .row-label small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.axgrid .val {
+  font: 500 19px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--signal);
+  padding: 9px 12px; border-radius: 8px; background: var(--signal-soft); min-width: 0;
+}
+.axgrid .val + .hint { font-size: 12.5px; }
+.axgrid .num { font: 500 17px var(--font-mono); font-variant-numeric: tabular-nums; min-width: 0; }
+.axgrid .num.big { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 3.6vw, 40px); color: var(--signal); line-height: 1; }
+.axgrid .num small { display: block; font-size: 13px; color: var(--muted); }
+.axgrid .cell .status { white-space: normal; }
+
+.formulas { display: grid; gap: 10px; }
+.formulas .fl { display: grid; gap: 4px; }
+.formulas .fl b { font-size: 13px; }
+
+/* Querformat-Tablet und PC: alles nebeneinander */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .axgrid { grid-template-columns: minmax(104px, .75fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 10px; }
+  .input-unit input { font-size: 19px; padding: 10px; }
+  .input-unit .unit { padding: 0 9px; font-size: 13px; }
+}
+
+/* Hochformat und Telefon: untereinander */
+@media (max-width: 760px) {
+  .split { grid-template-columns: 1fr; }
+  .split > * + * { border-left: 0; border-top: 1px solid var(--line); }
+  .split > .out { border-radius: 0; }
+  .axgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 10px; }
+  .axgrid .corner { display: none; }
+  .axgrid .row-label { grid-column: 1 / -1; padding-top: 6px; }
+  nav.tools { width: 100%; }
+}
+@media (max-width: 420px) {
+  .input-unit input { font-size: 18px; padding: 10px; }
+  .input-unit .unit { padding: 0 8px; }
+  nav.tools a { padding: 8px 6px; font-size: 13.5px; white-space: normal; line-height: 1.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  details.more > summary::before { transition: none; }
+}
+
+/* Hintergrund: ganzes Bild, auf der Startseite deutlich, in den Rechnern zurückhaltend */
+.backdrop {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  /* Querformat: Bild füllt die Breite, Berge oben bleiben sichtbar */
+  background: url("hintergrund.jpg") center 35% / cover no-repeat;
+  mix-blend-mode: multiply; opacity: .9;
+}
+@media (orientation: portrait) { .backdrop { background-position: 40% 60%; } }
+/* Nur auf der Startseite */
+body[data-view]:not([data-view="start"]) .backdrop { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .backdrop { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; opacity: .45; }
+}
+:root[data-theme="dark"] .backdrop { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; opacity: .45; }
+.wrap { position: relative; z-index: 1; }
+
+/* Startseite */
+a.brand { text-decoration: none; color: inherit; border-radius: 8px; }
+a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+.start-head { display: grid; gap: 4px; padding: 6px 0 4px; }
+.start-head h2, .start-head p { text-shadow: 0 0 12px var(--bg), 0 0 4px var(--bg); }
+.start-head h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 30px; }
+.start-head p { margin: 0; color: var(--muted); max-width: 65ch; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tile {
+  display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; text-decoration: none; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; min-height: 180px;
+}
+.tile:hover { border-color: var(--signal); }
+.tile:active { transform: scale(.99); }
+.tile-tag {
+  justify-self: start; min-width: 48px; height: 48px; padding: 0 10px; border-radius: 8px; background: var(--signal); color: var(--signal-ink);
+  display: grid; place-items: center; font: 700 22px var(--font-display);
+}
+.tile h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 24px; }
+.tile p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.tile-meta { font: 500 12.5px var(--font-mono); color: var(--muted); }
+.tile-go {
+  display: flex; justify-content: center; align-items: center; min-height: 48px; border-radius: 8px;
+  background: var(--signal-soft); color: var(--signal); font-weight: 600; font-size: 15px;
+}
+.tile-go::after { content: "→"; margin-left: 8px; }
+.back { padding: 16px 20px 20px; border-top: 1px solid var(--line); }
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 8px;
+  background: var(--signal); color: var(--signal-ink); font-weight: 600; font-size: 15px; text-decoration: none;
+}
+.btn-back::before { content: "←"; }
+@media (max-width: 900px) { .tiles { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } .tile { min-height: 0; } }
+@media (prefers-reduced-motion: reduce) { .tile:active { transform: none; } }
+
+/* Achslasten */
+.modes.n4 { grid-template-columns: repeat(4, 1fr); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.select {
+  width: 100%; min-height: 54px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  color: var(--ink); font: 500 16px var(--font-body); padding: 0 12px;
+}
+.axles { display: grid; gap: 0; }
+.axle { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 8px 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.axle-n { display: grid; gap: 2px; justify-items: start; }
+.axle-n .tag { font: 700 18px var(--font-display); color: var(--signal-ink); background: var(--signal); border-radius: 6px; min-width: 34px; height: 34px; display: grid; place-items: center; padding: 0 6px; }
+.axle-n span:last-child { font-size: 12px; color: var(--muted); }
+.axle-body { display: grid; grid-template-columns: minmax(130px, 1fr) auto; gap: 8px; align-items: center; min-width: 0; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip span {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 13.5px; font-weight: 600; cursor: pointer; user-select: none;
+}
+.chip span::before { content: ""; width: 14px; height: 14px; border-radius: 4px; border: 2px solid currentColor; flex: none; }
+.chip input:checked + span { background: var(--signal-soft); border-color: var(--signal); color: var(--signal); }
+.chip input:checked + span::before { background: currentColor; box-shadow: inset 0 0 0 2px var(--signal-soft); }
+.chip input:focus-visible + span { outline: 3px solid var(--signal); outline-offset: 2px; }
+.spacing { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 12px; align-items: center; padding: 6px 0 8px; }
+.spacing .lbl { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.2; }
+.spacing .lbl::before { content: "↕"; display: block; font-size: 16px; color: var(--signal); }
+.spacing .input-unit { max-width: 260px; }
+.spacing .input-unit input { font-size: 17px; min-height: 44px; padding: 8px 10px; }
+.spacing .grp { font-size: 12.5px; color: var(--muted); }
+.spacing-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.cands { display: grid; gap: 6px; }
+.cand { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+.cand.gov { border-color: var(--signal); box-shadow: inset 3px 0 0 var(--signal); }
+.cand .t { font-size: 14px; font-weight: 600; }
+.cand .t small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.cand .v { font: 500 17px var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+.cand.gov .v { color: var(--signal); }
+
+.z243 { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.z243-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-bottom: 1px solid var(--line); }
+.z243-head b { font-family: var(--font-display); font-size: 18px; }
+.btn {
+  font: 600 14px var(--font-body); color: var(--signal); background: var(--signal-soft); border: 0; border-radius: 7px;
+  min-height: 40px; padding: 0 14px; cursor: pointer;
+}
+.z243 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.z243 td { padding: 7px 14px; border-top: 1px solid var(--line); font-size: 14.5px; }
+.z243 tr:first-child td { border-top: 0; }
+.z243 td.kg { text-align: right; font-family: var(--font-mono); white-space: nowrap; }
+.z243 tr.grp td { font-weight: 600; }
+.z243 td small { color: var(--muted); font-weight: 400; }
+.warns { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--warn); font-size: 13.5px; }
+.tbl-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { padding: 6px 8px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
+.tbl th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-top: 0; }
+.tbl td.r, .tbl th.r { text-align: right; font-family: var(--font-mono); white-space: nowrap; }
+
+/* Achslasten: Kopfzeile mit Grunddaten, darunter Achstabelle | Resultate */
+.lk-top {
+  display: grid; grid-template-columns: minmax(200px, 1.1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 16px; padding: 16px 20px; border-bottom: 1px solid var(--line); align-items: start;
+}
+.lk-top .hint { font-weight: 400; }
+.lk-split { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+
+.axtab { --axcols: 36px minmax(120px, 1.4fr) repeat(3, minmax(58px, .7fr)); display: grid; }
+.axhead, .axrow, .sprow { display: grid; grid-template-columns: var(--axcols); gap: 8px; align-items: center; }
+.axhead { padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.axhead span { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); text-align: center; line-height: 1.2; hyphens: manual; }
+.axhead span:nth-child(2) { text-align: left; }
+.axrow { padding: 6px 0; }
+.axno {
+  width: 36px; height: 36px; border-radius: 6px; background: var(--signal); color: var(--signal-ink);
+  display: grid; place-items: center; font: 700 18px var(--font-display);
+}
+.axrow .input-unit input { min-height: 48px; padding: 8px 10px; font-size: 19px; }
+.tog { position: relative; display: block; }
+.tog input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.tog span {
+  display: grid; place-items: center; height: 48px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer; color: transparent; font: 700 20px var(--font-body);
+}
+.tog span::before { content: "✓"; }
+.tog input:checked + span { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+.tog input:focus-visible + span { outline: 3px solid var(--signal); outline-offset: 2px; }
+.sprow { padding: 2px 0; }
+.sp-ico { text-align: center; color: var(--signal); font-size: 18px; }
+.input-unit.sm input { min-height: 38px; padding: 6px 10px; font-size: 16px; }
+.input-unit.sm .unit { font-size: 12.5px; padding: 0 9px; }
+.sprow .grp { grid-column: 3 / -1; font-size: 12px; color: var(--muted); line-height: 1.25; }
+
+/* Resultate kompakter im Querformat */
+@media (min-width: 761px) {
+  #view-achslasten .cands { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #view-achslasten .cand { grid-template-columns: 1fr; align-content: space-between; }
+  #view-achslasten .cand .v { text-align: left; }
+  #view-achslasten .answer { font-size: clamp(40px, 5vw, 56px); }
+  #view-achslasten .z243 td { padding: 5px 14px; }
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .lk-top { grid-template-columns: minmax(180px, 1.1fr) repeat(3, minmax(0, 1fr)); gap: 10px 12px; padding: 14px 16px; }
+  .lk-split > * { padding: 16px; }
+  .axtab { --axcols: 32px minmax(110px, 1.4fr) repeat(3, minmax(50px, .6fr)); }
+  .axno { width: 32px; height: 32px; font-size: 16px; }
+  #view-achslasten .cand .t small { display: none; }
+}
+@media (max-width: 760px) {
+  .lk-top { grid-template-columns: 1fr 1fr; }
+  .lk-top > .field:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .lk-top { grid-template-columns: 1fr; padding: 14px 16px; }
+  .axtab { --axcols: 30px minmax(0, 1fr) repeat(3, 48px); }
+  .axno { width: 30px; height: 30px; font-size: 15px; }
+  .axhead span { font-size: 10px; letter-spacing: 0; }
+  .axrow .input-unit input { font-size: 17px; }
+  .sprow .grp { grid-column: 2 / -1; }
+}
+</style>
+
+<div class="backdrop" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="app">
+    <a class="brand" href="#start" aria-label="Verkehrsrechner, zur Startseite">
+      <div class="mark" aria-hidden="true">V</div>
+      <h1>Verkehrsrechner</h1>
+    </a>
+  </header>
+
+  <!-- ===================== Startseite ===================== -->
+  <section id="view-start" aria-labelledby="t-start" hidden>
+    <div class="start-head">
+      <h2 id="t-start">Berechnung wählen</h2>
+      <p>Fahrzeugtechnik für die Prüfung und Eintragung. Die Eingaben bleiben auf diesem Gerät gespeichert.</p>
+    </div>
+    <div class="tiles">
+      <a class="tile" href="#kupplung">
+        <h3>Anhängerkupplung</h3>
+        <p>Mindest-D-Wert aus den Gesamtgewichten oder maximale Anhängelast aus dem D-Wert.</p>
+        <span class="tile-meta">UN ECE R55</span>
+        <span class="tile-go">Öffnen</span>
+      </a>
+      <a class="tile" href="#felgen">
+        <h3>Felgen und Spur</h3>
+        <p>Mindest-Einpresstiefe, Distanzscheiben und resultierende Spur für Vorder- und Hinterachse.</p>
+        <span class="tile-meta">höchstens 1 % pro Rad</span>
+        <span class="tile-go">Öffnen</span>
+      </a>
+      <a class="tile" href="#achslasten">
+        <h3>Achslasten LKW</h3>
+        <p>Zulässiges Gesamtgewicht und Einträge für Ziffer 243 bei 2 bis 5 Achsen.</p>
+        <span class="tile-meta">VTS Art. 95</span>
+        <span class="tile-go">Öffnen</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===================== Kupplung ===================== -->
+  <section class="panel" id="view-kupplung" aria-labelledby="t-kupplung">
+    <div class="panel-head">
+      <h2 id="t-kupplung">D-Wert und Anhängelast</h2>
+      <span class="eyebrow">Kupplung · UN ECE R55</span>
+    </div>
+
+    <form class="split" id="calc" novalidate>
+      <div class="in">
+        <div class="modes" role="tablist" aria-label="Berechnungsart">
+          <button type="button" role="tab" id="m-d" aria-selected="true" data-mode="d">Mindest-D-Wert</button>
+          <button type="button" role="tab" id="m-r" aria-selected="false" data-mode="r">Max. Anhängelast</button>
+        </div>
+
+        <div class="field" id="f-t">
+          <label for="in-t">Gesamtgewicht Zugfahrzeug (T)</label>
+          <div class="input-unit">
+            <input id="in-t" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" value="2500">
+            <span class="unit">kg</span>
+          </div>
+          <span class="hint">Zulässiges Gesamtgewicht laut Fahrzeugausweis</span>
+          <span class="err" hidden></span>
+        </div>
+
+        <div class="field" id="f-r">
+          <label for="in-r">Gesamtgewicht Anhänger (R)</label>
+          <div class="input-unit">
+            <input id="in-r" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" value="2000">
+            <span class="unit">kg</span>
+          </div>
+          <span class="hint">Zulässiges Gesamtgewicht laut Fahrzeugausweis</span>
+          <span class="err" hidden></span>
+        </div>
+
+        <div class="field" id="f-d" hidden>
+          <label for="in-d">D-Wert der Kupplung</label>
+          <div class="input-unit">
+            <input id="in-d" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" value="12">
+            <span class="unit">kN</span>
+          </div>
+          <span class="hint">Typenschild der Kupplung oder Kugelstange</span>
+          <span class="err" hidden></span>
+        </div>
+      </div>
+
+      <div class="out" aria-live="polite">
+        <span class="answer-label" id="res-label">Erforderlicher D-Wert, mindestens</span>
+        <div class="answer" id="res-value">–</div>
+        <span class="status warn" id="res-status" hidden></span>
+        <p class="answer-note" id="res-note"></p>
+        <div class="formula" id="res-formula" aria-label="Rechenweg"></div>
+      </div>
+    </form>
+
+    <details class="more" id="more-kupplung">
+      <summary>Grundlage und Formeln</summary>
+      <div class="notes">
+        <ul>
+          <li><b>D = g · T · R / (T + R)</b> in kN, mit T und R in Tonnen und g = 9,81 m/s².</li>
+          <li>Umgestellt nach der Anhängelast: <b>R = T · D / (g · T − D)</b>. Ist D ≥ g · T, begrenzt die Kupplung die Anhängelast nicht.</li>
+          <li>Der Mindest-D-Wert wird auf 0,01 kN aufgerundet, die maximale Anhängelast auf ganze kg abgerundet.</li>
+          <li>Gilt für Deichselanhänger. Für Zentralachsanhänger mit starrer Deichsel braucht es zusätzlich D<sub>c</sub> und den V-Wert. Die Anhängelast, die im Fahrzeugausweis eingetragen ist, gilt immer zusätzlich.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+  </section>
+
+  <!-- ===================== Felgen ===================== -->
+  <section class="panel" id="view-felgen" aria-labelledby="t-felgen" hidden>
+    <div class="panel-head">
+      <h2 id="t-felgen">Einpresstiefe und Spur</h2>
+      <span class="eyebrow">Räder · höchstens 1 % Spuränderung pro Rad</span>
+    </div>
+
+    <form class="split" id="felgen" novalidate>
+      <div class="in">
+        <div class="axgrid">
+          <span class="corner"></span>
+          <span class="head"><span class="tag">VA</span>Vorderachse</span>
+          <span class="head"><span class="tag">HA</span>Hinterachse</span>
+
+          <div class="sec">Typengenehmigung</div>
+
+          <label class="row-label" for="fg-va-s">Grösste Spur</label>
+          <div class="cell" data-f="va-s"><div class="input-unit"><input id="fg-va-s" data-ax="va" data-k="s" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="Grösste Spur Vorderachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+          <div class="cell" data-f="ha-s"><div class="input-unit"><input id="fg-ha-s" data-ax="ha" data-k="s" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="Grösste Spur Hinterachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+
+          <label class="row-label" for="fg-va-etref">Kleinste ET <small>bei dieser Spur</small></label>
+          <div class="cell" data-f="va-etref"><div class="input-unit"><input id="fg-va-etref" data-ax="va" data-k="etref" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="Kleinste ET Vorderachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+          <div class="cell" data-f="ha-etref"><div class="input-unit"><input id="fg-ha-etref" data-ax="ha" data-k="etref" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="Kleinste ET Hinterachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+
+          <span class="row-label">Mindest-ET der Felge</span>
+          <div class="cell"><output class="val" id="fg-va-etmin">–</output><span class="hint" id="fg-va-etminhint"></span></div>
+          <div class="cell"><output class="val" id="fg-ha-etmin">–</output><span class="hint" id="fg-ha-etminhint"></span></div>
+
+          <div class="sec">Neue Felge</div>
+
+          <label class="row-label" for="fg-va-etnew">ET der neuen Felge</label>
+          <div class="cell" data-f="va-etnew"><div class="input-unit"><input id="fg-va-etnew" data-ax="va" data-k="etnew" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="ET neue Felge Vorderachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+          <div class="cell" data-f="ha-etnew"><div class="input-unit"><input id="fg-ha-etnew" data-ax="ha" data-k="etnew" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="ET neue Felge Hinterachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+
+          <label class="row-label" for="fg-va-sp">Distanzscheibe <small>pro Rad, 0 = keine</small></label>
+          <div class="cell" data-f="va-sp"><div class="input-unit"><input id="fg-va-sp" data-ax="va" data-k="sp" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="Distanzscheibe Vorderachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+          <div class="cell" data-f="ha-sp"><div class="input-unit"><input id="fg-ha-sp" data-ax="ha" data-k="sp" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="Distanzscheibe Hinterachse"><span class="unit">mm</span></div><span class="err" hidden></span></div>
+
+          <span class="row-label">Resultierende Gesamt-ET</span>
+          <div class="cell"><output class="val" id="fg-va-eteff">–</output></div>
+          <div class="cell"><output class="val" id="fg-ha-eteff">–</output></div>
+        </div>
+      </div>
+
+      <div class="out" aria-live="polite">
+        <div class="axgrid">
+          <span class="corner"></span>
+          <span class="head"><span class="tag">VA</span>Vorderachse</span>
+          <span class="head"><span class="tag">HA</span>Hinterachse</span>
+
+          <div class="sec">Resultat</div>
+
+          <span class="row-label">Prüfung</span>
+          <div class="cell"><span class="status" id="fg-va-status" hidden></span></div>
+          <div class="cell"><span class="status" id="fg-ha-status" hidden></span></div>
+
+          <span class="row-label">Spuränderung pro Rad</span>
+          <div class="num" id="fg-va-dwheel">–</div>
+          <div class="num" id="fg-ha-dwheel">–</div>
+
+          <span class="row-label">Zulässig pro Rad <small>1 % der Spur</small></span>
+          <div class="num" id="fg-va-dmax">–</div>
+          <div class="num" id="fg-ha-dmax">–</div>
+
+          <span class="row-label">Resultierende Spur</span>
+          <div class="num big" id="fg-va-track">–</div>
+          <div class="num big" id="fg-ha-track">–</div>
+        </div>
+
+        <details class="more" id="more-rechenweg" style="border-top:0">
+          <summary style="padding-inline:0">Rechenweg anzeigen</summary>
+          <div class="formulas">
+            <div class="fl"><b>Vorderachse</b><div class="formula" id="fg-va-formula"></div></div>
+            <div class="fl"><b>Hinterachse</b><div class="formula" id="fg-ha-formula"></div></div>
+          </div>
+        </details>
+      </div>
+    </form>
+
+    <details class="more" id="more-felgen">
+      <summary>Grundlage und Formeln</summary>
+      <div class="notes">
+        <ul>
+          <li>Referenz ist die <b>grösste Spur</b> aus der Typengenehmigung zusammen mit der <b>kleinsten dort aufgeführten ET</b>.</li>
+          <li>Gesamt-ET = ET der Felge − Dicke der Distanzscheibe. Eine kleinere ET schiebt das Rad nach aussen.</li>
+          <li>Spuränderung pro Rad = ET<sub>Referenz</sub> − Gesamt-ET. Zulässig sind höchstens <b>1 % der Referenzspur</b> pro Rad.</li>
+          <li>Mindest-ET der Felge = ET<sub>Referenz</sub> − 1 % · Spur + Distanzscheibe. Felgen-ETs gibt es in ganzen mm, deshalb steht darunter auch der aufgerundete Wert.</li>
+          <li>Resultierende Spur = Referenzspur + 2 · Spuränderung pro Rad. Freigängigkeit, Radabdeckung und Tragfähigkeit prüft die App nicht.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+  </section>
+
+  <!-- ===================== Achslasten ===================== -->
+  <section class="panel" id="view-achslasten" aria-labelledby="t-achs" hidden>
+    <div class="panel-head">
+      <h2 id="t-achs">Achslasten und Gesamtgewicht</h2>
+      <span class="eyebrow">Lastwagen · VTS Art. 95 · Ziffer 243</span>
+    </div>
+
+    <form id="achs" novalidate>
+      <div class="lk-top">
+        <div class="field">
+          <span class="row-label" id="lk-n-label">Anzahl Achsen</span>
+          <div class="modes n4" role="radiogroup" aria-labelledby="lk-n-label" id="lk-n">
+            <button type="button" role="radio" data-n="2">2</button>
+            <button type="button" role="radio" data-n="3">3</button>
+            <button type="button" role="radio" data-n="4">4</button>
+            <button type="button" role="radio" data-n="5">5</button>
+          </div>
+        </div>
+
+        <div class="field" id="f-lk-gar">
+          <label for="lk-gar">Garantiegewicht <small class="hint">Herstellerschild</small></label>
+          <div class="input-unit"><input id="lk-gar" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off"><span class="unit">kg</span></div>
+          <span class="err" hidden></span>
+        </div>
+
+        <div class="field">
+          <label for="lk-alt">Antrieb</label>
+          <select id="lk-alt" class="select">
+            <option value="none">Konventionell</option>
+            <option value="alt">Alternativ (max. +1 t)</option>
+            <option value="zero">Emissionsfrei (max. +2 t)</option>
+          </select>
+        </div>
+        <div class="field" id="f-lk-mehr">
+          <label for="lk-mehr">Mehrgewicht Antrieb</label>
+          <div class="input-unit"><input id="lk-mehr" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+          <span class="err" hidden></span>
+        </div>
+      </div>
+
+      <div class="split lk-split">
+      <div class="in">
+        <div class="axtab" id="lk-axles"><!-- per Script --></div>
+      </div>
+
+      <div class="out" aria-live="polite">
+        <span class="answer-label">Zulässiges Gesamtgewicht</span>
+        <div class="answer" id="lk-gg">–</div>
+        <div class="cands" id="lk-cands"></div>
+        <ul class="warns" id="lk-warns" hidden></ul>
+
+        <div class="z243">
+          <div class="z243-head">
+            <b>Ziffer 243 · Achslasten max.</b>
+            <button type="button" class="btn" id="lk-copy">Text kopieren</button>
+          </div>
+          <table><tbody id="lk-243"></tbody></table>
+        </div>
+        <textarea id="lk-243txt" readonly hidden aria-label="Text Ziffer 243" style="width:100%;min-height:140px;font:13px var(--font-mono);border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);padding:10px"></textarea>
+
+        <details class="more" id="more-achsweg" style="border-top:0">
+          <summary style="padding-inline:0">Rechenweg anzeigen</summary>
+          <div class="tbl-wrap"><table class="tbl" id="lk-detail"></table></div>
+        </details>
+      </div>
+      </div>
+    </form>
+
+    <details class="more" id="more-achslasten">
+      <summary>Grundlage und Annahmen</summary>
+      <div class="notes">
+        <ul>
+          <li><b>Zulässiges Gesamtgewicht</b> = kleinster Wert aus Garantiegewicht, Grenzwert nach VTS Art. 95 Abs. 1 (plus Zuschlag nach Abs. 1<sup>bis</sup>/1<sup>ter</sup>) und Summe der zulässigen Achslasten.</li>
+          <li><b>Abs. 1:</b> 2 Achsen 18 t, 3 Achsen 25 t (26 t nach Bst. f), 4 Achsen 32 t, mehr als 4 Achsen 40 t. Alternativer Antrieb: plus Mehrgewicht, höchstens 1 t, emissionsfrei höchstens 2 t.</li>
+          <li><b>Einzelachsen (Abs. 2):</b> nicht angetrieben 10 t, angetrieben 11,5 t. Massgebend ist der kleinere Wert aus Herstellerschild und Grenzwert.</li>
+          <li><b>Doppel- und Dreifachachsen:</b> zulässig ist die Summe der zulässigen Einzelachslasten, höchstens aber der Grenzwert nach Art. 95 Abs. 2. Der kleinere Wert ist massgebend.</li>
+          <li><b>Achsgruppen:</b> Achsen mit weniger als 1,80 m Abstand bilden eine Gruppe. Doppelachse: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t, mit Bst. f 19 t.</li>
+          <li><b>Dreifachachse:</b> Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Nur ein Abstand darf über 1,40 m liegen. Sonst rechnet die App die drei Achsen als Doppelachse plus Einzelachse und nimmt die ungünstigere Aufteilung.</li>
+          <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder alle betroffenen Antriebsachsen doppelbereift mit höchstens 9,5 t je Achse. Im zweiten Fall setzt die App diese Achsen auf 9500 kg, aber nur, wenn das ein höheres Gesamtgewicht ergibt.</li>
+          <li>Nicht abgedeckt: Gesellschaftswagen (19,5 t), Gelenkbusse, unbegleiteter kombinierter Verkehr (44 t), Anfahrhilfen, land- und forstwirtschaftliche Fahrzeuge.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (n, d) {
+    return n.toLocaleString("de-CH", { minimumFractionDigits: d, maximumFractionDigits: d });
+  };
+  var sgn = function (n, d) { return (n > 0 ? "+" : n < 0 ? "−" : "±") + fmt(Math.abs(n), d); };
+  function store(k, v) { try { localStorage.setItem("vr-" + k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem("vr-" + k); } catch (e) { return null; } }
+
+  function parseVal(el, opts) {
+    opts = opts || {};
+    var raw = el.value.trim().replace(/['’\s]/g, "").replace(",", ".").replace("−", "-");
+    if (raw === "") {
+      if (opts.emptyAs !== undefined) return { ok: true, v: opts.emptyAs };
+      return { ok: false, msg: "Bitte einen Wert eingeben." };
+    }
+    var v = Number(raw);
+    if (!isFinite(v)) return { ok: false, msg: "Bitte nur eine Zahl eingeben." };
+    if (opts.positive && v <= 0) return { ok: false, msg: "Muss grösser als 0 sein." };
+    if (opts.nonneg && v < 0) return { ok: false, msg: "Darf nicht negativ sein." };
+    return { ok: true, v: v };
+  }
+  function showErr(field, res) {
+    var e = field.querySelector(".err");
+    field.classList.toggle("invalid", !res.ok);
+    e.hidden = res.ok;
+    e.textContent = res.ok ? "" : res.msg;
+  }
+
+  // Auf dem Tablet: beim Antippen ganzen Wert markieren, damit man direkt überschreiben kann
+  document.querySelectorAll("input").forEach(function (i) {
+    i.addEventListener("focus", function () { setTimeout(function () { try { i.select(); } catch (e) {} }, 0); });
+  });
+
+  /* ---------------- Kupplung ---------------- */
+  var G = 9.81;
+  var mode = "d";
+  function dValue(Tkg, Rkg) { var T = Tkg / 1000, R = Rkg / 1000; return G * T * R / (T + R); }
+  function maxTrailer(Tkg, D) {
+    var T = Tkg / 1000, denom = G * T - D;
+    return denom <= 0 ? Infinity : (T * D / denom) * 1000;
+  }
+  function kStatus(text) { var s = $("res-status"); s.hidden = !text; s.textContent = text || ""; }
+  function kEmpty() {
+    $("res-value").textContent = "–";
+    $("res-note").textContent = "Werte links eingeben.";
+    $("res-formula").textContent = "";
+    kStatus("");
+  }
+  function computeK() {
+    var t = parseVal($("in-t"), { positive: true });
+    showErr($("f-t"), t);
+    if (mode === "d") {
+      var r = parseVal($("in-r"), { positive: true });
+      showErr($("f-r"), r);
+      if (!t.ok || !r.ok) return kEmpty();
+      var D = dValue(t.v, r.v), Dup = Math.ceil(D * 100 - 1e-9) / 100;
+      var T = t.v / 1000, R = r.v / 1000;
+      $("res-value").innerHTML = fmt(Dup, 2) + " <small>kN</small>";
+      $("res-note").textContent = "Die Kupplung muss mindestens diesen D-Wert haben.";
+      kStatus("");
+      $("res-formula").innerHTML =
+        '<span class="k">D = g · T · R / (T + R)</span>\n' +
+        "D = 9,81 · " + fmt(T, 3) + " · " + fmt(R, 3) + " / (" + fmt(T, 3) + " + " + fmt(R, 3) + ")\n" +
+        "D = " + fmt(D, 3) + " kN";
+    } else {
+      var d = parseVal($("in-d"), { positive: true });
+      showErr($("f-d"), d);
+      if (!t.ok || !d.ok) return kEmpty();
+      var Rkg = maxTrailer(t.v, d.v), T2 = t.v / 1000, gT = G * T2;
+      if (!isFinite(Rkg)) {
+        $("res-value").textContent = "unbegrenzt";
+        $("res-note").textContent = "Der D-Wert ist grösser als g · T. Die Kupplung begrenzt die Anhängelast nicht; massgebend ist die Anhängelast im Fahrzeugausweis.";
+        kStatus("D ≥ g · T = " + fmt(gT, 2) + " kN");
+        $("res-formula").innerHTML =
+          '<span class="k">R = T · D / (g · T − D)</span>\n' +
+          "g · T = 9,81 · " + fmt(T2, 3) + " = " + fmt(gT, 3) + " kN\n" +
+          "D = " + fmt(d.v, 2) + " kN ≥ g · T  →  keine Begrenzung";
+        return;
+      }
+      $("res-value").innerHTML = fmt(Math.floor(Rkg + 1e-9), 0) + " <small>kg</small>";
+      $("res-note").textContent = "Höchstens zulässiges Gesamtgewicht des Anhängers, soweit die Kupplung es begrenzt.";
+      kStatus("");
+      $("res-formula").innerHTML =
+        '<span class="k">R = T · D / (g · T − D)</span>\n' +
+        "R = " + fmt(T2, 3) + " · " + fmt(d.v, 2) + " / (9,81 · " + fmt(T2, 3) + " − " + fmt(d.v, 2) + ")\n" +
+        "R = " + fmt(Rkg / 1000, 4) + " t = " + fmt(Rkg, 1) + " kg";
+    }
+  }
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll(".modes button").forEach(function (b) {
+      b.setAttribute("aria-selected", b.dataset.mode === m ? "true" : "false");
+    });
+    $("f-r").hidden = m !== "d";
+    $("f-d").hidden = m !== "r";
+    $("res-label").textContent = m === "d" ? "Erforderlicher D-Wert, mindestens" : "Maximale Anhängelast";
+    store("mode", m);
+    computeK();
+  }
+  ["in-t", "in-r", "in-d"].forEach(function (id) {
+    var s = load(id); if (s !== null && s !== "") $(id).value = s;
+    $(id).addEventListener("input", function () { store(id, $(id).value); computeK(); });
+  });
+  document.querySelectorAll(".modes button").forEach(function (b) {
+    b.addEventListener("click", function () { setMode(b.dataset.mode); });
+  });
+  $("calc").addEventListener("submit", function (e) { e.preventDefault(); });
+  setMode(load("mode") === "r" ? "r" : "d");
+
+  /* ---------------- Felgen ---------------- */
+  var LIMIT = 0.01; // 1 % der Referenzspur pro Rad
+  var defaults = {
+    va: { s: "1580", etref: "45", etnew: "35", sp: "0" },
+    ha: { s: "1570", etref: "45", etnew: "35", sp: "5" }
+  };
+  document.querySelectorAll("#felgen input[data-ax]").forEach(function (inp) {
+    var s = load(inp.id);
+    inp.value = (s !== null && s !== "") ? s : defaults[inp.dataset.ax][inp.dataset.k];
+    inp.addEventListener("input", function () { store(inp.id, inp.value); computeAxle(inp.dataset.ax); });
+  });
+  $("felgen").addEventListener("submit", function (e) { e.preventDefault(); });
+
+  function computeAxle(ax) {
+    var p = "fg-" + ax + "-";
+    var s = parseVal($(p + "s"), { positive: true });
+    var etref = parseVal($(p + "etref"));
+    var etnew = parseVal($(p + "etnew"));
+    var sp = parseVal($(p + "sp"), { nonneg: true, emptyAs: 0 });
+    var f = function (k) { return document.querySelector('[data-f="' + ax + "-" + k + '"]'); };
+    showErr(f("s"), s); showErr(f("etref"), etref); showErr(f("etnew"), etnew); showErr(f("sp"), sp);
+
+    var dmax = null, etmin = null;
+    if (s.ok && etref.ok && sp.ok) {
+      dmax = LIMIT * s.v;
+      etmin = etref.v - dmax + sp.v;
+      $(p + "etmin").textContent = fmt(etmin, 1) + " mm";
+      $(p + "etminhint").textContent = "Felge mit ET ≥ " + fmt(Math.ceil(etmin - 1e-9), 0) + " mm";
+      $(p + "dmax").textContent = fmt(dmax, 1) + " mm";
+    } else {
+      $(p + "etmin").textContent = "–";
+      $(p + "etminhint").textContent = "";
+      $(p + "dmax").textContent = "–";
+    }
+
+    var eteff = null;
+    if (etnew.ok && sp.ok) {
+      eteff = etnew.v - sp.v;
+      $(p + "eteff").textContent = fmt(eteff, 1) + " mm";
+    } else {
+      $(p + "eteff").textContent = "–";
+    }
+
+    var st = $(p + "status");
+    if (dmax === null || eteff === null) {
+      $(p + "dwheel").textContent = "–";
+      $(p + "track").textContent = "–";
+      $(p + "formula").textContent = "Werte eingeben.";
+      st.hidden = true;
+      return;
+    }
+
+    var dwheel = etref.v - eteff;            // + = Rad weiter aussen
+    var track = s.v + 2 * dwheel;
+    var pct = dwheel / s.v * 100;
+    var okay = dwheel <= dmax + 1e-9;
+
+    $(p + "dwheel").innerHTML = sgn(dwheel, 1) + " mm<small>" + sgn(pct, 2) + " % der Spur</small>";
+    $(p + "track").textContent = fmt(track, 0) + " mm";
+
+    st.hidden = false;
+    st.className = "status " + (okay ? "ok" : "warn");
+    if (!okay) st.textContent = "Zu breit, " + fmt(dwheel - dmax, 1) + " mm über 1 %";
+    else if (dwheel < 0) st.textContent = "Zulässig, Spur schmaler";
+    else st.textContent = "Zulässig";
+
+    $(p + "formula").innerHTML =
+      '<span class="k">ET min  = ET ref − 1 % · Spur + Distanzscheibe</span>\n' +
+      "        = " + fmt(etref.v, 1) + " − " + fmt(dmax, 1) + " + " + fmt(sp.v, 1) + " = " + fmt(etmin, 1) + " mm\n" +
+      '<span class="k">ET ges  = ET neu − Distanzscheibe</span>\n' +
+      "        = " + fmt(etnew.v, 1) + " − " + fmt(sp.v, 1) + " = " + fmt(eteff, 1) + " mm\n" +
+      '<span class="k">Δ/Rad   = ET ref − ET ges</span>\n' +
+      "        = " + fmt(etref.v, 1) + " − " + fmt(eteff, 1) + " = " + sgn(dwheel, 1) + " mm\n" +
+      '<span class="k">Spur    = Spur ref + 2 · Δ/Rad</span>\n' +
+      "        = " + fmt(s.v, 0) + " " + (dwheel < 0 ? "−" : "+") + " 2 · " + fmt(Math.abs(dwheel), 1) + " = " + fmt(track, 1) + " mm";
+  }
+  computeAxle("va"); computeAxle("ha");
+
+  /* ---------------- Achslasten LKW ---------------- */
+  var MAXAX = 5;
+  var lkDefaults = {
+    n: 4, gar: "32000", alt: "none", mehr: "0",
+    load: ["9000", "9000", "13000", "13000", "10000"],
+    drv:  [false, false, true, true, false],
+    dual: [false, false, true, true, false],
+    air:  [false, false, true, true, false],
+    sp:   ["1950", "3200", "1350", "1350"]
+  };
+  var axWrap = $("lk-axles");
+  var hdr = document.createElement("div");
+  hdr.className = "axhead";
+  hdr.innerHTML = '<span></span><span>Achslast Schild</span><span>Ange&shy;trieben</span><span>Doppel&shy;bereift</span><span>Luft&shy;gefedert</span>';
+  axWrap.appendChild(hdr);
+  function tog(id, name) {
+    return '<label class="tog"><input type="checkbox" id="' + id + '" aria-label="' + name + '"><span aria-hidden="true"></span></label>';
+  }
+  for (var i = 0; i < MAXAX; i++) {
+    if (i > 0) {
+      var sr = document.createElement("div");
+      sr.className = "sprow"; sr.id = "lk-sprow" + i;
+      sr.innerHTML = '<span class="sp-ico" aria-hidden="true">↕</span>' +
+        '<div class="input-unit sm"><input id="lk-sp' + i + '" type="text" inputmode="decimal" autocomplete="off" aria-label="Achsabstand ' + i + '. bis ' + (i + 1) + '. Achse in mm"><span class="unit">mm</span></div>' +
+        '<span class="grp" id="lk-spinfo' + i + '"></span>';
+      axWrap.appendChild(sr);
+    }
+    var ar = document.createElement("div");
+    ar.className = "axrow"; ar.id = "lk-axrow" + i;
+    ar.innerHTML = '<span class="axno">' + (i + 1) + '</span>' +
+      '<div class="field" id="f-lk-load' + i + '"><div class="input-unit"><input id="lk-load' + i + '" type="text" inputmode="numeric" autocomplete="off" aria-label="Achslast Herstellerschild ' + (i + 1) + '. Achse"><span class="unit">kg</span></div><span class="err" hidden></span></div>' +
+      tog("lk-drv" + i, (i + 1) + ". Achse angetrieben") +
+      tog("lk-dual" + i, (i + 1) + ". Achse doppelbereift") +
+      tog("lk-air" + i, (i + 1) + ". Achse luftgefedert");
+    axWrap.appendChild(ar);
+  }
+  var foot = document.createElement("div");
+  foot.className = "hint"; foot.style.paddingTop = "8px";
+  foot.textContent = "Achsabstände in mm von Achsmitte zu Achsmitte, z. B. 1350.";
+  axWrap.appendChild(foot);
+
+  var lkN = lkDefaults.n;
+  function lkBindText(id, def) {
+    var el = $(id), s = load(id);
+    el.value = (s !== null) ? s : def;
+    el.addEventListener("input", function () { store(id, el.value); computeLK(); });
+    el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
+  }
+  function lkBindCheck(id, def) {
+    var el = $(id), s = load(id);
+    el.checked = (s !== null) ? s === "1" : def;
+    el.addEventListener("change", function () { store(id, el.checked ? "1" : "0"); computeLK(); });
+  }
+  lkBindText("lk-gar", lkDefaults.gar);
+  lkBindText("lk-mehr", lkDefaults.mehr);
+  (function () {
+    var el = $("lk-alt"), s = load("lk-alt");
+    el.value = s || lkDefaults.alt;
+    el.addEventListener("change", function () { store("lk-alt", el.value); computeLK(); });
+  })();
+  for (var k = 0; k < MAXAX; k++) {
+    lkBindText("lk-load" + k, lkDefaults.load[k]);
+    lkBindCheck("lk-drv" + k, lkDefaults.drv[k]);
+    lkBindCheck("lk-dual" + k, lkDefaults.dual[k]);
+    lkBindCheck("lk-air" + k, lkDefaults.air[k]);
+    if (k > 0) lkBindText("lk-sp" + k, lkDefaults.sp[k - 1]);
+  }
+  function lkSetN(n) {
+    lkN = n; store("lk-n", String(n));
+    document.querySelectorAll("#lk-n button").forEach(function (b) {
+      b.setAttribute("aria-checked", Number(b.dataset.n) === n ? "true" : "false");
+      b.setAttribute("aria-selected", Number(b.dataset.n) === n ? "true" : "false");
+    });
+    for (var i = 0; i < MAXAX; i++) {
+      $("lk-axrow" + i).hidden = i >= n;
+      if (i > 0) $("lk-sprow" + i).hidden = i >= n;
+    }
+    computeLK();
+  }
+  document.querySelectorAll("#lk-n button").forEach(function (b) {
+    b.addEventListener("click", function () { lkSetN(Number(b.dataset.n)); });
+  });
+  $("achs").addEventListener("submit", function (e) { e.preventDefault(); });
+
+  var kg = function (n) { return fmt(n, 0); };
+  var ord = function (i) { return (i + 1) + "."; };
+
+  // Grenzwerte VTS Art. 95 Abs. 2
+  function singleLimit(drv) { return drv ? { v: 11500, ref: "Abs. 2 Bst. b Ziff. 3" } : { v: 10000, ref: "Abs. 2 Bst. a" }; }
+  function doubleLimit(sp, qualF) {
+    if (sp < 1000) return { v: 11500, ref: "Abs. 2 Bst. c" };
+    if (sp < 1300) return { v: 16000, ref: "Abs. 2 Bst. d" };
+    return qualF ? { v: 19000, ref: "Abs. 2 Bst. f" } : { v: 18000, ref: "Abs. 2 Bst. e" };
+  }
+  function tripleLimit(maxSp) {
+    if (maxSp <= 1300) return { v: 21000, ref: "Abs. 2 Bst. g" };
+    if (maxSp <= 1400) return { v: 24000, ref: "Abs. 2 Bst. h" };
+    return { v: 27000, ref: "Abs. 2 Bst. i" };
+  }
+
+  // Bedingungen Bst. f für eine Achsgruppe (Indizes)
+  function condF(ax, idx) {
+    var drivers = idx.filter(function (i) { return ax[i].drv; });
+    if (!drivers.length) return { a: false, b: false, drivers: drivers };
+    var a = drivers.some(function (i) { return ax[i].dual && ax[i].air; });
+    var b = drivers.every(function (i) { return ax[i].dual; });
+    return { a: a, b: b, drivers: drivers };
+  }
+
+  // Achsen in Einheiten (Einzel, Doppel, Dreifach) aufteilen
+  function groupChains(n, sp) {
+    var chains = [], cur = [0];
+    for (var i = 1; i < n; i++) {
+      if (sp[i] < 1800) cur.push(i); else { chains.push(cur); cur = [i]; }
+    }
+    chains.push(cur);
+    return chains;
+  }
+
+  function evaluate(ax, sp, n, capOn, warns) {
+    var cap = {};             // Achsen, die auf 9500 kg begrenzt werden
+    var plan = [];            // Einheiten
+    var chains = groupChains(n, sp);
+
+    chains.forEach(function (c) {
+      if (c.length === 1) plan.push({ type: "single", idx: c });
+      else if (c.length === 2) plan.push({ type: "double", idx: c });
+      else if (c.length === 3) {
+        var s1 = sp[c[1]], s2 = sp[c[2]];
+        if (s1 > 1400 && s2 > 1400) plan.push({ type: "split3", idx: c });
+        else plan.push({ type: "triple", idx: c });
+      } else {
+        warns.push("Mehr als drei Achsen mit weniger als 1,80 m Abstand: als zwei Doppelachsen gerechnet, bitte manuell prüfen.");
+        plan.push({ type: "double", idx: c.slice(0, 2) });
+        plan.push({ type: c.length - 2 === 1 ? "single" : "double", idx: c.slice(2) });
+      }
+    });
+
+    // Bst. f für Doppelachsen: Kappung bestimmen
+    function markDoubleCap(idx, s) {
+      if (s < 1300 || s >= 1800) return;
+      var f = condF(ax, idx);
+      if (!f.a && f.b && capOn) f.drivers.forEach(function (i) { cap[i] = true; });
+    }
+    plan.forEach(function (u) {
+      if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);
+      if (u.type === "triple") { markDoubleCap([u.idx[0], u.idx[1]], sp[u.idx[1]]); markDoubleCap([u.idx[1], u.idx[2]], sp[u.idx[2]]); }
+    });
+
+    // Bst. f für 3-achsige Motorwagen (26 t)
+    var gg3 = null;
+    if (n === 3) {
+      var a3 = [0, 1, 2].some(function (i) { return ax[i].drv && ax[i].dual && ax[i].air; });
+      var b3 = ax[1].drv && ax[1].dual && ax[2].drv && ax[2].dual;
+      if (a3) gg3 = { v: 26000, ref: "Abs. 1 Bst. f" };
+      else if (b3 && capOn) { cap[1] = true; cap[2] = true; gg3 = { v: 26000, ref: "Abs. 1 Bst. f" }; }
+      else gg3 = { v: 25000, ref: "Abs. 1 Bst. e" };
+    }
+
+    // Einzelachsen
+    var single = ax.slice(0, n).map(function (a, i) {
+      var lim = singleLimit(a.drv);
+      var v = Math.min(a.load, lim.v), why = a.load <= lim.v ? "Herstellerschild" : "VTS Art. 95 " + lim.ref;
+      if (cap[i] && v > 9500) { v = 9500; why = "9,5 t je Achse für Bst. f"; }
+      return { v: v, why: why, lim: lim };
+    });
+
+    function doubleUnit(idx) {
+      var s = sp[idx[1]];
+      var f = condF(ax, idx);
+      var qual = s >= 1300 && s < 1800 && (f.a || (f.b && idx.filter(function (i) { return ax[i].drv; }).every(function (i) { return cap[i]; })));
+      var lim = doubleLimit(s, qual);
+      var sum = single[idx[0]].v + single[idx[1]].v;
+      return { v: Math.min(lim.v, sum), lim: lim, sum: sum, sp: s };
+    }
+
+    var entries = [], units = [], total = 0;
+    plan.forEach(function (u) {
+      if (u.type === "single") {
+        units.push({ label: ord(u.idx[0]) + " Achse", kind: "Einzelachse", v: single[u.idx[0]].v, why: single[u.idx[0]].why });
+      } else if (u.type === "double") {
+        var d = doubleUnit(u.idx);
+        units.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v,
+          why: d.v < d.lim.v ? "Summe Einzelachsen" : "VTS Art. 95 " + d.lim.ref + " (Abstand " + fmt(d.sp / 1000, 2) + " m)" });
+        entries.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v, grp: true });
+      } else if (u.type === "triple") {
+        var i0 = u.idx[0], i1 = u.idx[1], i2 = u.idx[2];
+        var p1 = doubleUnit([i0, i1]), p2 = doubleUnit([i1, i2]);
+        var maxSp = Math.max(sp[i1], sp[i2]);
+        var tl = tripleLimit(maxSp);
+        var tsum = single[i0].v + single[i1].v + single[i2].v;
+        var tv = Math.min(tl.v, tsum);
+        entries.push({ label: ord(i0) + "+" + ord(i1) + " Achse", kind: "Doppelachse", v: p1.v, grp: true });
+        entries.push({ label: ord(i1) + "+" + ord(i2) + " Achse", kind: "Doppelachse", v: p2.v, grp: true });
+        entries.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv, grp: true });
+        units.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv,
+          why: tv < tl.v ? "Summe Einzelachsen" :"VTS Art. 95 " + tl.ref + " (grösserer Abstand " + fmt(maxSp / 1000, 2) + " m)" });
+      } else if (u.type === "split3") {
+        var j0 = u.idx[0], j1 = u.idx[1], j2 = u.idx[2];
+        var q1 = doubleUnit([j0, j1]), q2 = doubleUnit([j1, j2]);
+        var optA = q1.v + single[j2].v, optB = single[j0].v + q2.v;
+        warns.push("Achsen " + ord(j0) + "–" + ord(j2) + ": beide Abstände über 1,40 m, keine Dreifachachse. Gerechnet mit der ungünstigeren Aufteilung Doppelachse plus Einzelachse.");
+        entries.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, grp: true });
+        entries.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, grp: true });
+        if (optA <= optB) {
+          units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, why: "Aufteilung (" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) });
+          units.push({ label: ord(j2) + " Achse", kind: "Einzelachse", v: single[j2].v, why: single[j2].why });
+        } else {
+          units.push({ label: ord(j0) + " Achse", kind: "Einzelachse", v: single[j0].v, why: single[j0].why });
+          units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, why: "Aufteilung " + ord(j0) + " + (" + ord(j1) + "+" + ord(j2) + ")" });
+        }
+      }
+    });
+    units.forEach(function (u) { total += u.v; });
+
+    var legal;
+    if (n === 2) legal = { v: 18000, ref: "Abs. 1 Bst. d" };
+    else if (n === 3) legal = gg3;
+    else if (n === 4) legal = { v: 32000, ref: "Abs. 1 Bst. g" };
+    else legal = { v: 40000, ref: "Abs. 1 Bst. h" };
+
+    var singleEntries = single.map(function (s, i) { return { label: ord(i) + " Achse", kind: "", v: s.v, grp: false }; });
+    return { single: single, units: units, entries: singleEntries.concat(entries), total: total, legal: legal, capped: Object.keys(cap).length > 0 };
+  }
+
+  function computeLK() {
+    var n = lkN, ok = true;
+    var gar = parseVal($("lk-gar"), { positive: true }); showErr($("f-lk-gar"), gar); ok = ok && gar.ok;
+    var altMode = $("lk-alt").value;
+    $("f-lk-mehr").hidden = altMode === "none";
+    var mehr = altMode === "none" ? { ok: true, v: 0 } : parseVal($("lk-mehr"), { nonneg: true, emptyAs: 0 });
+    showErr($("f-lk-mehr"), mehr); ok = ok && mehr.ok;
+
+    var ax = [], sp = [0], spMeter = {};
+    for (var i = 0; i < n; i++) {
+      var l = parseVal($("lk-load" + i), { positive: true });
+      showErr($("f-lk-load" + i), l); ok = ok && l.ok;
+      ax.push({ load: l.ok ? l.v : 0, drv: $("lk-drv" + i).checked, dual: $("lk-dual" + i).checked, air: $("lk-air" + i).checked });
+      if (i > 0) {
+        var s = parseVal($("lk-sp" + i), { positive: true });
+        $("lk-sp" + i).closest(".input-unit").style.borderColor = s.ok ? "" : "var(--warn)";
+        // Eingabe in mm; Werte unter 10 werden als Meter erkannt.
+        if (s.ok && s.v < 10) { s.v = Math.round(s.v * 1000); s.m = "m"; }
+        ok = ok && s.ok; sp.push(s.ok ? s.v : 0);
+        if (s.ok) spMeter[i] = s.m || "";
+      }
+    }
+
+    if (!ok) {
+      $("lk-gg").textContent = "–";
+      $("lk-cands").innerHTML = '<p class="answer-note">Bitte alle Felder links ausfüllen.</p>';
+      $("lk-243").innerHTML = ""; $("lk-detail").innerHTML = ""; $("lk-warns").hidden = true;
+      return;
+    }
+
+    // Achsabstand-Info
+    for (var j = 1; j < n; j++) {
+      var t = sp[j] < 1000 ? "Gruppe, unter 1,00 m" : sp[j] < 1300 ? "Gruppe, 1,00 bis unter 1,30 m" : sp[j] < 1800 ? "Gruppe, 1,30 bis unter 1,80 m" : "keine Gruppe (ab 1,80 m)";
+      $("lk-spinfo" + j).textContent = "= " + fmt(sp[j] / 1000, 2) + " m" + (spMeter[j] ? " (als Meter gelesen)" : "") + " · " + t;
+      $("lk-spinfo" + j).style.color = sp[j] < 500 ? "var(--warn)" : "";
+      if (sp[j] < 500) $("lk-spinfo" + j).textContent += " · sehr klein, in mm eingegeben?";
+    }
+
+    var bonusMax = altMode === "alt" ? 1000 : altMode === "zero" ? 2000 : 0;
+    var bonus = Math.min(mehr.v, bonusMax);
+
+    function gg(r) { return Math.min(gar.v, r.legal.v + bonus, r.total); }
+    var w0 = [], w1 = [];
+    var r0 = evaluate(ax, sp, n, false, w0), r1 = evaluate(ax, sp, n, true, w1);
+    var res = r0, warns = w0;
+    if (r1.capped && gg(r1) > gg(r0)) { res = r1; warns = w1; }
+    var GG = gg(res);
+
+    $("lk-gg").innerHTML = kg(GG) + " <small>kg</small>";
+
+    var cands = [
+      { t: "Garantiegewicht", s: "Herstellerschild", v: gar.v },
+      { t: "Grenzwert VTS", s: "Art. 95 " + res.legal.ref + (bonus ? " + " + kg(bonus) + " kg Abs. 1" + (n > 4 ? "ter" : "bis") : ""), v: res.legal.v + bonus },
+      { t: "Summe zulässiger Achslasten", s: res.units.map(function (u) { return kg(u.v); }).join(" + "), v: res.total }
+    ];
+    var minV = Math.min(cands[0].v, cands[1].v, cands[2].v);
+    $("lk-cands").innerHTML = cands.map(function (c) {
+      return '<div class="cand' + (c.v === minV ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === minV ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
+    }).join("");
+
+    if (res.capped) warns.push("Antriebsachsen auf 9500 kg begrenzt, damit Bst. f (höherer Grenzwert) gilt.");
+    if (mehr.v > bonusMax && bonusMax) warns.push("Mehrgewicht über " + kg(bonusMax) + " kg: Zuschlag auf " + kg(bonusMax) + " kg begrenzt.");
+    res.single.forEach(function (s, i) {
+      if (ax[i].load > s.lim.v) warns.push(ord(i) + " Achse: Herstellerschild " + kg(ax[i].load) + " kg über Grenzwert, auf " + kg(s.lim.v) + " kg begrenzt.");
+    });
+    $("lk-warns").innerHTML = warns.map(function (w) { return "<li>" + w + "</li>"; }).join("");
+    $("lk-warns").hidden = !warns.length;
+
+    // Ziffer 243
+    $("lk-243").innerHTML = res.entries.map(function (e) {
+      return '<tr class="' + (e.grp ? "grp" : "") + '"><td>' + e.label + (e.kind ? " <small>(" + e.kind + ")</small>" : "") + '</td><td class="kg">' + kg(e.v) + "</td></tr>";
+    }).join("");
+    lkText = "243: Achslasten max. kg\n" + res.entries.map(function (e) {
+      return e.label + (e.kind ? " (" + e.kind + ")" : "") + " " + kg(e.v);
+    }).join("\n");
+
+    // Rechenweg
+    var rows = '<tr><th>Achse</th><th class="r">Schild</th><th class="r">Grenzwert</th><th class="r">zulässig</th><th>massgebend</th></tr>';
+    res.single.forEach(function (s, i) {
+      rows += "<tr><td>" + ord(i) + " " + (ax[i].drv ? "angetrieben" : "nicht angetr.") + '</td><td class="r">' + kg(ax[i].load) + '</td><td class="r">' + kg(s.lim.v) + '</td><td class="r">' + kg(s.v) + "</td><td>" + s.why + "</td></tr>";
+    });
+    rows += '<tr><th colspan="5" style="padding-top:12px">Einheiten für die Summe</th></tr>';
+    res.units.forEach(function (u) {
+      rows += "<tr><td>" + u.label + "</td><td></td><td></td><td class=\"r\">" + kg(u.v) + "</td><td>" + u.kind + ": " + u.why + "</td></tr>";
+    });
+    rows += '<tr><td><b>Summe</b></td><td></td><td></td><td class="r"><b>' + kg(res.total) + "</b></td><td></td></tr>";
+    $("lk-detail").innerHTML = rows;
+  }
+  var lkText = "";
+  $("lk-copy").addEventListener("click", function () {
+    var btn = this, ta = $("lk-243txt");
+    function done(msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = "Text kopieren"; }, 1800); }
+    try {
+      navigator.clipboard.writeText(lkText).then(function () { done("Kopiert"); }, function () {
+        ta.hidden = false; ta.value = lkText; ta.focus(); ta.select(); done("Text markiert");
+      });
+    } catch (e) { ta.hidden = false; ta.value = lkText; ta.focus(); ta.select(); done("Text markiert"); }
+  });
+  (function () { var s = Number(load("lk-n")); lkSetN(s >= 2 && s <= 5 ? s : lkDefaults.n); })();
+
+  /* ---------------- Aufklappbereiche merken ---------------- */
+  document.querySelectorAll("details.more").forEach(function (d) {
+    if (load("open-" + d.id) === "1") d.open = true;
+    d.addEventListener("toggle", function () { store("open-" + d.id, d.open ? "1" : "0"); });
+  });
+
+  /* ---------------- Navigation ---------------- */
+  var views = ["start", "kupplung", "felgen", "achslasten"];
+  var titles = { start: "Verkehrsrechner", kupplung: "Anhängerkupplung · Verkehrsrechner", felgen: "Felgen und Spur · Verkehrsrechner", achslasten: "Achslasten LKW · Verkehrsrechner" };
+  var current = null;
+  function show(h) {
+    if (views.indexOf(h) < 0) h = "start";
+    if (h === current) return;
+    current = h;
+    views.forEach(function (v) { $("view-" + v).hidden = v !== h; });
+    document.body.setAttribute("data-view", h);
+    document.title = titles[h];
+    window.scrollTo(0, 0);
+  }
+  function route() { show((location.hash || "").replace("#", "")); }
+  // Links direkt umschalten (funktioniert auch, wenn der Rahmen den Hash nicht weitergibt)
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var h = a.getAttribute("href").slice(1);
+    if (views.indexOf(h) < 0) return;
+    e.preventDefault();
+    show(h);
+    try { if (location.hash !== "#" + h) location.hash = h; } catch (err) {}
+  });
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
