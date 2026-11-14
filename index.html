@@ -801,25 +801,41 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <div class="in">
           <div class="axtab ss-tab" id="ss-axles"><!-- per Script --></div>
           <div class="group">
-            <div class="group-label">Auflieger · für VTS Art. 39 Abs. 3 (Fahrzeugkombination)</div>
+            <div class="group-label">Fahrzeugkombination · für Gesamtzugsgewicht und VTS Art. 39 Abs. 3</div>
+            <div class="ss-trl">
+              <div class="field" id="f-ss-kw">
+                <label for="ss-kw">Motorleistung</label>
+                <div class="input-unit"><input id="ss-kw" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kW</span></div>
+                <span class="err" hidden></span>
+              </div>
+              <div class="field" id="f-ss-gzg">
+                <label for="ss-gzg">Gesamtzugsgewicht Schild</label>
+                <div class="input-unit"><input id="ss-gzg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+                <span class="err" hidden></span>
+              </div>
+              <div class="field">
+                <span class="row-label">Kombinierter Verkehr</span>
+                <label class="tog" style="max-width:120px"><input type="checkbox" id="ss-kv" aria-label="Unbegleiteter kombinierter Verkehr (44 t)"><span aria-hidden="true"></span></label>
+              </div>
+            </div>
             <div class="ss-trl">
               <div class="field" id="f-ss-tleer">
-                <label for="ss-tleer">Leergewicht</label>
+                <label for="ss-tleer">Auflieger leer</label>
                 <div class="input-unit"><input id="ss-tleer" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
                 <span class="err" hidden></span>
               </div>
               <div class="field" id="f-ss-tsl">
-                <label for="ss-tsl">Sattellast leer</label>
+                <label for="ss-tsl">Sattellast Auflieger leer</label>
                 <div class="input-unit"><input id="ss-tsl" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
                 <span class="err" hidden></span>
               </div>
               <div class="field" id="f-ss-tgg">
-                <label for="ss-tgg">Gesamtgewicht</label>
+                <label for="ss-tgg">Auflieger Gesamtgewicht</label>
                 <div class="input-unit"><input id="ss-tgg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
                 <span class="err" hidden></span>
               </div>
             </div>
-            <span class="hint">Leer lassen, wenn ohne Auflieger geprüft werden soll.</span>
+            <span class="hint">Alle Felder sind freiwillig. Leere Felder werden bei der Prüfung übersprungen.</span>
           </div>
         </div>
 
@@ -831,6 +847,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="tbl-wrap"><table class="tbl" id="ss-tbl"></table></div>
           <span class="answer-label" style="margin-top:6px">VTS Art. 39 Abs. 2 und 3</span>
           <div class="tbl-wrap"><table class="tbl" id="ss-a39"></table></div>
+          <span class="answer-label" style="margin-top:6px">Höchstmögliches Gesamtzugsgewicht</span>
+          <div class="answer" id="ss-gzgmax" style="font-size:clamp(34px,4.5vw,46px)">–</div>
+          <div class="cands" id="ss-gzgc"></div>
+          <p class="answer-note" id="ss-gzgnote"></p>
           <ul class="warns" id="ss-warns" hidden></ul>
           <details class="more" id="more-ssweg" style="border-top:0">
             <summary style="padding-inline:0">Rechenweg anzeigen</summary>
@@ -852,7 +872,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
           <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und zusätzlich beladen.</li>
           <li><b>Fahrzeugkombination (Abs. 3):</b> Leer = Antriebsachsen inklusive Anteil der leeren Sattellast des Aufliegers, geteilt durch Schlepper leer + Auflieger leer. Beladen = Antriebsachsen mit der Sattellast oben, geteilt durch Schlepper leer + Gesamtgewicht des Aufliegers. Die Lenkachse (Abs. 2) wird nur für den Sattelschlepper geprüft.</li>
-          <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen.</li>
+          <li><b>Höchstmögliches Gesamtzugsgewicht</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (40 t, im kombinierten Verkehr 44 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %), VTS Art. 97 Abs. 2 Bst. a (Motorleistung ÷ 5,0 kW je t, nur wenn eingegeben) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
+          <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Achslasten des Aufliegers.</li>
         </ul>
       </div>
     </details>
@@ -1544,7 +1565,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
   }
   ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x);
-  ssBind("ss-tleer", "7000"); ssBind("ss-tsl", "2000"); ssBind("ss-tgg", "39000");
+  ssBind("ss-tleer", "7000"); ssBind("ss-tsl", "2000"); ssBind("ss-tgg", "32500");
+  ssBind("ss-kw", "330"); ssBind("ss-gzg", "40000"); ssBind("ss-kv", false, true);
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
@@ -1613,7 +1635,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var out = ["ss-smax"];
     if (!ok) {
       $("ss-smax").textContent = "–"; $("ss-gov").textContent = "Bitte die Felder links ausfüllen.";
-      $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
+      $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-gzgnote").textContent = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
       return;
     }
 
@@ -1690,11 +1712,36 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       a39rows += '<tr><td>Kombination beladen</td><td class="r">–</td>' + cell(K1.adh, 25) + "</tr>";
     }
     $("ss-a39").innerHTML = a39rows;
+
+    // Höchstmögliches Gesamtzugsgewicht
+    var kw = parseVal($("ss-kw"), { positive: true }), gzs = parseVal($("ss-gzg"), { positive: true });
+    showErr($("f-ss-kw"), kw.empty ? { ok: true } : kw); showErr($("f-ss-gzg"), gzs.empty ? { ok: true } : gzs);
+    var kv = $("ss-kv").checked, gzFail = false;
+    var gc = [
+      { t: "SVG Art. 9 Abs. 1", s: kv ? "kombinierter Verkehr" : "Fahrzeugkombination", v: kv ? 44000 : 40000 },
+      { t: "VTS Art. 39 Abs. 3", s: "Adhäsion beladen " + kg(Math.round(A1.drv)) + " kg ÷ 25 %", v: Math.floor(A1.drv / 0.25) }
+    ];
+    if (kw.ok) gc.push({ t: "VTS Art. 97 Abs. 2 Bst. a", s: kg(kw.v) + " kW ÷ 5,0 kW/t", v: Math.floor(kw.v / 5 * 1000) });
+    if (gzs.ok) gc.push({ t: "Herstellerschild", s: "Gesamtzugsgewicht", v: gzs.v });
+    var gzMax = Math.min.apply(null, gc.map(function (c) { return c.v; }));
+    $("ss-gzgmax").innerHTML = kg(gzMax) + " <small>kg</small>";
+    $("ss-gzgc").innerHTML = gc.map(function (c) {
+      return '<div class="cand' + (c.v === gzMax ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === gzMax ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
+    }).join("");
+    var gzNote = "";
+    if (tgg.ok) {
+      var gzIst = leerTot + tgg.v, gzOk = gzIst <= gzMax;
+      if (!gzOk) gzFail = true;
+      gzNote = "Mit diesem Auflieger: " + kg(leerTot) + " + " + kg(tgg.v) + " = " + kg(gzIst) + " kg " + (gzOk ? "✓ eingehalten" : "✗ " + kg(gzIst - gzMax) + " kg zu viel");
+    }
+    if (!kw.ok) gzNote += (gzNote ? " · " : "") + "Ohne Motorleistung ist Art. 97 nicht geprüft.";
+    $("ss-gzgnote").textContent = gzNote;
     if (!ax.some(function (a) { return a.drv; })) a39ok = false;
 
     var st = $("ss-status"); st.hidden = false;
-    st.className = "status " + (allOk && a39ok ? "ok" : "warn");
-    st.textContent = !allOk ? "Grenze überschritten" : !a39ok ? "Achslasten eingehalten, Art. 39 nicht erfüllt" : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
+    st.className = "status " + (allOk && a39ok && !gzFail ? "ok" : "warn");
+    st.textContent = !allOk ? "Grenze überschritten" : !a39ok ? "Achslasten eingehalten, Art. 39 nicht erfüllt"
+      : gzFail ? "Gesamtzugsgewicht mit diesem Auflieger zu hoch" : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
 
     var warns = [];
     if (X <= 0) warns.push("x ist 0 oder negativ: Der Königszapfen liegt hinter der Mitte des Achspakets, die Vorderachse wird entlastet.");
