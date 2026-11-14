@@ -1,4 +1,4 @@
-<title>Verkehrsrechner</title>
+<title>Kleiner Expertengehilfe</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -234,6 +234,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .kv dd { margin: 0; text-align: right; font: 500 16px var(--font-mono); font-variant-numeric: tabular-nums; }
 .kv dd.big { font-family: var(--font-display); font-weight: 700; font-size: 30px; color: var(--signal); line-height: 1; }
 
+.brand h1 .by { font-family: var(--font-body); font-weight: 500; font-size: 12.5px; color: var(--muted); letter-spacing: 0; margin-left: 6px; white-space: nowrap; }
+.mark { font-size: 15px !important; letter-spacing: .02em; }
+
 /* Startseite: Fusszeile ganz unten */
 #view-start { display: flex; flex-direction: column; gap: 14px; min-height: calc(100vh - 110px); min-height: calc(100dvh - 110px); }
 .start-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; padding-top: 12px; }
@@ -420,9 +423,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 <div class="backdrop" aria-hidden="true"></div>
 <div class="wrap">
   <header class="app">
-    <a class="brand" href="#start" aria-label="Verkehrsrechner, zur Startseite">
-      <div class="mark" aria-hidden="true">V</div>
-      <h1>Verkehrsrechner</h1>
+    <a class="brand" href="#start" aria-label="Kleiner Expertengehilfe, zur Startseite">
+      <div class="mark" aria-hidden="true">KE</div>
+      <h1>Kleiner Expertengehilfe <span class="by">by Georg Winklmeier</span></h1>
     </a>
   </header>
 
@@ -1476,7 +1479,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
   /* ---------------- Navigation ---------------- */
   var views = ["start", "kupplung", "felgen", "achslasten", "zentralachs"];
-  var titles = { start: "Verkehrsrechner", kupplung: "Anhängerkupplung · Verkehrsrechner", felgen: "Felgen und Spur · Verkehrsrechner", achslasten: "Achslasten LKW · Verkehrsrechner", zentralachs: "Zentralachsanhänger · Verkehrsrechner" };
+  var titles = { start: "Kleiner Expertengehilfe", kupplung: "Anhängerkupplung · Kleiner Expertengehilfe", felgen: "Felgen und Spur · Kleiner Expertengehilfe", achslasten: "Achslasten LKW · Kleiner Expertengehilfe", zentralachs: "Zentralachsanhänger · Kleiner Expertengehilfe" };
   var current = null;
   function show(h) {
     if (views.indexOf(h) < 0) h = "start";
