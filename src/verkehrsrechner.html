@@ -756,14 +756,22 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
             <div class="input-unit"><input id="za-li" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
             <span class="err" hidden></span>
           </div>
+          <div class="field" id="f-za-sl">
+            <label for="za-sl">Stützlast leer</label>
+            <div class="input-unit"><input id="za-sl" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+            <span class="hint">Stützlast des leeren Anhängers, z. B. gewogen. 0 eingeben, wenn unbekannt.</span>
+            <span class="err" hidden></span>
+          </div>
           <div class="za-fig" aria-hidden="true"><svg id="za-svg" viewBox="0 0 600 150" preserveAspectRatio="xMidYMid meet"></svg></div>
         </div>
 
         <div class="out" aria-live="polite">
-          <span class="answer-label">Stützlast aus der Nutzlast</span>
+          <span class="answer-label">Stützlast beladen (gesamt)</span>
           <div class="answer" id="za-s">–</div>
           <span class="status" id="za-status" hidden></span>
           <dl class="kv">
+            <dt>Stützlast leer</dt><dd id="za-sl0">–</dd>
+            <dt>+ Stützlast aus der Nutzlast</dt><dd id="za-snl">–</dd>
             <dt>X-Wert <small style="display:block;font-size:12px">Mitte Ladefläche zu Mitte Achsaggregat</small></dt><dd class="big" id="za-x">–</dd>
             <dt>Lage</dt><dd id="za-xdir">–</dd>
             <dt>L (Kugelpfanne bis Mitte Achsaggregat)</dt><dd id="za-l">–</dd>
@@ -788,7 +796,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>L</b> = Kugelpfanne bis Mitte Achsaggregat. Die Mitte liegt zwischen erster und letzter Achse, bei einer Achse auf der Achse.</li>
           <li><b>X-Wert</b> = Mitte Achsaggregat bis Ende Ladefläche − Innenlänge / 2. Negativ heisst: Die Ladeflächenmitte liegt vor dem Achsaggregat, Richtung Zugfahrzeug.</li>
           <li><b>Stützlast aus der Nutzlast</b> = Nutzlast · (Innenlänge / 2 − Mitte Achsaggregat bis Ende Ladefläche) / L. Die Nutzlast ist dabei gleichmässig über die Innenlänge verteilt.</li>
-          <li>Die Stützlast des leeren Anhängers ist nicht enthalten. Für die gesamte Stützlast kommt sie dazu.</li>
+          <li><b>Stützlast beladen</b> = Stützlast leer (Eingabe) + Stützlast aus der Nutzlast. Geprüft wird der Richtwert mit diesem Gesamtwert.</li>
           <li>Richtwert: Bei einem Zentralachsanhänger beträgt die Stützlast höchstens 10 % des Gesamtgewichts bzw. 1000 kg (der kleinere Wert). Die zulässige Stützlast von Kupplung und Zugfahrzeug gilt zusätzlich.</li>
         </ul>
       </div>
@@ -1312,9 +1320,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   (function () { var s = Number(load("lk-n")); lkSetN(s >= 2 && s <= 5 ? s : lkDefaults.n); })();
 
   /* ---------------- Zentralachsanhänger ---------------- */
-  var zaDef = { n: 2, gg: "3500", lg: "900", a: "3000", s1: "800", s2: "800", b: "1700", li: "4000" };
+  var zaDef = { n: 2, gg: "3500", lg: "900", a: "3000", s1: "800", s2: "800", b: "1700", li: "4000", sl: "50" };
   var zaN = zaDef.n;
-  ["gg", "lg", "a", "s1", "s2", "b", "li"].forEach(function (k) {
+  ["gg", "lg", "a", "s1", "s2", "b", "li", "sl"].forEach(function (k) {
     var id = "za-" + k, el = $(id), s = load(id);
     el.value = (s !== null) ? s : zaDef[k];
     el.addEventListener("input", function () { store(id, el.value); computeZA(); });
@@ -1388,10 +1396,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     get("a", { positive: true });
     if (zaN >= 2) get("s1", { positive: true }); else { v.s1 = 0; showErr($("f-za-s1"), { ok: true }); }
     if (zaN >= 3) get("s2", { positive: true }); else { v.s2 = 0; showErr($("f-za-s2"), { ok: true }); }
-    get("b"); get("li", { positive: true });
+    get("b"); get("li", { positive: true }); get("sl", { nonneg: true, emptyAs: 0 });
 
     var clear = function () {
-      ["za-s", "za-x", "za-xdir", "za-l", "za-nl2", "za-pct", "za-lim"].forEach(function (id) { $(id).textContent = "–"; });
+      ["za-s", "za-sl0", "za-snl", "za-x", "za-xdir", "za-l", "za-nl2", "za-pct", "za-lim"].forEach(function (id) { $(id).textContent = "–"; });
       $("za-status").hidden = true; $("za-warns").hidden = true; $("za-formula").textContent = ""; $("za-svg").innerHTML = "";
     };
     if (v.gg && v.lg && v.gg > v.lg) $("za-nl").textContent = kg(v.gg - v.lg) + " kg"; else $("za-nl").textContent = "–";
@@ -1404,8 +1412,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     if (r.xStart < 0) warns.push("Die Ladefläche würde vor der Kugelpfanne beginnen. Bitte Masse prüfen.");
     if (r.xEnd < r.axles[r.axles.length - 1]) warns.push("Die Ladefläche endet vor der letzten Achse. Bitte Masse prüfen.");
 
-    var S = r.S, lim = Math.min(0.10 * v.gg, 1000);
+    var Snl = r.S, S = v.sl + Snl, lim = Math.min(0.10 * v.gg, 1000);
+    var sk = function (n) { return (n < 0 ? "−" : "") + kg(Math.abs(Math.round(n))) + " kg"; };
     $("za-s").innerHTML = (S < 0 ? "−" : "") + kg(Math.abs(Math.round(S))) + " <small>kg</small>";
+    $("za-sl0").textContent = sk(v.sl);
+    $("za-snl").textContent = sk(Snl);
     $("za-x").textContent = (r.X < 0 ? "−" : r.X > 0 ? "+" : "±") + kg(Math.abs(r.X)) + " mm";
     $("za-xdir").textContent = r.X < 0 ? "vor dem Achsaggregat (Richtung Kupplung)" : r.X > 0 ? "hinter dem Achsaggregat" : "genau über dem Achsaggregat";
     $("za-l").textContent = kg(r.L) + " mm";
@@ -1431,8 +1442,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       "         = " + kg(r.L) + " mm\n" +
       '<span class="k">X        = b − Li / 2</span>\n' +
       "         = " + kg(v.b) + " − " + kg(v.li / 2) + " = " + (r.X < 0 ? "−" : "") + kg(Math.abs(r.X)) + " mm\n" +
-      '<span class="k">Stützlast = Nutzlast · (Li / 2 − b) / L = Nutzlast · (−X) / L</span>\n' +
-      "         = " + kg(r.nl) + " · " + (r.X > 0 ? "−" : "") + kg(Math.abs(r.X)) + " / " + kg(r.L) + " = " + fmt(S, 1) + " kg";
+      '<span class="k">S Nutzlast = Nutzlast · (Li / 2 − b) / L = Nutzlast · (−X) / L</span>\n' +
+      "         = " + kg(r.nl) + " · " + (r.X > 0 ? "−" : "") + kg(Math.abs(r.X)) + " / " + kg(r.L) + " = " + fmt(Snl, 1) + " kg\n" +
+      '<span class="k">S gesamt  = S leer + S Nutzlast</span>\n' +
+      "         = " + kg(v.sl) + " + " + fmt(Snl, 1) + " = " + fmt(S, 1) + " kg";
     zaDraw(p, r);
   }
   (function () { var s = Number(load("za-n")); zaSetN(s >= 1 && s <= 3 ? s : zaDef.n); })();
