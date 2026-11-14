@@ -714,7 +714,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           </div>
         </div>
         <div class="field" id="f-za-gg">
-          <label for="za-gg">Gesamtgewicht</label>
+          <label for="za-gg">Garantiegewicht</label>
           <div class="input-unit"><input id="za-gg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
           <span class="err" hidden></span>
         </div>
@@ -778,8 +778,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
             <dt>Lage</dt><dd id="za-xdir">–</dd>
             <dt>L (Kugelpfanne bis Mitte Achsaggregat)</dt><dd id="za-l">–</dd>
             <dt>Nutzlast</dt><dd id="za-nl2">–</dd>
-            <dt>Anteil am Gesamtgewicht</dt><dd id="za-pct">–</dd>
-            <dt>Richtwert Zentralachsanhänger <small style="display:block;font-size:12px">VTS Art. 184 Abs. 2: 10 % GG, höchstens 1000 kg</small></dt><dd id="za-lim">–</dd>
+            <dt>Anteil am Garantiegewicht</dt><dd id="za-pct">–</dd>
+            <dt>Richtwert Zentralachsanhänger <small style="display:block;font-size:12px">VTS Art. 184 Abs. 2: 10 % Garantiegewicht, höchstens 1000 kg</small></dt><dd id="za-lim">–</dd>
           </dl>
           <ul class="warns" id="za-warns" hidden></ul>
           <details class="more" id="more-zaweg" style="border-top:0">
@@ -794,7 +794,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <summary>Grundlage und Annahmen</summary>
       <div class="notes">
         <ul>
-          <li><b>Nutzlast</b> = Gesamtgewicht − Leergewicht.</li>
+          <li><b>Nutzlast</b> = Garantiegewicht − Leergewicht.</li>
           <li><b>L</b> = Kugelpfanne bis Mitte Achsaggregat. Die Mitte liegt zwischen erster und letzter Achse, bei einer Achse auf der Achse.</li>
           <li><b>X-Wert</b> = Mitte Achsaggregat bis Ende Ladefläche − Innenlänge / 2. Negativ heisst: Die Ladeflächenmitte liegt vor dem Achsaggregat, Richtung Zugfahrzeug.</li>
           <li><b>Stützlast aus der Nutzlast</b> = Nutzlast · (Innenlänge / 2 − Mitte Achsaggregat bis Ende Ladefläche) / L. Die Nutzlast ist dabei gleichmässig über die Innenlänge verteilt.</li>
@@ -1408,7 +1408,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     if (!ok) return clear();
 
     var warns = [];
-    if (v.lg >= v.gg) { warns.push("Leergewicht ist gleich gross wie oder grösser als das Gesamtgewicht."); }
+    if (v.lg >= v.gg) { warns.push("Leergewicht ist gleich gross wie oder grösser als das Garantiegewicht."); }
     var p = { n: zaN, gg: v.gg, lg: v.lg, a: v.a, s1: v.s1, s2: v.s2, b: v.b, li: v.li };
     var r = zaCalc(p);
     if (r.xStart < 0) warns.push("Die Ladefläche würde vor der Kugelpfanne beginnen. Bitte Masse prüfen.");
@@ -1438,7 +1438,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var axTxt = r.axles.map(function (x, i) { return (i + 1) + ". Achse " + kg(x); }).join(", ");
     $("za-formula").innerHTML =
       '<span class="k">Achsen ab Kugelpfanne: ' + axTxt + ' mm</span>\n' +
-      '<span class="k">Nutzlast = GG − LG</span>\n' +
+      '<span class="k">Nutzlast = Garantiegewicht − Leergewicht</span>\n' +
       "         = " + kg(v.gg) + " − " + kg(v.lg) + " = " + kg(r.nl) + " kg\n" +
       '<span class="k">L        = Mitte zwischen erster und letzter Achse</span>\n' +
       "         = " + kg(r.L) + " mm\n" +
