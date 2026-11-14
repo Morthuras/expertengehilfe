@@ -21,7 +21,7 @@ Rechner für Fahrzeugtechnik in der Schweiz, als Web-App im Browser – ohne Ins
 ## Aktualisieren
 
 1. `src/verkehrsrechner.html` bearbeiten.
-2. Daraus eine neue `index.html` erzeugen: Bild als Base64 einbetten und in ein vollständiges HTML-Gerüst setzen.
-3. `index.html` und die geänderten Dateien in `src/` hochladen.
+2. Mit `sync-github.ps1` (PowerShell, liegt lokal neben der Quelldatei) die `index.html` neu bauen und alle geänderten Dateien hochladen. Das Skript bettet das Bild als Base64 ein und überspringt unveränderte Dateien.
+3. GitHub Pages ist nach 1–2 Minuten aktuell.
 
 Eingaben werden nur im Browser des jeweiligen Geräts gespeichert, nicht auf GitHub.
