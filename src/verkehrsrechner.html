@@ -258,6 +258,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .ss-tab .axhead span { font-size: 10.5px; letter-spacing: .02em; }
 .ss-tab .axrow .input-unit input { font-size: 17px; }
 .ss-tab .axrow .input-unit .unit { padding: 0 7px; font-size: 12px; }
+.ss-trl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ss-trl .input-unit input { font-size: 18px; min-height: 48px; padding: 8px 10px; }
+@media (max-width: 520px) { .ss-trl { grid-template-columns: 1fr; } }
+.group { display: grid; gap: 10px; }
+.group-label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
 .tbl td.ok { color: var(--ok); font-weight: 600; }
 .tbl td.bad { color: var(--warn); font-weight: 600; }
 .tbl tr.sum td { border-top: 2px solid var(--line); font-weight: 600; }
@@ -772,7 +777,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <span class="err" hidden></span>
         </div>
         <div class="field" id="f-ss-s">
-          <label for="ss-s">Sattellast</label>
+          <label for="ss-s">Sattellast beladen</label>
           <div class="input-unit"><input id="ss-s" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
           <span class="hint">Leer lassen = grösstmögliche Sattellast</span>
           <span class="err" hidden></span>
@@ -782,6 +787,27 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <div class="split lk-split">
         <div class="in">
           <div class="axtab ss-tab" id="ss-axles"><!-- per Script --></div>
+          <div class="group">
+            <div class="group-label">Auflieger · für VTS Art. 39 Abs. 3 (Fahrzeugkombination)</div>
+            <div class="ss-trl">
+              <div class="field" id="f-ss-tleer">
+                <label for="ss-tleer">Leergewicht</label>
+                <div class="input-unit"><input id="ss-tleer" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+                <span class="err" hidden></span>
+              </div>
+              <div class="field" id="f-ss-tsl">
+                <label for="ss-tsl">Sattellast leer</label>
+                <div class="input-unit"><input id="ss-tsl" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+                <span class="err" hidden></span>
+              </div>
+              <div class="field" id="f-ss-tgg">
+                <label for="ss-tgg">Gesamtgewicht</label>
+                <div class="input-unit"><input id="ss-tgg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
+                <span class="err" hidden></span>
+              </div>
+            </div>
+            <span class="hint">Leer lassen, wenn ohne Auflieger geprüft werden soll.</span>
+          </div>
         </div>
 
         <div class="out" aria-live="polite">
@@ -808,10 +834,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Achse 1</b> ist die Vorderachse. Die übrigen Achsen bilden das hintere Achspaket. Dessen Mitte liegt bei 3 Achsen zwischen 2. und 3. Achse.</li>
           <li><b>R</b> = Abstand Vorderachse bis Mitte hinteres Achspaket. <b>x</b> = Abstand Mitte hinteres Achspaket bis Königszapfen, nach vorne positiv.</li>
           <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Bei 3 Achsen verteilt sich der hintere Anteil gleichmässig auf beide Achsen.</li>
-          <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen gilt für das hintere Paket zusätzlich der Grenzwert der Doppelachse, inklusive Bst. f (19 t).</li>
+          <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
           <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f).</li>
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
           <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und zusätzlich beladen.</li>
+          <li><b>Fahrzeugkombination (Abs. 3):</b> Leer = Antriebsachsen inklusive Anteil der leeren Sattellast des Aufliegers, geteilt durch Schlepper leer + Auflieger leer. Beladen = Antriebsachsen mit der Sattellast oben, geteilt durch Schlepper leer + Gesamtgewicht des Aufliegers. Die Lenkachse (Abs. 2) wird nur für den Sattelschlepper geprüft.</li>
           <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen.</li>
         </ul>
       </div>
@@ -1504,6 +1531,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
   }
   ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x); ssBind("ss-s", ssDef.s);
+  ssBind("ss-tleer", "7000"); ssBind("ss-tsl", "2000"); ssBind("ss-tgg", "39000");
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
@@ -1534,13 +1562,15 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var grp = null, legal, capped = false;
     if (n === 3) {
       var f = condF(ax, rear), s = sp[2];
-      var qual = s >= 1300 && s < 1800 && (f.a || (f.b && rear.every(function (i) { return lim[i].v <= 9500; })));
-      if (!qual && capOn && s >= 1300 && s < 1800 && f.b) {
-        rear.forEach(function (i) { if (lim[i].v > 9500) { lim[i] = { v: 9500, why: "9,5 t je Achse für Bst. f" }; capped = true; } });
-        qual = true;
+      if (s < 1800) {   // Doppelachse nach VTS Art. 95 Abs. 2 nur unter 1,80 m Achsabstand
+        var qual = s >= 1300 && (f.a || (f.b && rear.every(function (i) { return lim[i].v <= 9500; })));
+        if (!qual && capOn && s >= 1300 && f.b) {
+          rear.forEach(function (i) { if (lim[i].v > 9500) { lim[i] = { v: 9500, why: "9,5 t je Achse für Bst. f" }; capped = true; } });
+          qual = true;
+        }
+        var dl = doubleLimit(s, qual);
+        grp = { v: Math.min(dl.v, lim[1].v + lim[2].v), ref: dl.ref, sum: lim[1].v + lim[2].v, lim: dl.v, sp: s };
       }
-      var dl = doubleLimit(s, qual);
-      grp = { v: Math.min(dl.v, lim[1].v + lim[2].v), ref: dl.ref, sum: lim[1].v + lim[2].v };
       var a3 = ax.some(function (a) { return a.drv && a.dual && a.air; });
       var b3 = ax[1].drv && ax[1].dual && ax[2].drv && ax[2].dual && lim[1].v <= 9500 && lim[2].v <= 9500;
       legal = (a3 || b3) ? { v: 26000, ref: "Abs. 1 Bst. f" } : { v: 25000, ref: "Abs. 1 Bst. e" };
@@ -1588,7 +1618,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       c.push({ name: "Gesamtgewicht", v: L.gg.v - leerTot });
       if (fF > 0) c.push({ name: "Vorderachse", v: (L.lim[0].v - ax[0].leer) / fF });
       rear.forEach(function (i) { if (fR > 0) c.push({ name: (i + 1) + ". Achse", v: (L.lim[i].v - ax[i].leer) / (fR / rear.length) }); });
-      if (L.grp && fR > 0) c.push({ name: "Doppelachse 2.+3.", v: (L.grp.v - leerRear) / fR });
+      if (L.grp && fR > 0) c.push({ name: "Doppelachse 2.+3. Achse", v: (L.grp.v - leerRear) / fR });
       var m = c.reduce(function (a, b) { return b.v < a.v ? b : a; });
       return { v: Math.max(0, Math.floor(m.v)), by: m.name, cands: c };
     }
@@ -1615,7 +1645,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     rows += row("1. Achse (vorne)", ax[0].leer, S * fF, L.lim[0].v, L.lim[0].why);
     rear.forEach(function (i) { rows += row((i + 1) + ". Achse", ax[i].leer, S * fR / rear.length, L.lim[i].v, L.lim[i].why); });
-    if (L.grp) rows += row("2.+3. Achse (Doppelachse)", leerRear, S * fR, L.grp.v, "VTS Art. 95 " + L.grp.ref);
+    if (L.grp) rows += row("2.+3. Achse (Doppelachse, " + fmt(L.grp.sp / 1000, 2) + " m, " + L.grp.ref.replace("Abs. 2 ", "") + ")", leerRear, S * fR, L.grp.v,
+      L.grp.v < L.grp.lim ? "Summe Einzelachsen" : "VTS Art. 95 " + L.grp.ref);
     rows += row("Gesamt", leerTot, S, L.gg.v, L.gg.why, "sum");
     $("ss-tbl").innerHTML = rows;
 
@@ -1629,10 +1660,29 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     var A0 = a39(loadsLeer), A1 = a39(loadsBel), a39ok = true;
     function cell(p, min) { var g = p >= min - 1e-9; if (!g) a39ok = false; return '<td class="r ' + (g ? "ok" : "bad") + '">' + fmt(p, 1) + " % " + (g ? "✓" : "✗") + "</td>"; }
-    $("ss-a39").innerHTML =
+    var a39rows =
       '<tr><th>Zustand</th><th class="r">Lenkachse ≥ 20 %</th><th class="r">Adhäsion ≥ 25 %</th></tr>' +
-      "<tr><td>leer (Art. 39)</td>" + cell(A0.lenk, 20) + cell(A0.adh, 25) + "</tr>" +
-      "<tr><td>voll beladen</td>" + cell(A1.lenk, 20) + cell(A1.adh, 25) + "</tr>";
+      "<tr><td>Sattelschlepper leer</td>" + cell(A0.lenk, 20) + cell(A0.adh, 25) + "</tr>" +
+      "<tr><td>Sattelschlepper beladen</td>" + cell(A1.lenk, 20) + cell(A1.adh, 25) + "</tr>";
+
+    // Fahrzeugkombination (Art. 39 Abs. 3): nur wenn Auflieger-Daten vorhanden
+    var tl = parseVal($("ss-tleer"), { positive: true }), tsl = parseVal($("ss-tsl"), { nonneg: true }), tgg = parseVal($("ss-tgg"), { positive: true });
+    showErr($("f-ss-tleer"), tl.empty ? { ok: true } : tl); showErr($("f-ss-tsl"), tsl.empty ? { ok: true } : tsl); showErr($("f-ss-tgg"), tgg.empty ? { ok: true } : tgg);
+    var K0 = null, K1 = null;
+    function drvShare(sl) { // Anteil einer Sattellast auf die angetriebenen Achsen
+      return ax.reduce(function (t, a, i) { return t + (a.drv ? (i === 0 ? sl * fF : sl * fR / rear.length) : 0); }, 0);
+    }
+    if (tl.ok && tsl.ok) {
+      var d0 = A0.drv + drvShare(tsl.v), t0 = leerTot + tl.v;
+      K0 = { drv: d0, tot: t0, adh: d0 / t0 * 100 };
+      a39rows += '<tr><td>Kombination leer</td><td class="r">–</td>' + cell(K0.adh, 25) + "</tr>";
+    }
+    if (tgg.ok) {
+      var t1 = leerTot + tgg.v;
+      K1 = { drv: A1.drv, tot: t1, adh: A1.drv / t1 * 100 };
+      a39rows += '<tr><td>Kombination beladen</td><td class="r">–</td>' + cell(K1.adh, 25) + "</tr>";
+    }
+    $("ss-a39").innerHTML = a39rows;
     if (!ax.some(function (a) { return a.drv; })) a39ok = false;
 
     var st = $("ss-status"); st.hidden = false;
@@ -1644,6 +1694,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     if (X >= R) warns.push("x ist gleich gross wie oder grösser als R: Der Königszapfen liegt vor oder über der Vorderachse. Bitte Masse prüfen.");
     if (L.capped) warns.push("Hinterachsen auf 9500 kg je Achse begrenzt, damit Bst. f (19 t) gilt.");
     if (!ax.some(function (a) { return a.drv; })) warns.push("Keine Achse als angetrieben markiert: Adhäsionsgewicht ist 0.");
+    if (n === 3 && sp[1] < 1800) warns.push("1. und 2. Achse liegen weniger als 1,80 m auseinander und bilden nach Art. 95 eine Doppelachse. Der Rechner nimmt Achse 1 als einzelne Lenkachse an. Bitte manuell prüfen.");
+    if (n === 3 && sp[2] >= 1800) warns.push("2. und 3. Achse liegen 1,80 m oder mehr auseinander: Sie gelten als Einzelachsen, keine Doppelachse.");
     $("ss-warns").innerHTML = warns.map(function (w) { return "<li>" + w + "</li>"; }).join("");
     $("ss-warns").hidden = !warns.length;
 
@@ -1658,7 +1710,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       M.cands.map(function (c) { return "  " + c.name + ": " + kg(Math.max(0, Math.floor(c.v))) + " kg"; }).join("\n") + "\n" +
       '<span class="k">Art. 39: Lenkachse / Gesamt, angetriebene Achsen / Gesamt</span>\n' +
       "  leer:     " + kg(ax[0].leer) + " / " + kg(A0.tot) + " = " + fmt(A0.lenk, 1) + " %   " + kg(A0.drv) + " / " + kg(A0.tot) + " = " + fmt(A0.adh, 1) + " %\n" +
-      "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %";
+      "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %" +
+      (K0 ? "\n" + '<span class="k">Kombination leer: Antriebsachsen (inkl. Anteil Sattellast leer) / (Schlepper leer + Auflieger leer)</span>\n' +
+        "  " + kg(Math.round(K0.drv)) + " / " + kg(Math.round(K0.tot)) + " = " + fmt(K0.adh, 1) + " %" : "") +
+      (K1 ? "\n" + '<span class="k">Kombination beladen: Antriebsachsen beladen / (Schlepper leer + Auflieger Gesamtgewicht)</span>\n' +
+        "  " + kg(Math.round(K1.drv)) + " / " + kg(Math.round(K1.tot)) + " = " + fmt(K1.adh, 1) + " %" : "");
   }
   (function () { var s = Number(load("ss-n")); ssSetN(s === 3 ? 3 : 2); })();
 
