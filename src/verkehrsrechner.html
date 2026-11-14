@@ -288,7 +288,14 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   background: var(--signal-soft); color: var(--signal); font-weight: 600; font-size: 15px;
 }
 .tile-go::after { content: "→"; margin-left: 8px; }
-.back { padding: 16px 20px 20px; border-top: 1px solid var(--line); }
+.back { padding: 16px 20px 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.btn-reset {
+  min-height: 48px; padding: 0 22px; border-radius: 8px; cursor: pointer;
+  background: var(--surface); color: var(--warn); border: 1px solid var(--warn); font: 600 15px var(--font-body);
+}
+.btn-reset::before { content: "↺"; margin-right: 8px; }
+.btn-reset:hover { background: var(--warn-soft); }
+.btn-reset:focus-visible { outline: 3px solid var(--warn); outline-offset: 3px; }
 .btn-back {
   display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 8px;
   background: var(--signal); color: var(--signal-ink); font-weight: 600; font-size: 15px; text-decoration: none;
@@ -535,7 +542,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         </ul>
       </div>
     </details>
-    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a><button type="button" class="btn-reset">Reset</button></div>
   </section>
 
   <!-- ===================== Felgen ===================== -->
@@ -629,7 +636,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         </ul>
       </div>
     </details>
-    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a><button type="button" class="btn-reset">Reset</button></div>
   </section>
 
   <!-- ===================== Achslasten ===================== -->
@@ -715,7 +722,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         </ul>
       </div>
     </details>
-    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a><button type="button" class="btn-reset">Reset</button></div>
   </section>
 
   <!-- ===================== Zentralachsanhänger ===================== -->
@@ -825,7 +832,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         </ul>
       </div>
     </details>
-    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a></div>
+    <div class="back"><a class="btn-back" href="#start">Zur Startseite</a><button type="button" class="btn-reset">Reset</button></div>
   </section>
 </div>
 
@@ -844,7 +851,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var raw = el.value.trim().replace(/['’\s]/g, "").replace(",", ".").replace("−", "-");
     if (raw === "") {
       if (opts.emptyAs !== undefined) return { ok: true, v: opts.emptyAs };
-      return { ok: false, msg: "Bitte einen Wert eingeben." };
+      return { ok: false, empty: true, msg: "Bitte einen Wert eingeben." };
     }
     var v = Number(raw);
     if (!isFinite(v)) return { ok: false, msg: "Bitte nur eine Zahl eingeben." };
@@ -853,10 +860,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     return { ok: true, v: v };
   }
   function showErr(field, res) {
-    var e = field.querySelector(".err");
-    field.classList.toggle("invalid", !res.ok);
-    e.hidden = res.ok;
-    e.textContent = res.ok ? "" : res.msg;
+    // Leere Felder (z. B. nach Reset) nicht rot markieren, Resultat bleibt einfach leer
+    var e = field.querySelector(".err"), quiet = !res.ok && res.empty;
+    field.classList.toggle("invalid", !res.ok && !quiet);
+    e.hidden = res.ok || quiet;
+    e.textContent = res.ok || quiet ? "" : res.msg;
   }
 
   // Auf dem Tablet: beim Antippen ganzen Wert markieren, damit man direkt überschreiben kann
@@ -935,7 +943,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     computeK();
   }
   ["in-t", "in-r", "in-d"].forEach(function (id) {
-    var s = load(id); if (s !== null && s !== "") $(id).value = s;
+    var s = load(id); if (s !== null) $(id).value = s;
     $(id).addEventListener("input", function () { store(id, $(id).value); computeK(); });
   });
   document.querySelectorAll(".modes button").forEach(function (b) {
@@ -952,7 +960,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   };
   document.querySelectorAll("#felgen input[data-ax]").forEach(function (inp) {
     var s = load(inp.id);
-    inp.value = (s !== null && s !== "") ? s : defaults[inp.dataset.ax][inp.dataset.k];
+    inp.value = (s !== null) ? s : defaults[inp.dataset.ax][inp.dataset.k];
     inp.addEventListener("input", function () { store(inp.id, inp.value); computeAxle(inp.dataset.ax); });
   });
   $("felgen").addEventListener("submit", function (e) { e.preventDefault(); });
@@ -1262,7 +1270,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       ax.push({ load: l.ok ? l.v : 0, drv: $("lk-drv" + i).checked, dual: $("lk-dual" + i).checked, air: $("lk-air" + i).checked });
       if (i > 0) {
         var s = parseVal($("lk-sp" + i), { positive: true });
-        $("lk-sp" + i).closest(".input-unit").style.borderColor = s.ok ? "" : "var(--warn)";
+        $("lk-sp" + i).closest(".input-unit").style.borderColor = (s.ok || s.empty) ? "" : "var(--warn)";
         // Eingabe in mm; Werte unter 10 werden als Meter erkannt.
         if (s.ok && s.v < 10) { s.v = Math.round(s.v * 1000); s.m = "m"; }
         ok = ok && s.ok; sp.push(s.ok ? s.v : 0);
@@ -1477,6 +1485,18 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     zaDraw(p, r);
   }
   (function () { var s = Number(load("za-n")); zaSetN(s >= 1 && s <= 3 ? s : zaDef.n); })();
+
+  /* ---------------- Reset: alle Eingaben des Rechners leeren ---------------- */
+  document.querySelectorAll(".btn-reset").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var sec = btn.closest("section");
+      sec.querySelectorAll('input[type="text"]').forEach(function (i) { i.value = ""; store(i.id, ""); });
+      sec.querySelectorAll('input[type="checkbox"]').forEach(function (c) { c.checked = false; store(c.id, "0"); });
+      sec.querySelectorAll("select").forEach(function (s) { s.selectedIndex = 0; store(s.id, s.value); });
+      computeK(); computeAxle("va"); computeAxle("ha"); computeLK(); computeZA();
+      window.scrollTo(0, 0);
+    });
+  });
 
   /* ---------------- Aufklappbereiche merken ---------------- */
   document.querySelectorAll("details.more").forEach(function (d) {
