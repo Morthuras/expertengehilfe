@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beleuchtung Anhänger 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout wie «Beleuchtung Motorwagen 3D»: 3D-Modell mit Auswahlleiste, daneben das Vorschriftenblatt des gewählten Lichts. */
+:root{
+  --paper:#f3f5f7; --card:#ffffff; --ink:#16222e; --muted:#5a6878; --line:#d3dae2;
+  --accent:#f2a900; --dim:#0b63b5;
+  --vts:#0b63b5; --abb:#8a5a00; --r48:#5a6878; --must:#0a6b3d; --cond:#9a5b00;
+  --l-white:#fff3c4; --l-amber:#ffab1a; --l-red:#ff3b30;
+  --font-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --font-body:"Barlow","Segoe UI",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#10171f; --card:#18222d; --ink:#e8eef4; --muted:#9aa9b9; --line:#2c3a49;
+    --accent:#ffbf2e; --dim:#6db4f5; --vts:#6db4f5; --abb:#e0b35a; --r48:#9aa9b9; --must:#5fd39a; --cond:#f0b35a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#10171f; --card:#18222d; --ink:#e8eef4; --muted:#9aa9b9; --line:#2c3a49;
+  --accent:#ffbf2e; --dim:#6db4f5; --vts:#6db4f5; --abb:#e0b35a; --r48:#9aa9b9; --must:#5fd39a; --cond:#f0b35a;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:1.9rem;font-weight:700}
+h2{font-size:1.6rem;font-weight:700}
+p{margin:0}
+a{color:var(--dim)}
+.lead{color:var(--muted);max-width:65ch;margin-top:6px}
+.layout{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:860px){ .layout{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start} }
+.left{display:flex;flex-direction:column;gap:12px}
+.stage{position:relative;background:#eef2f6;border:1px solid var(--line);border-radius:10px;overflow:hidden;aspect-ratio:4 / 3}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.hint{position:absolute;left:10px;bottom:8px;font-size:.8rem;color:#16222e;opacity:.8;pointer-events:none}
+.viewbtns{position:absolute;right:8px;top:8px;display:flex;gap:6px}
+.viewbtns button{font:600 .8rem var(--font-body);color:#16222e;background:rgba(255,255,255,.85);border:1px solid #9aa9b9;border-radius:6px;padding:5px 9px;cursor:pointer}
+.viewbtns button:focus-visible,.chips button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lamptag{position:absolute;display:none;transform:translate(-50%,-190%);background:#16222e;color:#fff;font:600 .8rem var(--font-body);padding:2px 8px;border-radius:5px;white-space:nowrap;pointer-events:none}
+.nogl{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:20px;text-align:center;color:#16222e}
+.group{display:flex;flex-direction:column;gap:6px}
+.group b{font-family:var(--font-display);font-size:1rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:500 .88rem var(--font-body);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:5px 11px 5px 8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.chips button[aria-pressed="true"]{border-color:var(--dim);background:var(--dim);color:var(--card)}
+.dot{width:12px;height:12px;border-radius:50%;border:1px solid var(--muted);flex:none}
+.dot.sq{border-radius:2px;width:16px;height:10px}
+.dot.tri{width:0;height:0;border-radius:0;border:none;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid var(--l-red);background:none!important}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.sheet-top{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.pill{font-family:var(--font-display);font-weight:600;font-size:.82rem;letter-spacing:.03em;padding:0 7px;border-radius:4px;border:1.5px solid currentColor;white-space:nowrap}
+.pill.must{color:var(--must)} .pill.may{color:var(--muted)} .pill.cond{color:var(--cond)}
+.farbe{display:flex;gap:10px;align-items:flex-start}
+.fdots{display:inline-flex;gap:4px;padding-top:4px}
+.fdots .dot{width:16px;height:16px}
+.farbe .more{display:block;font-size:.88rem;color:var(--muted)}
+.maxbox{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;border:2px solid var(--dim);border-radius:8px;padding:10px 12px}
+.maxlabel{font-weight:600}
+.maxnum{font-family:var(--font-display);font-weight:700;font-size:2rem;line-height:1;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+.maxnum.long{font-size:1.25rem}
+.maxnote{grid-column:1 / -1;font-size:.88rem;color:var(--muted)}
+dl{margin:0;display:grid;grid-template-columns:1fr;gap:0}
+.item{padding:9px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(96px,34%) 1fr;gap:4px 12px}
+dt{font-weight:600;color:var(--muted);font-size:.9rem}
+dd{margin:0}
+dd .v{font-weight:600}
+dd .more{display:block;font-size:.88rem;color:var(--muted)}
+.tag{font-family:var(--font-display);font-weight:600;font-size:.75rem;letter-spacing:.03em;padding:0 6px;border-radius:4px;border:1.5px solid currentColor;white-space:nowrap;margin-left:4px}
+.tag.vts{color:var(--vts)} .tag.abb{color:var(--abb)} .tag.r48{color:var(--r48)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.85rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.foot{font-size:.85rem;color:var(--muted);max-width:70ch}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Beleuchtung an Anhängern: 3D-Modell</h1>
+  <p class="lead">Kofferanhänger mit Tandemachse. Modell mit dem Finger oder der Maus drehen, ein Licht, einen Rückstrahler oder das Kontrollschild antippen, und die Vorschriften dazu erscheinen. Grundlage ist die VTS (Fedlex, SR 741.41), Art. 192 bis 194 und Anhang 10.</p>
+</header>
+
+<div class="layout">
+  <div class="left">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Drehbares 3D-Modell eines Anhängers mit anklickbaren Lichtern"></canvas>
+      <div class="viewbtns">
+        <button type="button" data-view="f">Vorn</button>
+        <button type="button" data-view="s">Seite</button>
+        <button type="button" data-view="r">Hinten</button>
+      </div>
+      <div class="hint">Ziehen: drehen · Zwei Finger oder Mausrad: zoomen · Licht antippen</div>
+      <div class="lamptag" id="tag"></div>
+      <div class="nogl" id="nogl">Das 3D-Modell lässt sich auf diesem Gerät nicht anzeigen. Die Lichter sind unten in der Liste auswählbar.</div>
+    </div>
+    <div id="chips" class="left"></div>
+  </div>
+  <div class="left">
+    <article class="sheet" id="sheet" aria-live="polite"></article>
+    <div class="legend">
+      <span><b>Zahl in Klammern:</b> Höchstzahl unter den genannten besonderen Bedingungen</span>
+      <span><span class="pill cond" style="font-size:.75rem">bedingt</span> Pflicht nur unter der genannten Bedingung (Breite, Länge)</span>
+      <span><span class="tag vts" style="margin:0">VTS</span> steht im Text der VTS</span>
+      <span><span class="tag abb" style="margin:0">VTS Abb.</span> Winkel aus Abbildung in Anhang 10, nach UNECE-R 48 eingetragen</span>
+      <span><span class="tag r48" style="margin:0">R 48</span> in der VTS nicht beziffert, Wert aus UNECE-R 48</span>
+    </div>
+  </div>
+</div>
+
+<p class="foot">Hilfsmittel für die Praxis, kein Ersatz für den Verordnungstext. Massgebend ist die VTS in der geltenden Fassung auf <a href="https://www.fedlex.admin.ch/eli/cc/1995/4425_4425_4425/de">fedlex.admin.ch</a>. Das Modell ist schematisch; Lage und Grösse der Lichter sind nicht massstäblich. Alle weiteren, aussen angebrachten Beleuchtungsvorrichtungen sind untersagt (Art. 193 Abs. 3). Erleichterungen für besondere Anhänger (z. B. Art. 197, 209) sind hier nicht abgebildet.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var CSS = { w:'var(--l-white)', a:'var(--l-amber)', r:'var(--l-red)' };
+  var V = 'vts', A = 'abb', R = 'r48';
+  var low = 'Bei Anbauhöhe unter 0,75 m genügen 5° nach unten.';
+  var aufbau = 'bis 2,10 m, wenn es die Form des Aufbaus erfordert';
+  var rand = ['Abstand vom Fahrzeugrand', 'höchstens 0,40 m', '', V, 'Anh. 10 Ziff. 21'];
+  var zw = ['Zwischenraum', 'mindestens 0,50 m', 'Bis 1,30 m Fahrzeugbreite genügen 0,40 m.', V, 'Anh. 10 Ziff. 23'];
+
+  /* Jede Zeile: [Merkmal, Wert, Zusatz, Quellenart, Fundstelle]; st: must / cond (bedingt) / may */
+  var LAMPS = [
+    { id:'stand', g:'Vorn', n:'Standlicht', c:'w', st:'cond', rows:[
+      ['Anzahl', '2', 'Pflicht, wenn die Fahrzeugbreite mehr als 1,60 m beträgt, sonst fakultativ.', V, 'Art. 192 Abs. 1 Bst. a, Art. 193 Abs. 1 Bst. a'],
+      rand,
+      ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '.', V, 'Anh. 10 Ziff. 312, 322'],
+      ['Sichtwinkel horizontal', 'aussen 80°, innen 45°', '', A, 'Anh. 10 Ziff. 63'],
+      ['Sichtwinkel vertikal', 'oben 15°, unten 15°', low, V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'A', '', R, 'ASTRA-Liste'],
+      ['Lichtstärke', '4 bis 60 cd', '', V, 'Anh. 10 Ziff. 43']
+    ]},
+    { id:'rsv', g:'Vorn', n:'Rückstrahler vorn', c:'w', st:'must', rows:[
+      ['Anzahl', '2', 'Pflicht, an der Vorderseite des Fahrzeugs. Nicht dreieckig.', V, 'Art. 192 Abs. 1 Bst. a'],
+      rand,
+      ['Höhe über Boden', '0,25 bis 0,90 m', 'Bis 1,50 m, wenn es die Form des Aufbaus erfordert.', V, 'Anh. 10 Ziff. 313, 324'],
+      ['Sichtwinkel horizontal', 'aussen 30°, innen 30°', '', R, 'R 48'],
+      ['Sichtwinkel vertikal', 'oben 10°, unten 10°', low, R, 'R 48'],
+      ['Homologationszeichen', 'IA, IB', '', R, 'ASTRA-Liste']
+    ]},
+    { id:'mkv', g:'Vorn', n:'Markierlicht vorn', c:'w', st:'cond', rows:[
+      ['Anzahl', '2', 'Pflicht bei Anhängern über 2,10 m Breite, sonst fakultativ.', V, 'Art. 192 Abs. 2, Art. 193 Abs. 1 Bst. a'],
+      ['Abstand vom Fahrzeugrand', 'möglichst aussen, höchstens 0,40 m', '', V, 'Anh. 10 Ziff. 22'],
+      ['Höhe über Boden', '0,35 bis 4,00 m', '', V, 'Anh. 10 Ziff. 312, 323'],
+      ['Sichtwinkel horizontal', 'aussen 80°', '', V, 'Anh. 10 Ziff. 62'],
+      ['Sichtwinkel vertikal', 'oben 5°, unten 20°', '', V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'A, AM', '', R, 'UNECE'],
+      ['Weitere Vorschriften', 'Über 7,00 m Länge: zusätzlich hinten ein nach vorn wirkendes Markierlicht je Seite', 'Möglichst weit hinten. Alternativ seitliche Markierlichter höchstens 3,00 m vom vordersten Fahrzeugrand (einschliesslich Verbindungseinrichtung) und höchstens 1,00 m vom hintersten Fahrzeugrand.', V, 'Art. 192 Abs. 4 und 5']
+    ]},
+    { id:'schluss', g:'Hinten', n:'Schlusslicht', c:'r', st:'must', rows:[
+      ['Anzahl', '2 (4)', 'Pflicht. 4 mit 2 zusätzlichen hoch angeordneten, wenn keine entsprechenden Markierlichter vorhanden sind.', V, 'Art. 192 Abs. 1 Bst. b, Art. 193 Abs. 1 Bst. p'],
+      rand,
+      ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '.', V, 'Anh. 10 Ziff. 312, 322'],
+      ['Sichtwinkel horizontal', 'aussen 80°, innen 45°', '', A, 'Anh. 10 Ziff. 63'],
+      ['Sichtwinkel vertikal', 'oben 15°, unten 15°', low, V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'R, R1, R2', '', R, 'ASTRA-Liste'],
+      ['Lichtstärke', '4 bis 12 cd', '', V, 'Anh. 10 Ziff. 43']
+    ]},
+    { id:'brems', g:'Hinten', n:'Bremslicht', c:'r', st:'must', rows:[
+      ['Anzahl', '2', 'Pflicht.', V, 'Art. 192 Abs. 1 Bst. b'],
+      ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '.', V, 'Anh. 10 Ziff. 312, 322'],
+      ['Sichtwinkel horizontal', 'aussen 45°, innen 45°', '', A, 'Anh. 10 Ziff. 64'],
+      ['Sichtwinkel vertikal', 'oben 15°, unten 15°', low, V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'S1, S2', 'Mit Schlusslicht kombiniert z. B. R-S1.', R, 'ASTRA-Liste'],
+      ['Lichtstärke', '60 bis 185 cd', '', V, 'Anh. 10 Ziff. 43'],
+      ['Weitere Vorschriften', 'Leuchtet bei jeder Betätigung der Betriebsbremse', '', V, 'Art. 75 Abs. 3']
+    ]},
+    { id:'blh', g:'Hinten', n:'Richtungsblinker hinten', c:'a', st:'must', rows:[
+      ['Anzahl', '2 (4)', 'Pflicht an der Rückseite. 4 mit 2 zusätzlichen hoch angeordneten.', V, 'Art. 194, Art. 193 Abs. 1 Bst. o'],
+      rand, zw,
+      ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '. Gilt nicht für die zusätzlichen hoch angeordneten.', V, 'Anh. 10 Ziff. 312, 322'],
+      ['Sichtwinkel horizontal', 'aussen 80°, innen 45°', '', A, 'Anh. 10 Ziff. 51'],
+      ['Sichtwinkel vertikal', 'oben 15°, unten 15°', low, V, 'Anh. 10 Ziff. 5'],
+      ['Homologationszeichen', '2a, 2b', '', R, 'UNECE'],
+      ['Lichtstärke', '50 bis 350 cd', '', V, 'Anh. 10 Ziff. 43'],
+      ['Weitere Vorschriften', 'Blinkfrequenz 90 ± 30 pro Minute', '', V, 'Art. 79']
+    ]},
+    { id:'rsh', g:'Hinten', n:'Rückstrahler hinten (dreieckig)', c:'r', st:'must', tri:true, rows:[
+      ['Anzahl', '2', 'Pflicht, dreieckig. Nicht dreieckige Rückstrahler hinten sind nur zusätzlich und nur mit einer hinteren Leuchte zusammengebaut erlaubt.', V, 'Art. 192 Abs. 1 Bst. b, Art. 193 Abs. 1 Bst. l'],
+      ['Form', 'gleichseitiges Dreieck, Spitze oben', 'Seitenlänge mindestens 0,15 m und höchstens 0,20 m. Darf aus retroreflektierendem Belag bestehen.', V, 'Art. 193 Abs. 2'],
+      rand,
+      ['Höhe über Boden', '0,25 bis 0,90 m', 'Bis 1,50 m, wenn es die Form des Aufbaus erfordert.', V, 'Anh. 10 Ziff. 313, 324'],
+      ['Sichtwinkel horizontal', 'aussen 30°, innen 30°', '', R, 'R 48'],
+      ['Sichtwinkel vertikal', 'oben 10°, unten 10°', low, R, 'R 48'],
+      ['Homologationszeichen', 'IIIA, IIIB', '', R, 'ASTRA-Liste']
+    ]},
+    { id:'ksb', g:'Hinten', n:'Kontrollschildbeleuchtung', c:'w', st:'must', rows:[
+      ['Anzahl', '1', 'Pflicht, sofern ein Kontrollschild erforderlich ist.', V, 'Art. 192 Abs. 1 Bst. b'],
+      ['Homologationszeichen', 'L', '', R, 'ASTRA-Liste'],
+      ['Weitere Vorschriften', 'Schild nachts aus mindestens 20 m lesbar', 'Gleichmässig ausgeleuchtet, kein direktes Licht nach hinten.', V, 'Art. 75 Abs. 5']
+    ]},
+    { id:'ksh', g:'Hinten', n:'Kontrollschild hinten', c:'w', st:'must', plate:true, rows:[
+      ['Anzahl', '1', 'Hinten am Anhänger.', V, 'Art. 45'],
+      ['Höhe über Boden', '0,20 bis 1,50 m', 'Unterer Rand mindestens 0,20 m, oberer Rand höchstens 1,50 m, wenn nicht technische oder betriebliche Gründe entgegenstehen.', V, 'Art. 45 Abs. 2'],
+      ['Anbauwinkel (Neigung)', 'höchstens 30° nach oben, 15° nach unten', 'Möglichst senkrecht anzubringen.', V, 'Art. 45 Abs. 2'],
+      ['Sichtwinkel horizontal', 'je 30° beidseits der Längsachse', '', V, 'Art. 45 Abs. 2'],
+      ['Weitere Vorschriften', 'Gut lesbar, nicht verdeckt', 'Ladung, Arbeitsgeräte und Lastenträger dürfen es nicht verdecken.', V, 'Art. 45 Abs. 2 und 3']
+    ]},
+    { id:'mkh', g:'Hinten', n:'Markierlicht hinten', c:'r', st:'cond', rows:[
+      ['Anzahl', '2', 'Pflicht bei Anhängern über 2,10 m Breite, sonst fakultativ.', V, 'Art. 192 Abs. 2, Art. 193 Abs. 1 Bst. a'],
+      ['Abstand vom Fahrzeugrand', 'möglichst aussen, höchstens 0,40 m', '', V, 'Anh. 10 Ziff. 22'],
+      ['Höhe über Boden', '0,35 bis 4,00 m', '', V, 'Anh. 10 Ziff. 312, 323'],
+      ['Sichtwinkel horizontal', 'aussen 80°', '', V, 'Anh. 10 Ziff. 62'],
+      ['Sichtwinkel vertikal', 'oben 5°, unten 20°', '', V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'R, RM', '', R, 'UNECE'],
+      ['Lichtstärke', '4 bis 12 cd', '', V, 'Anh. 10 Ziff. 43']
+    ]},
+    { id:'nsl', g:'Hinten', n:'Nebelschlusslicht', c:'r', st:'may', rows:[
+      ['Anzahl', '1 oder 2', 'Fakultativ.', V, 'Art. 193 Abs. 1 Bst. i'],
+      ['Lage', 'mindestens 100 mm von den Bremslichtern', 'Zwei sitzen symmetrisch in gleicher Höhe, ein einzelnes in der linken Hälfte oder in der Mitte.', V, 'Art. 76 Abs. 2'],
+      ['Höhe über Boden', '0,25 bis 1,00 m', '', V, 'Anh. 10 Ziff. 313, 325'],
+      ['Sichtwinkel horizontal', 'links 25°, rechts 25°', '', A, 'Anh. 10 Ziff. 67'],
+      ['Sichtwinkel vertikal', 'oben 5°, unten 5°', '', V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'F, B', '', R, 'ASTRA-Liste']
+    ]},
+    { id:'rueckfahr', g:'Hinten', n:'Rückfahrlicht', c:'w', st:'may', rows:[
+      ['Anzahl', '1 oder 2 (4)', 'Fakultativ. Klasse O über 6 m Länge: ein oder zwei zusätzliche, nach hinten oder höchstens 15° zur Seite gerichtet; nur bei eingeschaltetem Standlicht des Zugfahrzeugs zuschaltbar.', V, 'Art. 193 Abs. 1 Bst. b und q'],
+      ['Höhe über Boden', '0,25 bis 1,20 m', '', V, 'Anh. 10 Ziff. 314, 326'],
+      ['Sichtwinkel horizontal', 'aussen 45°, innen 30°', 'Bei nur einem Licht je 45° nach links und rechts.', R, 'R 48'],
+      ['Sichtwinkel vertikal', 'oben 15°, unten 5°', '', R, 'R 48'],
+      ['Homologationszeichen', 'AR', '', R, 'ASTRA-Liste']
+    ]},
+    { id:'zbrems', g:'Hinten', n:'Zusätzliches Bremslicht', c:'r', st:'may', rows:[
+      ['Anzahl', '1 (2)', 'Fakultativ. 1 in der Mitte oder 2 hoch angeordnete. Anhang 10 Ziff. 322 ist nicht anwendbar.', V, 'Art. 193 Abs. 1 Bst. n'],
+      ['Lage', 'hinten in der Mitte', 'Nicht mit anderen Lichtern kombiniert.', V, 'Art. 75 Abs. 4'],
+      ['Sichtwinkel horizontal', 'links 10°, rechts 10°', '', A, 'Anh. 10 Ziff. 65'],
+      ['Homologationszeichen', 'S3', '', R, 'ASTRA-Liste'],
+      ['Lichtstärke', '25 bis 80 cd', '', V, 'Anh. 10 Ziff. 43']
+    ]},
+    { id:'rss', g:'Seitlich', n:'Seitlicher Rückstrahler', c:'a', st:'cond', rows:[
+      ['Anzahl', 'je Seite 1 und mehr', 'Pflicht bei Anhängern über 5,00 m Länge: je Seite einer, nicht dreieckig, in zweckmässiger Anordnung. Sonst fakultativ.', V, 'Art. 192 Abs. 3, Art. 193 Abs. 1 Bst. c'],
+      ['Höhe über Boden', '0,25 bis 0,90 m', 'Bis 1,50 m, wenn es die Form des Aufbaus erfordert.', V, 'Anh. 10 Ziff. 313, 324'],
+      ['Sichtwinkel horizontal', 'je 45° nach vorn und hinten', '', R, 'R 48'],
+      ['Sichtwinkel vertikal', 'oben 10°, unten 10°', low, R, 'R 48'],
+      ['Homologationszeichen', 'IA, IB', '', R, 'ASTRA-Liste']
+    ]},
+    { id:'mks', g:'Seitlich', n:'Seitliches Markierlicht', c:'a', st:'may', rows:[
+      ['Anzahl', 'je Seite 1 und mehr', 'Fakultativ. Bei über 7,00 m Länge als Alternative zum hinteren, nach vorn wirkenden Markierlicht: je eines höchstens 3,00 m vom vordersten Fahrzeugrand (einschliesslich Verbindungseinrichtung) und je eines höchstens 1,00 m vom hintersten Fahrzeugrand.', V, 'Art. 193 Abs. 1 Bst. a und c, Art. 192 Abs. 5'],
+      ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '.', V, 'Anh. 10 Ziff. 312, 322'],
+      ['Sichtwinkel vertikal', 'oben 10°, unten 10°', '', V, 'Anh. 10 Ziff. 61'],
+      ['Homologationszeichen', 'SM1, SM2', '', R, 'UNECE']
+    ]}
+  ];
+
+  /* Lage am Modell: [id, Fläche f/r/s, x, y, z, Breite, Höhe, gespiegelt, Form, Farbton]; vorn = +x, links = -z */
+  var POS = [
+    ['stand','f', 1.21, .80, .70, .10, .06, 1, 'rect', 0xfff6dc], ['rsv','f', 1.21, .70, .48, .11, .05, 1, 'refl', 0xe3e7ea],
+    ['mkv','f', 1.21, 1.90, .76, .08, .05, 1, 'dome', 0xfff6dc],
+    ['blh','r', -2.31, .46, .74, .09, .08, 1, 'rect', 0xffa200], ['brems','r', -2.31, .46, .62, .09, .08, 1, 'rect', 0xff3b30],
+    ['schluss','r', -2.31, .46, .50, .09, .08, 1, 'rect', 0xd0241c],
+    ['rueckfahr','r', -2.31, .46, .36, .08, .07, 0, 'rect', 0xffffff], ['nsl','r', -2.31, .46, -.36, .08, .07, 0, 'round', 0xff4d2e],
+    ['rsh','r', -2.31, .30, .62, .17, .15, 1, 'tri', 0xc81e16],
+    ['ksb','r', -2.31, .555, 0, .10, .025, 0, 'strip', 0xffffff],
+    ['mkh','r', -2.21, 1.90, .76, .08, .05, 1, 'dome', 0xd0241c], ['zbrems','r', -2.21, 1.86, 0, .40, .035, 0, 'led', 0xff3b30],
+    ['rss','s', .70, .72, .855, .12, .05, 1, 'refl', 0xd98a00], ['rss','s', -1.70, .72, .855, .12, .05, 1, 'refl', 0xd98a00],
+    ['mks','s', .95, .95, .855, .07, .05, 1, 'dome', 0xffa200], ['mks','s', -1.95, .95, .855, .07, .05, 1, 'dome', 0xffa200]
+  ];
+
+  /* Zulässige Farben nach VTS Anhang 10 Ziff. 1 */
+  var DOT = { weiss:'#ffffff', hellgelb:'#fff08a', gelb:'var(--l-amber)', rot:'var(--l-red)' };
+  var FARBE = {
+    stand:[['weiss','hellgelb'], 'weiss oder hellgelb', 'Nach vorn gerichtete Lichter.', '111'],
+    mkv:[['weiss','hellgelb'], 'weiss oder hellgelb', 'Nach vorn gerichtete Lichter.', '111'],
+    rsv:[['weiss'], 'weiss', 'Nach vorn gerichtete Rückstrahler.', '111'],
+    schluss:[['rot'], 'rot', '', '112'], mkh:[['rot'], 'rot', '', '112'], rsh:[['rot'], 'rot', '', '112'],
+    brems:[['rot'], 'rot', '', '112'], zbrems:[['rot'], 'rot', '', '112'], nsl:[['rot'], 'rot', '', '112'],
+    blh:[['rot','gelb'], 'rot oder gelb', 'Rückwärts gerichtete Richtungsblinker und Warnblinker.', '112'],
+    rueckfahr:[['weiss','hellgelb','gelb'], 'weiss, hellgelb oder gelb', '', '112'],
+    ksb:[['weiss'], 'weiss', '', '112'],
+    rss:[['rot','gelb'], 'rot oder gelb', 'Seitwärts wirkende Rückstrahler.', '113'],
+    mks:[['rot','gelb'], 'rot oder gelb', '', '113']
+  };
+  var ST = { must:'Pflicht', cond:'bedingt Pflicht', may:'fakultativ' };
+
+  var byId = {};
+  LAMPS.forEach(function(l){ byId[l.id] = l; });
+  var selected = null;
+
+  /* ---------- Auswahlleiste und Vorschriftenblatt ---------- */
+  var chipBox = document.getElementById('chips');
+  ['Vorn', 'Hinten', 'Seitlich'].forEach(function(g){
+    var h = '<div class="group"><b>' + g + '</b><div class="chips">';
+    LAMPS.filter(function(l){ return l.g === g; }).forEach(function(l){
+      var dot = l.plate ? '<span class="dot sq" style="background:#f4f6f8"></span>'
+        : (l.tri ? '<span class="dot tri"></span>' : '<span class="dot" style="background:' + CSS[l.c] + '"></span>');
+      h += '<button type="button" id="chip-' + l.id + '" data-id="' + l.id + '" aria-pressed="false">' + dot + l.n + '</button>';
+    });
+    chipBox.insertAdjacentHTML('beforeend', h + '</div></div>');
+  });
+  chipBox.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-id]');
+    if (b) select(b.getAttribute('data-id'), true);
+  });
+
+  function farbe(l){
+    var f = FARBE[l.id]; if (!f) return '';
+    var dots = f[0].map(function(c){ return '<span class="dot" style="background:' + DOT[c] + '"></span>'; }).join('');
+    return '<div class="farbe"><span class="fdots">' + dots + '</span><span><b>Zulässige Farbe: ' + f[1] + '</b><span class="tag vts">VTS</span>' +
+      '<span class="more">' + (f[2] ? f[2] + ' ' : '') + 'Anh. 10 Ziff. ' + f[3] + '.</span></span></div>';
+  }
+  var sheet = document.getElementById('sheet');
+  function renderSheet(l){
+    var h = '<div class="sheet-top"><h2>' + l.n + '</h2><span class="pill ' + l.st + '">' + ST[l.st] + '</span></div>' + farbe(l) +
+      '<div class="maxbox"><span class="maxlabel">Maximal erlaubte Anzahl</span><span class="maxnum' + (l.rows[0][1].length > 6 ? ' long' : '') + '">' + l.rows[0][1] + '</span>' +
+      '<span class="maxnote">' + l.rows[0][2] + ' <span class="tag vts" style="margin:0">VTS</span> ' + l.rows[0][4] + '</span></div><dl>';
+    l.rows.slice(1).forEach(function(r){
+      var tag = r[3] === 'vts' ? 'VTS' : (r[3] === 'abb' ? 'VTS Abb.' : 'R 48');
+      h += '<div class="item"><dt>' + r[0] + '</dt><dd><span class="v">' + r[1] + '</span><span class="tag ' + r[3] + '">' + tag + '</span>' +
+        '<span class="more">' + (r[2] ? r[2] + ' ' : '') + r[4] + '</span></dd></div>';
+    });
+    sheet.innerHTML = h + '</dl>';
+  }
+
+  var onSelect3d = function(){};
+  function select(id, turn){
+    selected = id;
+    renderSheet(byId[id]);
+    Array.prototype.forEach.call(chipBox.querySelectorAll('button'), function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-id') === id ? 'true' : 'false');
+    });
+    onSelect3d(id, turn);
+  }
+
+  /* ---------- 3D-Modell: Kofferanhänger mit Tandemachse ---------- */
+  function init3d(){
+    if (!window.THREE) throw new Error('three');
+    var canvas = document.getElementById('cv'), stage = document.getElementById('stage');
+    var renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    var scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xeef2f6);
+    var camera = new THREE.PerspectiveCamera(32, 4 / 3, 0.1, 100);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb4bdc6, 0.85));
+    var sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(5, 9, 6); scene.add(sun);
+    var fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-6, 4, -5); scene.add(fill);
+
+    var bodyM  = new THREE.MeshPhongMaterial({ color:0xe9edf1, specular:0x9aa6b2, shininess:40 });
+    var stripe = new THREE.MeshPhongMaterial({ color:0x0b57a4, specular:0x6f8fb0, shininess:60 });
+    var trim   = new THREE.MeshPhongMaterial({ color:0x9aa5b1, specular:0xffffff, shininess:90 });
+    var steel  = new THREE.MeshPhongMaterial({ color:0x2b3238, specular:0x55606a, shininess:40 });
+    var galv   = new THREE.MeshPhongMaterial({ color:0xb7bfc6, specular:0xffffff, shininess:70 });
+    var black  = new THREE.MeshLambertMaterial({ color:0x12171c, side:THREE.DoubleSide });
+    var tyre   = new THREE.MeshLambertMaterial({ color:0x15191e });
+    var rim    = new THREE.MeshPhongMaterial({ color:0xc5cdd5, specular:0xffffff, shininess:90 });
+    var white  = new THREE.MeshLambertMaterial({ color:0xf4f6f8 });
+    var solids = [];
+    function box(dx, dy, dz, x, y, z, mat, solid){
+      var m = new THREE.Mesh(new THREE.BoxGeometry(dx, dy, dz), mat); m.position.set(x, y, z); scene.add(m);
+      if (solid) solids.push(m); return m;
+    }
+
+    // Koffer mit leicht abgerundeten Kanten (Profil quer extrudiert)
+    var L = 3.40, xF = 1.20, xR = -2.20, yB = .62, yT = 1.98, W = 1.70;
+    (function(){
+      var r = .06, s = new THREE.Shape();
+      s.moveTo(xR + r, yB); s.lineTo(xF - r, yB); s.quadraticCurveTo(xF, yB, xF, yB + r);
+      s.lineTo(xF, yT - r); s.quadraticCurveTo(xF, yT, xF - r, yT);
+      s.lineTo(xR + r, yT); s.quadraticCurveTo(xR, yT, xR, yT - r);
+      s.lineTo(xR, yB + r); s.quadraticCurveTo(xR, yB, xR + r, yB);
+      var g = new THREE.ExtrudeGeometry(s, { depth:W - .08, bevelEnabled:true, bevelThickness:.04, bevelSize:.03, bevelSegments:4, curveSegments:10 });
+      g.translate(0, 0, -(W - .08) / 2);
+      var m = new THREE.Mesh(g, bodyM); scene.add(m); solids.push(m);
+    })();
+    // Zierstreifen, Kantenprofile, Hecktüren
+    [W / 2 + .002, -W / 2 - .002].forEach(function(z){
+      box(L - .1, .07, .01, (xF + xR) / 2, 1.10, z, stripe);
+      box(L - .1, .025, .01, (xF + xR) / 2, 1.18, z, stripe);
+    });
+    [[xF, 1], [xR, -1]].forEach(function(p){
+      [W / 2, -W / 2].forEach(function(z){ box(.05, yT - yB, .05, p[0] - p[1] * .015, (yB + yT) / 2, z, trim); });
+    });
+    [W / 2, -W / 2].forEach(function(z){ box(L, .05, .05, (xF + xR) / 2, yT - .015, z, trim); box(L, .05, .05, (xF + xR) / 2, yB + .015, z, trim); });
+    box(.012, yT - yB - .12, .012, xR - .045, (yB + yT) / 2, 0, steel);                      // Türspalt
+    [.25, .55, .85].forEach(function(t){ var y = yB + .08 + t * (yT - yB - .16);              // Scharniere
+      box(.03, .05, .08, xR - .05, y, .80, galv); box(.03, .05, .08, xR - .05, y, -.80, galv); });
+    [-.12, .12].forEach(function(z){ box(.025, (yT - yB) * .7, .022, xR - .055, (yB + yT) / 2, z, galv); }); // Verschlussstangen
+
+    // Fahrgestell, Unterfahrschutz mit Leuchtenträger
+    box(L - .3, .10, .10, (xF + xR) / 2, .54, .55, steel, true); box(L - .3, .10, .10, (xF + xR) / 2, .54, -.55, steel, true);
+    box(.08, .08, 1.2, xF - .2, .54, 0, steel); box(.08, .08, 1.2, xR + .2, .54, 0, steel);
+    box(.06, .16, W - .02, xR - .07, .46, 0, steel);                                           // Leuchtenträger
+    box(.04, .26, .04, xR + .05, .43, .6, steel); box(.04, .26, .04, xR + .05, .43, -.6, steel);
+
+    // Deichsel (V-Form), Kupplungskopf, Stützrad
+    function tube(x1, z1, x2, z2, y, rad, mat){
+      var dx = x2 - x1, dz = z2 - z1, len = Math.hypot(dx, dz);
+      var g = new THREE.CylinderGeometry(rad, rad, len, 14); g.rotateZ(Math.PI / 2);
+      var m = new THREE.Mesh(g, mat); m.position.set((x1 + x2) / 2, y, (z1 + z2) / 2); m.rotation.y = -Math.atan2(dz, dx); scene.add(m); solids.push(m); return m;
+    }
+    tube(xF - .25, .55, 2.35, .05, .52, .045, galv); tube(xF - .25, -.55, 2.35, -.05, .52, .045, galv);
+    box(.32, .09, .12, 2.45, .54, 0, galv, true);
+    var head = new THREE.Mesh(new THREE.SphereGeometry(.075, 18, 12), steel); head.scale.set(1.2, .8, 1); head.position.set(2.62, .57, 0); scene.add(head);
+    box(.12, .05, .07, 2.52, .62, 0, black);
+    box(.06, .14, .06, 1.95, .53, .14, galv); // Stützradhalter
+    var post = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .48, 12), galv); post.position.set(1.95, .35, .19); scene.add(post);
+    var jw = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, .05, 20), tyre); jw.rotation.x = Math.PI / 2; jw.position.set(1.95, .09, .19); scene.add(jw);
+    var crank = new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, .12, 8), galv); crank.position.set(1.95, .64, .19); scene.add(crank);
+
+    // Tandemachse mit Rädern und Kotflügeln
+    [-.95, -.25].forEach(function(x){
+      [1, -1].forEach(function(sd){
+        var t = new THREE.Mesh(new THREE.CylinderGeometry(.27, .27, .19, 34), tyre);
+        t.rotation.x = Math.PI / 2; t.position.set(x, .27, sd * .74); scene.add(t); solids.push(t);
+        var r = new THREE.Mesh(new THREE.CylinderGeometry(.16, .16, .20, 26), rim);
+        r.rotation.x = Math.PI / 2; r.position.copy(t.position); scene.add(r);
+        var c = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .21, 14), steel);
+        c.rotation.x = Math.PI / 2; c.position.copy(t.position); scene.add(c);
+        for (var k = 0; k < 5; k++) {
+          var b = new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, .205, 6), steel);
+          b.rotation.x = Math.PI / 2; var a = k * 2 * Math.PI / 5;
+          b.position.set(x + Math.cos(a) * .095, .27 + Math.sin(a) * .095, sd * .74); scene.add(b);
+        }
+      });
+      box(.08, .07, 1.3, x, .38, 0, steel);
+    });
+    [1, -1].forEach(function(sd){                                                          // Kotflügel über beiden Achsen
+      var g = new THREE.CylinderGeometry(.34, .34, .24, 30, 1, true, Math.PI / 2, Math.PI); g.scale(1.6, 1, 1);
+      var m = new THREE.Mesh(g, black); m.rotation.x = Math.PI / 2; m.rotation.z = 0; m.position.set(-.60, .30, sd * .74);
+      m.rotation.set(Math.PI / 2, 0, 0); scene.add(m);
+      box(1.12, .015, .26, -.60, .64, sd * .74, black);
+    });
+
+    // Boden mit weichem Schatten
+    var groundM = new THREE.Mesh(new THREE.CircleGeometry(8, 64), new THREE.MeshLambertMaterial({ color:0xdfe5eb }));
+    groundM.rotation.x = -Math.PI / 2; scene.add(groundM);
+    var shadow = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:.16, depthWrite:false }));
+    shadow.rotation.x = -Math.PI / 2; shadow.scale.set(2.6, 1.15, 1); shadow.position.set(-.3, .005, 0); scene.add(shadow);
+
+    var hits = [], parts = {};
+    var hitMat = new THREE.MeshBasicMaterial({ transparent:true, opacity:0, depthWrite:false });
+    var edgeS = new THREE.LineBasicMaterial({ color:0xe6007a });
+    var bezel = new THREE.MeshLambertMaterial({ color:0x0c1115 });
+    var chrome = new THREE.MeshPhongMaterial({ color:0xdde2e7, specular:0xffffff, shininess:140 });
+    var gridMat = new THREE.LineBasicMaterial({ color:0x000000, transparent:true, opacity:.45 });
+    function lensMat(hex){
+      var c = new THREE.Color(hex);
+      return new THREE.MeshPhongMaterial({ color:hex, emissive:c.clone().multiplyScalar(.5), specular:0xffffff, shininess:120 });
+    }
+    function xCyl(r, len, seg){ var g = new THREE.CylinderGeometry(r, r, len, seg || 28); g.rotateZ(Math.PI / 2); return g; }
+    function xTorus(r, tube){ var g = new THREE.TorusGeometry(r, tube, 10, 36); g.rotateY(Math.PI / 2); return g; }
+    // Jedes Licht wird mit der Aussenseite in +x gebaut und dann zur Fläche gedreht
+    function addLamp(id, face, x, y, z, w, h, kind, tone){
+      var g = new THREE.Group();
+      g.position.set(x, y, z);
+      g.rotation.y = face === 'f' ? 0 : (face === 'r' ? Math.PI : (z > 0 ? -Math.PI / 2 : Math.PI / 2));
+      var lm = lensMat(tone), m = Math.min(w, h) / 2, i, n;
+      function add(geo, mat, px, pz){ var o = new THREE.Mesh(geo, mat); o.position.x = px || 0; o.position.z = pz || 0; g.add(o); return o; }
+      if (kind !== 'dome' && kind !== 'tri') add(new THREE.BoxGeometry(.03, h + .03, w + .03), bezel, 0);
+      if (kind === 'round') {
+        add(xCyl(m * .92, .036, 28), lm, .014); add(xTorus(m * .92, .007), chrome, .03);
+      } else if (kind === 'led') {
+        n = Math.max(4, Math.round(w / .06));
+        for (i = 0; i < n; i++) add(new THREE.BoxGeometry(.032, h, w / n * .6), lm, .012, -w / 2 + (i + .5) * w / n);
+      } else if (kind === 'refl') {
+        add(new THREE.BoxGeometry(.03, h, w), lm, .01);
+        var v = []; n = Math.round(w / .022);
+        for (i = 1; i < n; i++) { var zz = -w / 2 + i * w / n; v.push(.027, -h / 2, zz, .027, h / 2, zz); }
+        v.push(.027, 0, -w / 2, .027, 0, w / 2);
+        var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
+        g.add(new THREE.LineSegments(lg, gridMat));
+      } else if (kind === 'dome') {
+        add(xCyl(m * 1.25, .02, 20), bezel, .004);
+        var dg = new THREE.SphereGeometry(m, 18, 12); dg.scale(.7, 1, 1); add(dg, lm, .012);
+      } else if (kind === 'tri') {      // gleichseitiges Dreieck, Spitze oben (Art. 193 Abs. 2)
+        var ts = new THREE.Shape(); ts.moveTo(-w / 2, -h / 2); ts.lineTo(w / 2, -h / 2); ts.lineTo(0, h / 2); ts.lineTo(-w / 2, -h / 2);
+        var hole = new THREE.Path(); hole.moveTo(-w / 2 + .03, -h / 2 + .02); hole.lineTo(w / 2 - .03, -h / 2 + .02); hole.lineTo(0, h / 2 - .04); hole.lineTo(-w / 2 + .03, -h / 2 + .02);
+        var outer = new THREE.ExtrudeGeometry(ts, { depth:.02, bevelEnabled:false }); outer.rotateY(Math.PI / 2);
+        add(outer, bezel, -.01);
+        var ring = new THREE.Shape(ts.getPoints()); ring.holes.push(hole);
+        var rg = new THREE.ExtrudeGeometry(ring, { depth:.012, bevelEnabled:false }); rg.rotateY(Math.PI / 2);
+        add(rg, lm, .012);
+      } else {
+        add(new THREE.BoxGeometry(.034, h, w), lm, .012);
+      }
+      var sel = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(.08, h + .07, w + .07)), edgeS);
+      sel.visible = false; g.add(sel);
+      var side = face === 's';
+      var hit = new THREE.Mesh(new THREE.BoxGeometry(side ? Math.max(w + .1, .14) : .14, Math.max(h + .08, .13), side ? .14 : Math.max(w + .1, .14)), hitMat);
+      hit.position.copy(g.position); hit.userData.id = id;
+      scene.add(g); scene.add(hit); hits.push(hit);
+      (parts[id] = parts[id] || []).push({ group:g, sel:sel, face:face });
+    }
+    function addPlate(id, x, y, w, h){
+      var g = new THREE.Group(); g.position.set(x, y, 0); g.rotation.y = Math.PI;
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(.02, h + .016, w + .016), bezel));
+      var pl = new THREE.Mesh(new THREE.BoxGeometry(.024, h, w), white); pl.position.x = .004; g.add(pl);
+      for (var i = 0; i < 6; i++) {
+        var ch = new THREE.Mesh(new THREE.BoxGeometry(.004, h * .5, w * .07), bezel);
+        ch.position.set(.017, 0, -w * .32 + i * w * .128); g.add(ch);
+      }
+      var sel = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(.07, h + .06, w + .06)), edgeS);
+      sel.visible = false; g.add(sel);
+      var hit = new THREE.Mesh(new THREE.BoxGeometry(.12, h + .02, w + .02), hitMat);
+      hit.position.copy(g.position); hit.userData.id = id;
+      scene.add(g); scene.add(hit); hits.push(hit);
+      parts[id] = [{ group:g, sel:sel, face:'r' }];
+    }
+    addPlate('ksh', -2.32, .46, .50, .11);
+    POS.forEach(function(p){
+      addLamp(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[8], p[9]);
+      if (p[7] && p[4] !== 0) addLamp(p[0], p[1], p[2], p[3], -p[4], p[5], p[6], p[8], p[9]);
+    });
+
+    /* Kamera auf Kugelbahn */
+    var cam = { th:.70, ph:1.20, r:9.2, tth:.70, tph:1.20 };
+    var target = new THREE.Vector3(.2, .95, 0);
+    var dirty = true, animating = false;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function place(){
+      camera.position.set(target.x + cam.r * Math.sin(cam.ph) * Math.cos(cam.th), target.y + cam.r * Math.cos(cam.ph), target.z + cam.r * Math.sin(cam.ph) * Math.sin(cam.th));
+      camera.lookAt(target);
+    }
+    function frame(){
+      if (animating) {
+        var dth = cam.tth - cam.th, dph = cam.tph - cam.ph;
+        if (Math.abs(dth) < .004 && Math.abs(dph) < .004) { cam.th = cam.tth; cam.ph = cam.tph; animating = false; }
+        else { cam.th += dth * .16; cam.ph += dph * .16; }
+        dirty = true;
+      }
+      if (dirty) { place(); renderer.render(scene, camera); dirty = false; placeTag(); }
+      requestAnimationFrame(frame);
+    }
+    var tagEl = document.getElementById('tag'), tv = new THREE.Vector3();
+    function placeTag(){
+      if (!selected || !parts[selected]) { tagEl.style.display = 'none'; return; }
+      var best = null, bd = 1e9;
+      parts[selected].forEach(function(p){ var d = camera.position.distanceTo(p.group.position); if (d < bd) { bd = d; best = p; } });
+      tv.copy(best.group.position).project(camera);
+      if (tv.z > 1) { tagEl.style.display = 'none'; return; }
+      tagEl.textContent = byId[selected].n;
+      tagEl.style.display = 'block';
+      tagEl.style.left = ((tv.x + 1) / 2 * stage.clientWidth) + 'px';
+      tagEl.style.top = ((1 - tv.y) / 2 * stage.clientHeight) + 'px';
+    }
+    function resize(){
+      var w = stage.clientWidth, h = stage.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
+    }
+    if (window.ResizeObserver) new ResizeObserver(resize).observe(stage); else window.addEventListener('resize', resize);
+    resize();
+
+    function turnTo(face){
+      var th = face === 'f' ? .55 : (face === 'r' ? Math.PI - .55 : Math.PI / 2 - .25);
+      var cur = cam.th;
+      while (th - cur > Math.PI) th -= 2 * Math.PI;
+      while (th - cur < -Math.PI) th += 2 * Math.PI;
+      cam.tth = th; cam.tph = 1.25;
+      if (reduce) { cam.th = th; cam.ph = 1.25; dirty = true; } else animating = true;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.viewbtns button'), function(b){
+      b.addEventListener('click', function(){ turnTo(b.getAttribute('data-view')); });
+    });
+
+    onSelect3d = function(id, turn){
+      Object.keys(parts).forEach(function(k){
+        parts[k].forEach(function(p){ p.sel.visible = k === id; p.group.scale.setScalar(k === id ? (byId[k].plate ? 1.12 : 1.3) : 1); });
+      });
+      if (turn) turnTo(parts[id][0].face);
+      dirty = true;
+    };
+
+    /* Bedienung: ziehen, zoomen, antippen */
+    var pts = {}, start = null, pinch = 0, ray = new THREE.Raycaster(), v2 = new THREE.Vector2();
+    function count(){ return Object.keys(pts).length; }
+    function dist(){ var k = Object.keys(pts); return Math.hypot(pts[k[0]].x - pts[k[1]].x, pts[k[0]].y - pts[k[1]].y); }
+    canvas.addEventListener('pointerdown', function(e){
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+      pts[e.pointerId] = { x:e.clientX, y:e.clientY };
+      if (count() === 1) start = { x:e.clientX, y:e.clientY, moved:false };
+      if (count() === 2) { pinch = dist(); if (start) start.moved = true; }
+      animating = false;
+    });
+    canvas.addEventListener('pointermove', function(e){
+      var p = pts[e.pointerId]; if (!p) return;
+      var dx = e.clientX - p.x, dy = e.clientY - p.y;
+      p.x = e.clientX; p.y = e.clientY;
+      if (count() === 1) {
+        if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 7) start.moved = true;
+        if (start && start.moved) {
+          cam.th += dx * .009;
+          cam.ph = Math.max(.25, Math.min(1.52, cam.ph - dy * .007));
+          dirty = true;
+        }
+      } else if (count() === 2) {
+        var d = dist();
+        if (pinch) { cam.r = Math.max(5, Math.min(16, cam.r * pinch / d)); dirty = true; }
+        pinch = d;
+      }
+    });
+    function up(e){
+      var was = start, n = count();
+      delete pts[e.pointerId];
+      if (n === 1 && was && !was.moved && e.type === 'pointerup') tap(e);
+      if (count() === 0) start = null;
+      pinch = 0;
+    }
+    canvas.addEventListener('pointerup', up);
+    canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('wheel', function(e){
+      e.preventDefault();
+      cam.r = Math.max(5, Math.min(16, cam.r * (e.deltaY > 0 ? 1.08 : .93))); dirty = true;
+    }, { passive:false });
+    function tap(e){
+      var r = canvas.getBoundingClientRect();
+      v2.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      place(); camera.updateMatrixWorld();
+      ray.setFromCamera(v2, camera);
+      var list = ray.intersectObjects(hits.concat(solids), false);
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i].object;
+        if (o.userData.id) { select(o.userData.id, false); return; }
+        if (i + 1 < list.length && list[i + 1].object.userData.id && list[i + 1].distance - list[i].distance < .12) { select(list[i + 1].object.userData.id, false); return; }
+        return;
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  try { init3d(); }
+  catch (err) {
+    document.getElementById('cv').style.display = 'none';
+    document.getElementById('nogl').style.display = 'flex';
+    Array.prototype.forEach.call(document.querySelectorAll('.viewbtns, .hint'), function(n){ n.style.display = 'none'; });
+  }
+  select('schluss', true);
+})();
+</script>
+</body>
+</html>
