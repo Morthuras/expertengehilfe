@@ -261,6 +261,9 @@ body[data-view]:not([data-view="start"]) .side-label { display: none; }
 body[data-view]:not([data-view="start"]) .side-item { justify-content: center; padding: 0; }
 
 .sec { display: grid; gap: 14px; }
+.bel-frame { padding: 0; }
+.bel-frame iframe { display: block; width: 100%; height: 900px; border: 0; border-radius: 0 0 12px 12px; background: var(--bg); }
+.bel-frame .hint { padding: 12px 20px; margin: 0; }
 .empty-card {
   display: grid; gap: 8px; justify-items: start; max-width: 560px; padding: 22px; border-radius: 16px;
   background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line);
@@ -543,13 +546,13 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 <nav class="side" aria-label="Bereiche">
   <span class="side-label">Bereiche</span>
   <a class="side-item" href="#motorwagen" data-sec="motorwagen" title="Motorwagen">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15.5V12l2.2-4.5h10.6L19 12h2v3.5"/><path d="M3 12h16"/><circle cx="7" cy="16.5" r="2"/><circle cx="17" cy="16.5" r="2"/></svg><span>Motorwagen</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="matrix(-1 0 0 1 24 0)"><path d="M3 15.5V12l2.2-4.5h10.6L19 12h2v3.5"/><path d="M3 12h16"/><circle cx="7" cy="16.5" r="2"/><circle cx="17" cy="16.5" r="2"/></g></svg><span>Motorwagen</span>
   </a>
   <a class="side-item" href="#motorraeder" data-sec="motorraeder" title="Motorräder">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="16" r="3"/><circle cx="18.5" cy="16" r="3"/><path d="M5.5 16l4-6h5l4 6"/><path d="M14.5 10l-1.5-3h3"/><path d="M9.5 10h-3"/></svg><span>Motorräder</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="matrix(-1 0 0 1 24 0)"><circle cx="5.5" cy="16" r="3"/><circle cx="18.5" cy="16" r="3"/><path d="M5.5 16l4-6h5l4 6"/><path d="M14.5 10l-1.5-3h3"/><path d="M9.5 10h-3"/></g></svg><span>Motorräder</span>
   </a>
   <a class="side-item" href="#landwirtschaft" data-sec="landwirtschaft" title="Landwirtschaft">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="15.5" r="4"/><circle cx="18.5" cy="17" r="2.5"/><path d="M5 11.5V5h6l1.5 6.5H20v4"/><path d="M11 17.5h5"/></svg><span>Landwirtschaft</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="matrix(-1 0 0 1 24 0)"><circle cx="7" cy="15.5" r="4"/><circle cx="18.5" cy="17" r="2.5"/><path d="M5 11.5V5h6l1.5 6.5H20v4"/><path d="M11 17.5h5"/></g></svg><span>Landwirtschaft</span>
   </a>
   <a class="side-item" href="#anhaenger" data-sec="anhaenger" title="Anhänger">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14.5h4"/><circle cx="2.5" cy="14.5" r="1"/><path d="M6 8h15v6.5H6z"/><circle cx="13.5" cy="17.5" r="2"/></svg><span>Anhänger</span>
@@ -607,7 +610,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <nav class="tiles" aria-label="Motorwagen">
         <a class="tile" href="#beleuchtung">
           <span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 5.5H9.5a6.5 6.5 0 0 0 0 13H11z"/><path d="M14.5 7.5l6-1.5M14.5 12h6.5M14.5 16.5l6 1.5"/></svg></span>
-          <span class="tile-tx"><b>Beleuchtung</b><span>Lichter und Leuchten</span></span>
+          <span class="tile-tx"><b>Beleuchtung</b><span>3D-Modell · Vorschriften</span></span>
           <span class="tile-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
         </a>
       </nav>
@@ -637,8 +640,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <h2 id="t-bel">Beleuchtung</h2>
       <span class="eyebrow">Motorwagen</span>
     </div>
-    <div style="padding:20px">
-      <div class="empty-card"><b>Inhalt folgt</b><p>Hier kommt das Hilfsmittel für die Beleuchtung von Motorwagen hin. Die Inhalte sind noch nicht festgelegt.</p></div>
+    <div class="bel-frame">
+      <iframe id="bel-3d" title="Beleuchtung Motorwagen 3D" data-src="beleuchtung-3d.html" loading="lazy"></iframe>
+      <p class="hint" id="bel-hint">3D-Modell wird geladen …</p>
     </div>
     <div class="back"><a class="btn-back" href="#motorwagen">Zu Motorwagen</a></div>
   </section>
@@ -2052,8 +2056,29 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var side = document.querySelector(".side"), act = document.querySelector(".side-item[aria-current]");
     if (side && act && side.scrollWidth > side.clientWidth) side.scrollLeft = act.offsetLeft - (side.clientWidth - act.offsetWidth) / 2;
     document.body.setAttribute("data-view", isSec ? "start" : h);
+    if (h === "beleuchtung") loadBel3d();
     document.title = titles[h];
     window.scrollTo(0, 0);
+  }
+  // 3D-Modell Beleuchtung: erst beim Öffnen laden, Höhe an den Inhalt anpassen
+  function loadBel3d() {
+    var f = $("bel-3d");
+    if (!f || f.getAttribute("src")) return;
+    f.addEventListener("load", function () {
+      $("bel-hint").hidden = true;
+      function fit() {
+        try {
+          var d = f.contentDocument;
+          if (d && d.documentElement) {
+            var hgt = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+            if (hgt > 200) f.style.height = hgt + "px";
+          }
+        } catch (e) {}
+      }
+      fit();
+      setInterval(function () { if (!$("view-beleuchtung").hidden) fit(); }, 600);
+    });
+    f.setAttribute("src", f.getAttribute("data-src"));
   }
   function route() { show((location.hash || "").replace("#", "")); }
   // Links direkt umschalten (funktioniert auch, wenn der Rahmen den Hash nicht weitergibt)
