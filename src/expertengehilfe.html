@@ -226,8 +226,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .start-head h2, .start-head p { text-shadow: 0 0 12px var(--bg), 0 0 4px var(--bg); }
 .start-head h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 30px; }
 .start-head p { margin: 0; color: var(--muted); max-width: 65ch; }
-.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: baseline; margin: 0; }
 .kv dt { font-size: 14px; color: var(--muted); }
@@ -295,24 +296,33 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .za-fig text { fill: var(--muted); font: 500 11px var(--font-mono); }
 .za-fig text.em { fill: var(--signal); font-weight: 600; }
 .stand { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); text-shadow: 0 0 8px var(--bg); }
+/* Startseite: schlichte Kacheln mit Symbol, Titel, Kurzinfo und Pfeil */
 .tile {
-  display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; text-decoration: none; color: var(--ink);
-  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; min-height: 180px;
+  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; gap: 14px 8px;
+  text-decoration: none; color: var(--ink); min-height: 138px; padding: 18px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent); border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(15, 30, 50, .06), 0 6px 18px rgba(15, 30, 50, .06);
 }
-.tile:hover { border-color: var(--signal); }
-.tile:active { transform: scale(.99); }
-.tile-tag {
-  justify-self: start; min-width: 48px; height: 48px; padding: 0 10px; border-radius: 8px; background: var(--signal); color: var(--signal-ink);
-  display: grid; place-items: center; font: 700 22px var(--font-display);
+.tile-ic {
+  width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--signal-soft); color: var(--signal);
 }
-.tile h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 24px; }
-.tile p { margin: 0; color: var(--muted); font-size: 14.5px; }
-.tile-meta { font: 500 12.5px var(--font-mono); color: var(--muted); }
-.tile-go {
-  display: flex; justify-content: center; align-items: center; min-height: 48px; border-radius: 8px;
-  background: var(--signal-soft); color: var(--signal); font-weight: 600; font-size: 15px;
+.tile-ic svg, .tile-ar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.tile-ic { grid-column: 1; grid-row: 1; }
+.tile-ar { grid-column: 2; grid-row: 1; justify-self: end; align-self: start; color: var(--muted); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; }
+.tile-ar svg { width: 18px; height: 18px; stroke-width: 2; }
+.tile-tx { grid-column: 1 / -1; grid-row: 2; align-self: end; display: grid; gap: 3px; min-width: 0; }
+.tile-tx b { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.15; }
+.tile-tx span { color: var(--muted); font-size: 13.5px; line-height: 1.3; }
+.tile:hover, .tile:focus-visible { border-color: var(--signal); }
+.tile:hover .tile-ar, .tile:focus-visible .tile-ar { background: var(--signal); color: var(--signal-ink); }
+.tile:active { transform: scale(.985); }
+@media (prefers-reduced-motion: no-preference) {
+  .tile { transition: border-color .15s, transform .1s; }
+  .tile-ar { transition: background-color .15s, color .15s; }
 }
-.tile-go::after { content: "→"; margin-left: 8px; }
 .back { padding: 16px 20px 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .btn-reset {
   min-height: 48px; padding: 0 22px; border-radius: 8px; cursor: pointer;
@@ -326,7 +336,14 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   background: var(--signal); color: var(--signal-ink); font-weight: 600; font-size: 15px; text-decoration: none;
 }
 .btn-back::before { content: "←"; }
-@media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } .tile { min-height: 0; } }
+@media (max-width: 560px) {
+  .tiles { grid-template-columns: 1fr; gap: 8px; }
+  .tile { grid-template-columns: auto 1fr auto; grid-template-rows: auto; align-items: center; min-height: 0; padding: 12px 14px; gap: 12px; }
+  .tile-ic { grid-column: 1; grid-row: 1; }
+  .tile-tx { grid-column: 2; grid-row: 1; align-self: center; }
+  .tile-ar { grid-column: 3; grid-row: 1; align-self: center; }
+  .tile-tx b { font-size: 18px; }
+}
 @media (prefers-reduced-motion: reduce) { .tile:active { transform: none; } }
 
 /* Achslasten */
@@ -467,38 +484,33 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <h2 id="t-start">Berechnung wählen</h2>
       <p>Fahrzeugtechnik für die Prüfung und Eintragung. Die Eingaben bleiben auf diesem Gerät gespeichert.</p>
     </div>
-    <div class="tiles">
+    <nav class="tiles" aria-label="Rechner">
       <a class="tile" href="#kupplung">
-        <h3>Anhängerkupplung</h3>
-        <p>Mindest-D-Wert aus den Gesamtgewichten oder maximale Anhängelast aus dem D-Wert.</p>
-        <span class="tile-meta">UN ECE R55</span>
-        <span class="tile-go">Öffnen</span>
+        <span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3.2"/><path d="M8 11.2v3.3a3 3 0 0 0 3 3h9"/><path d="M16 14.5v6"/></svg></span>
+        <span class="tile-tx"><b>Anhängerkupplung</b><span>D-Wert · Anhängelast</span></span>
+        <span class="tile-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
       <a class="tile" href="#felgen">
-        <h3>Felgen und Spur</h3>
-        <p>Mindest-Einpresstiefe, Distanzscheiben und resultierende Spur für Vorder- und Hinterachse.</p>
-        <span class="tile-meta">höchstens 1 % pro Rad</span>
-        <span class="tile-go">Öffnen</span>
+        <span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v5.5M12 15v5.5M3.5 12H9M15 12h5.5"/></svg></span>
+        <span class="tile-tx"><b>Felgen und Spur</b><span>Einpresstiefe · Spur</span></span>
+        <span class="tile-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
       <a class="tile" href="#achslasten">
-        <h3>Achslasten LKW</h3>
-        <p>Zulässiges Gesamtgewicht und Einträge für Ziffer 243 bei 2 bis 5 Achsen.</p>
-        <span class="tile-meta">VTS Art. 95</span>
-        <span class="tile-go">Öffnen</span>
+        <span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 16V7h11v9"/><path d="M13.5 10h4l3 3.5V16"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M8.3 17.5h6.9M2.5 16v1.5h2.2M18.8 17.5h1.7V16"/></svg></span>
+        <span class="tile-tx"><b>Achslasten LKW</b><span>Gesamtgewicht · Ziffer 243</span></span>
+        <span class="tile-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
       <a class="tile" href="#sattel">
-        <h3>Sattelschlepper</h3>
-        <p>Achslasten beladen und grösstmögliche Sattellast aus Leergewichten und Abstand x, 2 oder 3 Achsen.</p>
-        <span class="tile-meta">VTS Art. 95</span>
-        <span class="tile-go">Öffnen</span>
+        <span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 15.5V9.5h4.5l2.5 3v3"/><path d="M10 12.5h11.5"/><path d="M12 12.5V7h9.5v5.5"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><circle cx="20.5" cy="17.5" r="1.3"/></svg></span>
+        <span class="tile-tx"><b>Sattelschlepper</b><span>Sattellast · Gesamtzugsgewicht</span></span>
+        <span class="tile-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
       <a class="tile" href="#zentralachs">
-        <h3>Zentralachsanhänger</h3>
-        <p>Stützlast aus der Nutzlast, X-Wert der Ladefläche und Nutzlast bei 1 bis 3 Achsen.</p>
-        <span class="tile-meta">max. 10 % bzw. 1000 kg</span>
-        <span class="tile-go">Öffnen</span>
+        <span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 14.5h4"/><circle cx="2.5" cy="14.5" r="1"/><path d="M6 8h15v6.5H6z"/><circle cx="13.5" cy="17.5" r="2"/></svg></span>
+        <span class="tile-tx"><b>Zentralachsanhänger</b><span>Stützlast · X-Wert</span></span>
+        <span class="tile-ar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
       </a>
-    </div>
+    </nav>
     <div class="start-foot">
       <a class="btn-ext" href="https://www.fedlex.admin.ch/eli/cc/1995/4425_4425_4425/de" target="_blank" rel="noopener">VTS auf fedlex öffnen <small>SR 741.41</small></a>
       <p class="stand">Stand: 14.11.2026</p>
