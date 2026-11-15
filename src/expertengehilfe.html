@@ -219,36 +219,28 @@ body[data-view]:not([data-view="start"]) .backdrop { display: none; }
 :root[data-theme="dark"] .backdrop { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; opacity: .45; }
 .wrap { position: relative; z-index: 1; min-width: 0; width: 100%; }
 
-/* Menübalken rechts: blau, linke Kanten abgerundet */
-.shell { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 100vh; min-height: 100dvh; }
-.shell > .wrap { grid-column: 1; grid-row: 1; }
+/* Menübalken oben: blau, untere Kanten abgerundet */
+.shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 100vh; min-height: 100dvh; }
 .side {
-  grid-column: 2; grid-row: 1;
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; align-self: start;
-  height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  width: 204px; display: flex; flex-direction: column; gap: 4px;
-  padding: 18px max(12px, env(safe-area-inset-right, 0px)) 18px 12px;
+  position: sticky; top: 0; z-index: 3;
+  display: flex; flex-direction: row; justify-content: center; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  padding: max(8px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px));
   background: var(--signal);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--signal) 72%, #000) 0%, var(--signal) 55%, color-mix(in srgb, var(--signal) 78%, #fff) 100%);
-  color: var(--signal-ink); border-radius: 22px 0 0 22px;
-  box-shadow: -2px 0 14px rgba(11, 40, 80, .18);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 72%, #000) 0%, var(--signal) 55%, color-mix(in srgb, var(--signal) 78%, #fff) 100%);
+  color: var(--signal-ink); border-radius: 0 0 20px 20px;
+  box-shadow: 0 2px 14px rgba(11, 40, 80, .18);
 }
-.side-label { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; opacity: .75; padding: 4px 12px 10px; }
+.side::-webkit-scrollbar { display: none; }
+.side-label { display: none; }
 .side-item {
-  display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 12px; border-radius: 12px;
+  display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px; border-radius: 12px; flex: none;
   color: inherit; text-decoration: none; font-weight: 600; font-size: 15px; white-space: nowrap;
 }
 .side-item svg { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .side-item:hover { background: color-mix(in srgb, var(--signal-ink) 14%, transparent); }
 .side-item[aria-current="page"] { background: var(--signal-ink); color: var(--signal); }
 .side-item:focus-visible { outline: 3px solid var(--signal-ink); outline-offset: 2px; }
-@media (prefers-reduced-motion: no-preference) { .side-item { transition: background-color .15s, color .15s; } .side { transition: width .2s; } }
-/* In den Rechnern: nur Symbole, damit die Rechner ihre Breite behalten */
-body[data-view]:not([data-view="start"]) .side { width: 72px; padding-right: max(12px, env(safe-area-inset-right, 0px)); }
-body[data-view]:not([data-view="start"]) .side-item span,
-body[data-view]:not([data-view="start"]) .side-label { display: none; }
-body[data-view]:not([data-view="start"]) .side-item { justify-content: center; padding: 0; }
+@media (prefers-reduced-motion: no-preference) { .side-item { transition: background-color .15s, color .15s; } }
 
 .sec { display: grid; gap: 14px; }
 .bel-frame { padding: 0; }
@@ -267,19 +259,10 @@ body[data-view]:not([data-view="start"]) .side-item { justify-content: center; p
 }
 .btn-soft::after { content: "→"; margin-left: 8px; }
 
-/* Telefon: Menübalken oben quer */
+/* Telefon: Menüpunkte schmaler, Balken seitlich verschiebbar */
 @media (max-width: 760px) {
-  .shell { grid-template-columns: 1fr; }
-  .side { grid-column: 1; grid-row: 1; }
-  .shell > .wrap { grid-row: 2; }
-  .side, body[data-view]:not([data-view="start"]) .side {
-    position: sticky; top: env(safe-area-inset-top, 0px); height: auto; width: auto; flex-direction: row; overflow-x: auto;
-    padding: 8px max(10px, env(safe-area-inset-right, 0px)) 8px max(10px, env(safe-area-inset-left, 0px));
-    border-radius: 0 0 18px 18px; gap: 4px; scrollbar-width: none;
-  }
-  .side-label { display: none; }
-  .side-item, body[data-view]:not([data-view="start"]) .side-item { min-height: 44px; padding: 0 12px; font-size: 14px; justify-content: flex-start; }
-  body[data-view]:not([data-view="start"]) .side-item span { display: inline; }
+  .side { justify-content: flex-start; gap: 4px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); border-radius: 0 0 18px 18px; }
+  .side-item { min-height: 44px; padding: 0 12px; font-size: 14px; }
 }
 
 /* Startseite */
@@ -521,15 +504,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   .lk-top > .field:first-child { grid-column: 1 / -1; }
   .lk-split { grid-template-columns: 1fr; }
 }
-/* Handy quer (geringe Höhe, iPad nie betroffen): schmaler Symbolbalken, kompaktere Abstände */
+/* Handy quer (geringe Höhe, iPad nie betroffen): niedriger Menübalken, kompaktere Abstände */
 @media (orientation: landscape) and (max-height: 500px) and (min-width: 561px) {
-  .side, body[data-view]:not([data-view="start"]) .side {
-    width: 64px; gap: 2px; overflow-y: auto; scrollbar-width: none;
-    padding: 8px max(8px, env(safe-area-inset-right, 0px)) 8px 8px; border-radius: 16px 0 0 16px;
-  }
-  .side-label, .side-item span { display: none; }
-  .side-item, body[data-view]:not([data-view="start"]) .side-item { justify-content: center; padding: 0; min-height: 44px; }
-  .wrap { padding-block: 8px 20px; gap: 10px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: 12px; }
+  .side { padding-top: max(4px, env(safe-area-inset-top, 0px)); padding-bottom: 4px; border-radius: 0 0 14px 14px; }
+  .side-item { min-height: 40px; padding: 0 12px; font-size: 14px; }
+  .side-item svg { width: 20px; height: 20px; }
+  .wrap { padding-block: 8px 20px; gap: 10px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
   .mark { width: 28px; height: 28px; font-size: 15px; }
   .brand h1 { font-size: 19px; }
   .start-head h2 { font-size: 24px; }
