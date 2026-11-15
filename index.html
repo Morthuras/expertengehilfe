@@ -529,6 +529,31 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 @media (max-width: 760px) {
   .lk-top { grid-template-columns: 1fr 1fr; }
   .lk-top > .field:first-child { grid-column: 1 / -1; }
+  .lk-split { grid-template-columns: 1fr; }
+}
+/* Handy quer (geringe Höhe, iPad nie betroffen): schmaler Symbolbalken, kompaktere Abstände */
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 561px) {
+  .side, body[data-view]:not([data-view="start"]) .side {
+    width: 64px; gap: 2px; overflow-y: auto; scrollbar-width: none;
+    padding: 8px 8px 8px max(8px, env(safe-area-inset-left, 0px)); border-radius: 0 16px 16px 0;
+  }
+  .side-label, .side-item span { display: none; }
+  .side-item, body[data-view]:not([data-view="start"]) .side-item { justify-content: center; padding: 0; min-height: 44px; }
+  .wrap { padding-block: 8px 20px; gap: 10px; padding-right: max(12px, env(safe-area-inset-right, 0px)); padding-left: 12px; }
+  .mark { width: 28px; height: 28px; font-size: 15px; }
+  .brand h1 { font-size: 19px; }
+  .start-head h2 { font-size: 24px; }
+  .tile { min-height: 112px; padding: 14px; gap: 10px 8px; }
+  .panel-head { padding: 10px 16px; }
+  .panel-head h2 { font-size: 20px; }
+  .split > *, .lk-split > * { padding: 14px; gap: 12px; }
+  .lk-top { padding: 12px 14px; }
+  .answer { font-size: 40px; }
+  #view-achslasten .answer { font-size: 40px; }
+  #view-achslasten .cands { grid-template-columns: 1fr; }
+  #view-achslasten .cand { grid-template-columns: minmax(0, 1fr) auto; }
+  #view-achslasten .cand .v { text-align: right; }
+  .back { padding: 12px 14px; }
 }
 @media (max-width: 520px) {
   .lk-top { grid-template-columns: 1fr; padding: 14px 16px; }
