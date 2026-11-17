@@ -1100,9 +1100,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
             </div>
           </div>
           <div class="field" id="f-za-b">
-            <label for="za-b">Mitte Achsaggregat bis Ende Ladefläche</label>
+            <label for="za-b">Mitte hinterste Achse bis Ende Ladefläche</label>
             <div class="input-unit"><input id="za-b" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
-            <span class="hint" id="za-b-hint">Bei einer Achse: von der Achse bis zum hinteren Ende der Ladefläche</span>
+            <span class="hint" id="za-b-hint">Von der Mitte der hintersten Achse bis zum hinteren Ende der Ladefläche</span>
             <span class="err" hidden></span>
           </div>
           <div class="field" id="f-za-li">
@@ -1141,8 +1141,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <ul>
           <li><b>Nutzlast</b> = Garantiegewicht − Leergewicht.</li>
           <li><b>L</b> = Kugelpfanne bis Mitte Achsaggregat. Die Mitte liegt zwischen erster und letzter Achse, bei einer Achse auf der Achse.</li>
-          <li><b>X-Wert</b> = Mitte Achsaggregat bis Ende Ladefläche − Innenlänge / 2. Negativ heisst: Die Ladeflächenmitte liegt vor dem Achsaggregat, Richtung Zugfahrzeug.</li>
-          <li><b>Stützlast aus der Nutzlast</b> = Nutzlast · (Innenlänge / 2 − Mitte Achsaggregat bis Ende Ladefläche) / L. Die Nutzlast ist dabei gleichmässig über die Innenlänge verteilt.</li>
+          <li><b>b</b> = eingegebenes Mass Mitte hinterste Achse bis Ende Ladefläche. <b>e</b> = Abstand Mitte Achsaggregat bis hinterste Achse (bei einer Achse 0, sonst halber Abstand erste bis letzte Achse).</li>
+          <li><b>X-Wert</b> = b + e − Innenlänge / 2 (Mitte Achsaggregat bis Mitte Ladefläche). Negativ heisst: Die Ladeflächenmitte liegt vor dem Achsaggregat, Richtung Zugfahrzeug.</li>
+          <li><b>Stützlast aus der Nutzlast</b> = Nutzlast · (−X) / L. Die Nutzlast ist dabei gleichmässig über die Innenlänge verteilt.</li>
           <li><b>Stützlast beladen</b> = Stützlast leer (Eingabe) + Stützlast aus der Nutzlast. Geprüft wird der Richtwert mit diesem Gesamtwert.</li>
           <li><b>Richtwert nach VTS Art. 184 Abs. 2:</b> Bei Zentralachsanhängern müssen die Achsen so nahe am Schwerpunkt liegen, dass bei gleichmässiger Belastung höchstens 10 % des Garantiegewichts des Anhängers, jedoch nicht mehr als 1,00 t, als Stützlast auf das Zugfahrzeug übertragen werden. Die zulässige Stützlast von Kupplung und Zugfahrzeug gilt zusätzlich.</li>
         </ul>
@@ -2032,7 +2033,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   (function () { var s = Number(load("ss-n")); ssSetN(s === 3 ? 3 : 2); })();
 
   /* ---------------- Zentralachsanhänger ---------------- */
-  var zaDef = { n: 2, gg: "3500", lg: "900", a: "3000", s1: "800", s2: "800", b: "1700", li: "4000", sl: "50" };
+  var zaDef = { n: 2, gg: "3500", lg: "900", a: "3000", s1: "800", s2: "800", b: "1300", li: "4000", sl: "50" };
   var zaN = zaDef.n;
   ["gg", "lg", "a", "s1", "s2", "b", "li", "sl"].forEach(function (k) {
     var id = "za-" + k, el = $(id), s = load(id);
@@ -2049,7 +2050,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     });
     $("f-za-s1").hidden = n < 2;
     $("f-za-s2").hidden = n < 3;
-    $("za-b-hint").textContent = n === 1 ? "Von der Achse bis zum hinteren Ende der Ladefläche" : "Von der Mitte zwischen erster und letzter Achse bis zum hinteren Ende der Ladefläche";
+    $("za-b-hint").textContent = n === 1 ? "Von der Achse bis zum hinteren Ende der Ladefläche" : "Von der Mitte der hintersten Achse bis zum hinteren Ende der Ladefläche";
     computeZA();
   }
   document.querySelectorAll("#za-n button").forEach(function (b) {
@@ -2064,10 +2065,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     if (p.n >= 3) axles.push(p.a + p.s1 + p.s2);
     var first = axles[0], last = axles[axles.length - 1];
     var L = (first + last) / 2;                 // Mitte Achsaggregat
-    var xEnd = L + p.b, xStart = xEnd - p.li, xC = xEnd - p.li / 2;
-    var X = xC - L;                             // = b − Li/2 ; negativ = vor dem Aggregat
+    var xEnd = last + p.b, xStart = xEnd - p.li, xC = xEnd - p.li / 2;   // b ab Mitte hinterste Achse
+    var X = xC - L;                             // = b + e − Li/2 ; negativ = vor dem Aggregat
     var nl = p.gg - p.lg;
-    var S = nl * (L - xC) / L;                  // = nl · (Li/2 − b) / L
+    var S = nl * (L - xC) / L;                  // = nl · (−X) / L
     return { axles: axles, L: L, xEnd: xEnd, xStart: xStart, xC: xC, X: X, nl: nl, S: S };
   }
 
@@ -2213,9 +2214,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       "         = " + kg(v.gg) + " − " + kg(v.lg) + " = " + kg(r.nl) + " kg\n" +
       '<span class="k">L        = Mitte zwischen erster und letzter Achse</span>\n' +
       "         = " + kg(r.L) + " mm\n" +
-      '<span class="k">X        = b − Li / 2</span>\n' +
-      "         = " + kg(v.b) + " − " + kg(v.li / 2) + " = " + (r.X < 0 ? "−" : "") + kg(Math.abs(r.X)) + " mm\n" +
-      '<span class="k">S Nutzlast = Nutzlast · (Li / 2 − b) / L = Nutzlast · (−X) / L</span>\n' +
+      '<span class="k">e        = Mitte Achsaggregat bis hinterste Achse</span>\n' +
+      "         = " + kg(r.axles[r.axles.length - 1] - r.L) + " mm\n" +
+      '<span class="k">X        = b + e − Li / 2</span>\n' +
+      "         = " + kg(v.b) + " + " + kg(r.axles[r.axles.length - 1] - r.L) + " − " + kg(v.li / 2) + " = " + (r.X < 0 ? "−" : "") + kg(Math.abs(r.X)) + " mm\n" +
+      '<span class="k">S Nutzlast = Nutzlast · (−X) / L</span>\n' +
       "         = " + kg(r.nl) + " · " + (r.X > 0 ? "−" : "") + kg(Math.abs(r.X)) + " / " + kg(r.L) + " = " + fmt(Snl, 1) + " kg\n" +
       '<span class="k">S gesamt  = S leer + S Nutzlast</span>\n' +
       "         = " + kg(v.sl) + " + " + fmt(Snl, 1) + " = " + fmt(S, 1) + " kg";
