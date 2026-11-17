@@ -920,7 +920,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Doppel- und Dreifachachsen:</b> zulässig ist die Summe der zulässigen Einzelachslasten, höchstens aber der Grenzwert nach Art. 95 Abs. 2. Der kleinere Wert ist massgebend.</li>
           <li><b>Ziffer 243:</b> Eine Doppel- oder Dreifachachse wird nur eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen. Ist die Summe kleiner oder gleich, genügen die Einzelachsen.</li>
           <li><b>Achsgruppen:</b> Achsen mit weniger als 1,80 m Abstand bilden eine Gruppe. Doppelachse: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t, mit Bst. f 19 t.</li>
-          <li><b>Dreifachachse:</b> Drei Achsen mit Abständen unter 1,80 m bilden eine Dreifachachse. Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Zusätzlich werden die beiden Doppelachsen innerhalb der Dreifachachse nach ihrem Abstand berechnet und in Ziffer 243 eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen.</li>
+          <li><b>Dreifachachse:</b> Drei Achsen mit Abständen unter 1,80 m bilden eine Dreifachachse. Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Eine Dreifachachse über 1,40 m liegt nur vor, wenn höchstens ein Abstand über 1,40 m liegt. Sind beide Abstände grösser, rechnet die App Doppelachse plus Einzelachse mit der ungünstigeren Aufteilung. Zusätzlich werden die beiden Doppelachsen innerhalb der Dreifachachse nach ihrem Abstand berechnet und in Ziffer 243 eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen.</li>
           <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder jede Antriebsachse doppelbereift und höchstens 9,5 t je Achse. Liegen die Achslasten schon bei höchstens 9,5 t, gilt der höhere Grenzwert direkt. Liegen sie darüber, setzt die App die Achsen nur dann auf 9500 kg, wenn das ein höheres Gesamtgewicht ergibt.</li>
           <li>Nicht abgedeckt: Gesellschaftswagen (19,5 t), Gelenkbusse, unbegleiteter kombinierter Verkehr (44 t), Anfahrhilfen, land- und forstwirtschaftliche Fahrzeuge.</li>
         </ul>
@@ -1454,8 +1454,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     chains.forEach(function (c) {
       if (c.length === 1) plan.push({ type: "single", idx: c });
       else if (c.length === 2) plan.push({ type: "double", idx: c });
-      else if (c.length === 3) plan.push({ type: "triple", idx: c });   // Art. 95 Abs. 2 Bst. g–i, auch über 1,40 m (Bst. i, 27 t)
-      else {
+      else if (c.length === 3) {
+        // Bst. i (über 1,40 m) nur, wenn höchstens EIN Abstand über 1,40 m liegt; sonst keine Dreifachachse
+        if (sp[c[1]] > 1400 && sp[c[2]] > 1400) plan.push({ type: "split3", idx: c });
+        else plan.push({ type: "triple", idx: c });
+      } else {
         var restN = c.length - 2;   // 4 Achsen: Doppel + Doppel, 5 Achsen: Doppel + Dreifach
         warns.push("Mehr als drei Achsen mit weniger als 1,80 m Abstand: als Doppelachse plus " + (restN === 3 ? "Dreifachachse" : "Doppelachse") + " gerechnet, bitte manuell prüfen.");
         plan.push({ type: "double", idx: c.slice(0, 2) });
@@ -1472,7 +1475,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     plan.forEach(function (u) {
       if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);
-      if (u.type === "triple") { markDoubleCap([u.idx[0], u.idx[1]], sp[u.idx[1]]); markDoubleCap([u.idx[1], u.idx[2]], sp[u.idx[2]]); }
+      if (u.type === "triple" || u.type === "split3") { markDoubleCap([u.idx[0], u.idx[1]], sp[u.idx[1]]); markDoubleCap([u.idx[1], u.idx[2]], sp[u.idx[2]]); }
     });
 
     // Bst. f für 3-achsige Motorwagen (26 t)
@@ -1525,6 +1528,20 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         entries.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv, grp: true, sum: tsum });
         units.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv,
           why: tv < tl.v ? "Summe Einzelachsen" :"VTS Art. 95 " + tl.ref + " (grösserer Abstand " + fmt(maxSp / 1000, 2) + " m)" });
+      } else if (u.type === "split3") {
+        var j0 = u.idx[0], j1 = u.idx[1], j2 = u.idx[2];
+        var q1 = doubleUnit([j0, j1]), q2 = doubleUnit([j1, j2]);
+        var optA = q1.v + single[j2].v, optB = single[j0].v + q2.v;
+        warns.push("Achsen " + ord(j0) + "–" + ord(j2) + ": beide Abstände über 1,40 m, keine Dreifachachse. Gerechnet mit der ungünstigeren Aufteilung Doppelachse plus Einzelachse.");
+        entries.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, grp: true, sum: q1.sum });
+        entries.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, grp: true, sum: q2.sum });
+        if (optA <= optB) {
+          units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, why: "Aufteilung (" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) });
+          units.push({ label: ord(j2) + " Achse", kind: "Einzelachse", v: single[j2].v, why: single[j2].why });
+        } else {
+          units.push({ label: ord(j0) + " Achse", kind: "Einzelachse", v: single[j0].v, why: single[j0].why });
+          units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, why: "Aufteilung " + ord(j0) + " + (" + ord(j1) + "+" + ord(j2) + ")" });
+        }
       }
     });
     units.forEach(function (u) { total += u.v; });
