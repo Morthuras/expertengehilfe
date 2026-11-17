@@ -944,6 +944,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <div class="split lk-split">
         <div class="in">
           <div class="axtab ss-tab" id="ss-axles"><!-- per Script --></div>
+          <div class="za-fig" aria-hidden="true"><svg id="ss-svg" viewBox="0 0 600 192" preserveAspectRatio="xMidYMid meet"></svg></div>
           <div class="group">
             <div class="group-label">Fahrzeugkombination · für das Gesamtzugsgewicht</div>
             <div class="ss-trl">
@@ -1801,7 +1802,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var out = ["ss-smax"];
     if (!ok) {
       $("ss-smax").textContent = "–"; $("ss-gov").innerHTML = "<li><span>Bitte die Felder links ausfüllen.</span></li>";
-      $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-gzgnote").textContent = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
+      $("ss-svg").innerHTML = ""; $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-gzgnote").textContent = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
       return;
     }
 
@@ -1829,6 +1830,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     var S = M.v;
     $("ss-smax").innerHTML = kg(S) + " <small>kg</small>";
+    ssDraw(n, sp, D, X, R, S, fF, fR, rear, ax);
 
     // Achslasten beladen
     var rows = '<tr><th>Achse</th><th class="r">leer</th><th class="r">+ Sattellast</th><th class="r">beladen</th><th class="r">zulässig</th><th></th></tr>';
@@ -1932,6 +1934,43 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       '<span class="k">Art. 39: Lenkachse / Gesamt, angetriebene Achsen / Gesamt</span>\n' +
       "  leer:     " + kg(ax[0].leer) + " / " + kg(A0.tot) + " = " + fmt(A0.lenk, 1) + " %   " + kg(A0.drv) + " / " + kg(A0.tot) + " = " + fmt(A0.adh, 1) + " %\n" +
       "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %";
+  }
+  // Skizze Sattelschlepper: Vorderachse links, Masse in mm ab Vorderachse
+  function ssDraw(n, sp, D, X, R, S, fF, fR, rear, ax) {
+    var axles = [0, sp[1]]; if (n === 3) axles.push(sp[1] + sp[2]);
+    var last = axles[axles.length - 1], plate = last - D;
+    var minX = -1500, maxX = Math.max(last + 1000, plate + 600);
+    var W = 600, pad = 20, k = (W - 2 * pad) / (maxX - minX);
+    var P = function (mm) { return pad + (mm - minX) * k; };
+    var gy = 120, wr = 14, frameY = 84, s = "";
+    s += '<line class="ground" x1="0" y1="' + (gy + wr) + '" x2="' + W + '" y2="' + (gy + wr) + '"/>';
+    // Rahmen und Kabine
+    s += '<rect class="body" x="' + P(-1500) + '" y="' + frameY + '" width="' + (P(last + 1000) - P(-1500)) + '" height="10" rx="2"/>';
+    s += '<path class="body" d="M' + P(-1500) + ' ' + frameY + ' V36 Q' + P(-1500) + ' 28 ' + (P(-1500) + 8) + ' 28 H' + P(900) + ' V' + frameY + ' Z"/>';
+    // Achsen mit beladenen Achslasten
+    axles.forEach(function (a, i) {
+      var load = ax[i].leer + (i === 0 ? S * fF : S * fR / rear.length);
+      s += '<circle class="wheel" cx="' + P(a) + '" cy="' + gy + '" r="' + wr + '"/><circle class="hub" cx="' + P(a) + '" cy="' + gy + '" r="4"/>';
+      s += '<text x="' + P(a) + '" y="' + (gy + wr + 14) + '" text-anchor="middle">' + kg(Math.round(load)) + ' kg</text>';
+    });
+    // Sattelplatte und Sattellast
+    s += '<rect x="' + (P(plate) - 14) + '" y="' + (frameY - 7) + '" width="28" height="7" rx="1" style="fill:var(--warn)"/>';
+    s += '<path class="cog" d="M' + P(plate) + ' ' + (frameY - 9) + ' l-6 -10 h12 z"/>';
+    s += '<text class="em" x="' + P(plate) + '" y="' + (frameY - 24) + '" text-anchor="middle">Sattellast ' + kg(S) + ' kg</text>';
+    // Masslinien: R oben, d (und x) unten
+    s += '<line class="mark" x1="' + P(R) + '" y1="16" x2="' + P(R) + '" y2="' + (gy + wr) + '"/>';
+    s += '<line class="dim" x1="' + P(0) + '" y1="18" x2="' + P(R) + '" y2="18"/>';
+    s += '<text x="' + ((P(0) + P(R)) / 2) + '" y="14" text-anchor="middle">R ' + kg(R) + '</text>';
+    // d und x unter dem Boden, mit Hilfslinien von der Sattelplatte
+    s += '<line class="mark" x1="' + P(plate) + '" y1="' + frameY + '" x2="' + P(plate) + '" y2="186" style="stroke:var(--warn)"/>';
+    s += '<line class="dim" x1="' + P(last) + '" y1="' + (gy + wr) + '" x2="' + P(last) + '" y2="170"/>';
+    s += '<line class="dim" x1="' + P(plate) + '" y1="166" x2="' + P(last) + '" y2="166"/>';
+    s += '<text x="' + (Math.max(P(plate), P(last)) + 6) + '" y="169">d ' + kg(D) + '</text>';
+    if (n === 3) {
+      s += '<line class="dim" x1="' + P(plate) + '" y1="182" x2="' + P(R) + '" y2="182"/>';
+      s += '<text x="' + (Math.max(P(plate), P(R)) + 6) + '" y="185">x ' + kg(X) + '</text>';
+    }
+    $("ss-svg").innerHTML = s;
   }
   (function () { var s = Number(load("ss-n")); ssSetN(s === 3 ? 3 : 2); })();
 
