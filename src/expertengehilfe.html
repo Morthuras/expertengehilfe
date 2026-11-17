@@ -339,6 +339,25 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .za-fig .cog { fill: var(--warn); }
 .za-fig text { fill: var(--muted); font: 500 11px var(--font-mono); }
 .za-fig text.em { fill: var(--signal); font-weight: 600; }
+/* Realistische Skizzen: feste Fahrzeugfarben, in hell und dunkel lesbar */
+.za-fig .tire { fill: #1f252b; }
+.za-fig .tread { fill: none; stroke: #3a434c; stroke-width: 1.2; }
+.za-fig .rim { fill: #c5ccd4; stroke: #8e98a3; stroke-width: 1; }
+.za-fig .hubc { fill: #7d8792; }
+.za-fig .chassis { fill: #39424b; }
+.za-fig .fender { fill: none; stroke: #2a3138; stroke-width: 4; stroke-linecap: round; }
+.za-fig .cab { fill: #24507c; stroke: #173a5c; stroke-width: 1.2; }
+.za-fig .glass { fill: #b8d0e6; stroke: #173a5c; stroke-width: 1; }
+.za-fig .seam { fill: none; stroke: #173a5c; stroke-width: 1; opacity: .7; }
+.za-fig .dark { fill: #2a3138; }
+.za-fig .metal { fill: #aab3bd; stroke: #7d8792; stroke-width: 1; }
+.za-fig .lampr { fill: #d8382a; }
+.za-fig .lampw { fill: #f3e6a6; }
+.za-fig .plate5 { fill: var(--warn); }
+.za-fig .deck { fill: #8a6a48; }
+.za-fig .side { fill: #24507c; stroke: #173a5c; stroke-width: 1.2; }
+.za-fig .stake { stroke: #9aa3ad; stroke-width: 2; }
+.za-fig .tbar { fill: none; stroke: #39424b; stroke-width: 5; stroke-linecap: round; }
 .stand { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); text-shadow: 0 0 8px var(--bg); }
 /* Startseite: schlichte Kacheln mit Symbol, Titel, Kurzinfo und Pfeil */
 .tile {
@@ -1939,38 +1958,59 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   function ssDraw(n, sp, D, X, R, S, fF, fR, rear, ax) {
     var axles = [0, sp[1]]; if (n === 3) axles.push(sp[1] + sp[2]);
     var last = axles[axles.length - 1], plate = last - D;
-    var minX = -1500, maxX = Math.max(last + 1000, plate + 600);
-    var W = 600, pad = 20, k = (W - 2 * pad) / (maxX - minX);
-    var P = function (mm) { return pad + (mm - minX) * k; };
-    var gy = 120, wr = 14, frameY = 84, s = "";
-    s += '<line class="ground" x1="0" y1="' + (gy + wr) + '" x2="' + W + '" y2="' + (gy + wr) + '"/>';
-    // Rahmen und Kabine
-    s += '<rect class="body" x="' + P(-1500) + '" y="' + frameY + '" width="' + (P(last + 1000) - P(-1500)) + '" height="10" rx="2"/>';
-    s += '<path class="body" d="M' + P(-1500) + ' ' + frameY + ' V36 Q' + P(-1500) + ' 28 ' + (P(-1500) + 8) + ' 28 H' + P(900) + ' V' + frameY + ' Z"/>';
-    // Achsen mit beladenen Achslasten
+    var front = -1650, end = Math.max(last + 1150, plate + 700);
+    var g = sketch(front, end, 3650, n === 3 ? -1250 : -950);
+    var tr = 520, fr0 = 880, fr1 = 1120;   // Reifenradius, Rahmen unten/oben
+    g.ground();
+    // Rahmen, Tank, Auspuff
+    g.rect(-1350, fr0, last + 950, fr1, "chassis");
+    var tank0 = 1050, tank1 = axles[1] - 780;
+    if (tank1 - tank0 > 500) { g.rect(tank0, 470, Math.min(tank1, tank0 + 1500), 930, "metal", 6); }
+    g.rect(960, fr1, 1050, 3250, "metal");
+    // Kabine (Seitenansicht, Front links)
+    g.rect(-1560, 430, -1120, 900, "dark", 3);                       // Stossfänger
+    g.rect(-1575, 640, -1535, 820, "lampw", 1);                      // Scheinwerfer
+    g.poly([[-1470, 900], [-1470, 2280], [-1360, 2930], [-1250, 3060], [880, 3060], [920, 2960], [920, 900], [620, 900], [600, 1150], [-600, 1150], [-620, 900]], "cab");
+    g.poly([[-1350, 2380], [-1265, 2870], [-330, 2870], [-330, 2380]], "glass");      // Seitenfenster
+    g.poly([[-1240, 1240], [-1240, 2880], [-280, 2880], [-280, 1240]], "seam");       // Türfuge
+    g.rect(-120, 2400, 760, 2870, "glass", 2);                       // Schlafkabinenfenster
+    g.rect(-1700, 2200, -1640, 2720, "dark", 2);                     // Spiegel
+    g.line(-1640, 2650, -1470, 2700, "seam");
+    g.rect(-760, 620, -380, 690, "dark");                            // Trittstufe
+    // Kotflügel und Räder
+    g.fender(0, 610, tr);
+    axles.slice(1).forEach(function (a) { g.fender(a, 620, tr + 40); });
+    g.rect(last + 640, 260, last + 700, 960, "dark");                // Schmutzfänger
+    g.rect(last + 900, 980, last + 950, 1110, "lampr");              // Schlussleuchte
+    axles.forEach(function (a, i) { g.wheel(a, tr, i > 0 && ax[i].dual); });
+    // Sattelkupplung mit Sattelplatte
+    g.rect(plate - 520, fr1, plate + 520, fr1 + 120, "chassis");
+    g.rect(plate - 470, fr1 + 120, plate + 470, fr1 + 220, "plate5", 2);
+    g.line(plate, 2500, plate, fr1 + 300, "fender", "stroke:var(--warn);stroke-width:2.5");
+    g.s += '<path class="cog" d="M' + g.P(plate) + " " + (g.Y(fr1 + 230) - 1) + ' l-6 -10 h12 z"/>';
+    var sLbl = "Sattellast " + kg(S) + " kg", sW = sLbl.length * 6.8 / g.k;   // Textbreite in mm
+    if (plate - 120 - sW > 1100) g.text(plate - 120, 2380, sLbl, "end", "em");      // links über dem Rahmen
+    else g.text(plate + 120, 2380, sLbl, "start", "em");                             // sonst rechts der Sattelplatte
+    // Beladene Achslasten unter den Rädern
     axles.forEach(function (a, i) {
       var load = ax[i].leer + (i === 0 ? S * fF : S * fR / rear.length);
-      s += '<circle class="wheel" cx="' + P(a) + '" cy="' + gy + '" r="' + wr + '"/><circle class="hub" cx="' + P(a) + '" cy="' + gy + '" r="4"/>';
-      s += '<text x="' + P(a) + '" y="' + (gy + wr + 14) + '" text-anchor="middle">' + kg(Math.round(load)) + ' kg</text>';
+      g.text(a, -260, kg(Math.round(load)) + " kg");
     });
-    // Sattelplatte und Sattellast
-    s += '<rect x="' + (P(plate) - 14) + '" y="' + (frameY - 7) + '" width="28" height="7" rx="1" style="fill:var(--warn)"/>';
-    s += '<path class="cog" d="M' + P(plate) + ' ' + (frameY - 9) + ' l-6 -10 h12 z"/>';
-    s += '<text class="em" x="' + P(plate) + '" y="' + (frameY - 24) + '" text-anchor="middle">Sattellast ' + kg(S) + ' kg</text>';
     // Masslinien: R oben, d (und x) unten
-    s += '<line class="mark" x1="' + P(R) + '" y1="16" x2="' + P(R) + '" y2="' + (gy + wr) + '"/>';
-    s += '<line class="dim" x1="' + P(0) + '" y1="18" x2="' + P(R) + '" y2="18"/>';
-    s += '<text x="' + ((P(0) + P(R)) / 2) + '" y="14" text-anchor="middle">R ' + kg(R) + '</text>';
-    // d und x unter dem Boden, mit Hilfslinien von der Sattelplatte
-    s += '<line class="mark" x1="' + P(plate) + '" y1="' + frameY + '" x2="' + P(plate) + '" y2="186" style="stroke:var(--warn)"/>';
-    s += '<line class="dim" x1="' + P(last) + '" y1="' + (gy + wr) + '" x2="' + P(last) + '" y2="170"/>';
-    s += '<line class="dim" x1="' + P(plate) + '" y1="166" x2="' + P(last) + '" y2="166"/>';
-    s += '<text x="' + (Math.max(P(plate), P(last)) + 6) + '" y="169">d ' + kg(D) + '</text>';
+    g.line(R, 3480, R, 0, "mark");
+    g.line(0, 3480, R, 3480, "dim");
+    g.line(0, 3400, 0, 3560, "dim");
+    g.text(R / 2, 3530, "R " + kg(R));
+    g.line(plate, -380, plate, n === 3 ? -980 : -680, "mark", "stroke:var(--warn)");
+    g.line(last, -380, last, -680, "dim");
+    g.line(plate, -600, last, -600, "dim");
+    g.text(Math.max(plate, last) + 120, -640, "d " + kg(D), "start");
     if (n === 3) {
-      s += '<line class="dim" x1="' + P(plate) + '" y1="182" x2="' + P(R) + '" y2="182"/>';
-      s += '<text x="' + (Math.max(P(plate), P(R)) + 6) + '" y="185">x ' + kg(X) + '</text>';
+      g.line(R, -380, R, -980, "dim");
+      g.line(plate, -900, R, -900, "dim");
+      g.text(Math.max(plate, R) + 120, -940, "x " + kg(X), "start");
     }
-    $("ss-svg").innerHTML = s;
+    g.done($("ss-svg"));
   }
   (function () { var s = Number(load("ss-n")); ssSetN(s === 3 ? 3 : 2); })();
 
@@ -2014,31 +2054,85 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     return { axles: axles, L: L, xEnd: xEnd, xStart: xStart, xC: xC, X: X, nl: nl, S: S };
   }
 
+  /* Gemeinsame Zeichenhilfe: Masse in mm (x nach hinten, h über Boden), Ausgabe in SVG-Einheiten */
+  function sketch(front, end, top, bottom) {
+    var W = 600, pad = 16, k = (W - 2 * pad) / (end - front);
+    var g = {
+      k: k, W: W, H: Math.round((top - bottom) * k + 8), s: "",
+      P: function (x) { return +(pad + (x - front) * k).toFixed(1); },
+      Y: function (h) { return +(4 + (top - h) * k).toFixed(1); }
+    };
+    g.rect = function (x1, h1, x2, h2, cls, rx) {
+      g.s += '<rect class="' + cls + '" x="' + g.P(Math.min(x1, x2)) + '" y="' + g.Y(Math.max(h1, h2)) + '" width="' + Math.abs(x2 - x1) * k + '" height="' + Math.abs(h2 - h1) * k + '"' + (rx ? ' rx="' + rx + '"' : "") + "/>";
+    };
+    g.poly = function (pts, cls) {
+      g.s += '<path class="' + cls + '" d="M' + pts.map(function (q) { return g.P(q[0]) + " " + g.Y(q[1]); }).join(" L") + ' Z"/>';
+    };
+    g.line = function (x1, h1, x2, h2, cls, style) {
+      g.s += '<line class="' + cls + '" x1="' + g.P(x1) + '" y1="' + g.Y(h1) + '" x2="' + g.P(x2) + '" y2="' + g.Y(h2) + '"' + (style ? ' style="' + style + '"' : "") + "/>";
+    };
+    g.text = function (x, h, t, anchor, cls) {
+      g.s += '<text' + (cls ? ' class="' + cls + '"' : "") + ' x="' + g.P(x) + '" y="' + g.Y(h) + '" text-anchor="' + (anchor || "middle") + '">' + t + "</text>";
+    };
+    g.wheel = function (x, r, dual) {   // Reifen mit Profil, Felge, Nabe und Radbolzen
+      var cx = g.P(x), cy = g.Y(r), R = r * k;
+      g.s += '<circle class="tire" cx="' + cx + '" cy="' + cy + '" r="' + R + '"/>';
+      g.s += '<circle class="tread" cx="' + cx + '" cy="' + cy + '" r="' + (R * 0.9) + '"/>';
+      g.s += '<circle class="rim" cx="' + cx + '" cy="' + cy + '" r="' + (R * 0.6) + '"/>';
+      if (dual) g.s += '<circle class="tread" cx="' + cx + '" cy="' + cy + '" r="' + (R * 0.5) + '"/>';
+      g.s += '<circle class="hubc" cx="' + cx + '" cy="' + cy + '" r="' + (R * 0.22) + '"/>';
+      for (var b = 0; b < 6; b++) {
+        var w = b * Math.PI / 3;
+        g.s += '<circle class="dark" cx="' + (cx + Math.cos(w) * R * 0.36).toFixed(1) + '" cy="' + (cy + Math.sin(w) * R * 0.36).toFixed(1) + '" r="' + Math.max(0.8, R * 0.04).toFixed(1) + '"/>';
+      }
+    };
+    g.fender = function (x, rr, hc) {
+      g.s += '<path class="fender" d="M' + g.P(x - rr) + " " + g.Y(hc) + " A" + rr * k + " " + rr * k + " 0 0 1 " + g.P(x + rr) + " " + g.Y(hc) + '"/>';
+    };
+    g.ground = function () { g.s += '<line class="ground" x1="0" y1="' + g.Y(0) + '" x2="' + W + '" y2="' + g.Y(0) + '"/>'; };
+    g.done = function (svg) { svg.setAttribute("viewBox", "0 0 " + W + " " + g.H); svg.innerHTML = g.s; };
+    return g;
+  }
+
   function zaDraw(p, r) {
-    var svg = $("za-svg");
-    var minX = Math.min(0, r.xStart), maxX = Math.max(r.xEnd, r.axles[r.axles.length - 1]);
-    var span = maxX - minX || 1, W = 600, pad = 24, k = (W - 2 * pad) / span;
-    var X = function (mm) { return pad + (mm - minX) * k; };
-    var gy = 112, wr = 13, deckY = 62, deckH = 18;
-    var s = "";
-    s += '<line class="ground" x1="0" y1="' + (gy + wr) + '" x2="' + W + '" y2="' + (gy + wr) + '"/>';
-    s += '<line class="bar" x1="' + X(0) + '" y1="' + (deckY + deckH - 4) + '" x2="' + X(Math.max(r.xStart, r.axles[0] - 600)) + '" y2="' + (deckY + deckH - 4) + '"/>';
-    s += '<rect class="body" x="' + X(r.xStart) + '" y="' + deckY + '" width="' + Math.max(2, (r.xEnd - r.xStart) * k) + '" height="' + deckH + '" rx="2"/>';
-    r.axles.forEach(function (ax) {
-      s += '<circle class="wheel" cx="' + X(ax) + '" cy="' + gy + '" r="' + wr + '"/><circle class="hub" cx="' + X(ax) + '" cy="' + gy + '" r="4"/>';
-      s += '<line class="dim" x1="' + X(ax) + '" y1="' + (deckY + deckH) + '" x2="' + X(ax) + '" y2="' + (gy - wr) + '"/>';
-    });
-    s += '<circle class="ball" cx="' + X(0) + '" cy="' + (deckY + deckH - 4) + '" r="5"/>';
-    // Mitte Achsaggregat und Mitte Ladefläche
-    s += '<line class="mark" x1="' + X(r.L) + '" y1="22" x2="' + X(r.L) + '" y2="' + (gy + wr) + '"/>';
-    s += '<path class="cog" d="M' + X(r.xC) + ' ' + (deckY - 2) + ' l-6 -10 h12 z"/>';
-    // Masslinien oben
-    s += '<line class="dim" x1="' + X(0) + '" y1="30" x2="' + X(r.L) + '" y2="30"/>';
-    s += '<text x="' + ((X(0) + X(r.L)) / 2) + '" y="26" text-anchor="middle">L ' + kg(r.L) + '</text>';
-    s += '<line class="dim" x1="' + X(r.L) + '" y1="48" x2="' + X(r.xC) + '" y2="48"/>';
-    s += '<text class="em" x="' + X(r.xC) + '" y="44" text-anchor="' + (r.X < 0 ? "end" : "start") + '">X ' + (r.X < 0 ? "−" : "+") + kg(Math.abs(r.X)) + '</text>';
-    s += '<text x="' + ((X(r.xStart) + X(r.xEnd)) / 2) + '" y="' + (deckY + deckH + 14) + '" text-anchor="middle">Innenlänge ' + kg(p.li) + '</text>';
-    svg.innerHTML = s;
+    var last = r.axles[r.axles.length - 1];
+    var front = Math.min(-350, r.xStart - 150), end = Math.max(r.xEnd, last + 450) + 150;
+    var g = sketch(front, end, 1750, -520);
+    var tr = 330, deck0 = 640, deck1 = 740, sideTop = 1120, cpl = 450;
+    g.ground();
+    // Deichsel mit Zugkugelkupplung und Stützrad
+    var dEnd = Math.max(r.xStart + 250, 400);
+    g.line(0, cpl, dEnd, deck0 - 30, "tbar");
+    g.rect(-170, cpl - 60, 130, cpl + 70, "dark", 3);
+    if (r.xStart > 700) {
+      var jw = Math.min(r.xStart * 0.55, 900);
+      g.rect(jw - 25, 120, jw + 25, deck0 - 40, "metal");
+      g.wheel(jw, 100, false);
+    }
+    // Rahmen, Kotflügel, Räder
+    g.rect(r.xStart, deck0 - 90, r.xEnd, deck0, "chassis");
+    r.axles.forEach(function (a) { g.fender(a, 410, deck0 - 90 - 0); });
+    r.axles.forEach(function (a) { g.wheel(a, tr, false); });
+    // Ladefläche mit Bordwänden und Rungen
+    g.rect(r.xStart, deck0, r.xEnd, deck1, "deck");
+    g.rect(r.xStart, deck1, r.xEnd, sideTop, "side", 2);
+    var nSeg = Math.max(1, Math.round((r.xEnd - r.xStart) / 1100));
+    for (var i = 1; i < nSeg; i++) { var xs = r.xStart + (r.xEnd - r.xStart) * i / nSeg; g.line(xs, deck1, xs, sideTop, "stake"); }
+    g.line(r.xStart, (deck1 + sideTop) / 2, r.xEnd, (deck1 + sideTop) / 2, "seam");
+    g.rect(r.xEnd - 30, deck0 - 70, r.xEnd + 40, deck0 + 20, "lampr", 2);
+    // Kupplungspunkt, Mitte Achsaggregat, Mitte Ladefläche
+    g.s += '<circle class="ball" cx="' + g.P(0) + '" cy="' + g.Y(cpl) + '" r="5"/>';
+    g.line(r.L, 1600, r.L, 0, "mark");
+    g.s += '<path class="cog" d="M' + g.P(r.xC) + " " + (g.Y(sideTop) - 2) + ' l-6 -10 h12 z"/>';
+    // Masslinien
+    g.line(0, 1620, r.L, 1620, "dim");
+    g.text(r.L / 2, 1660, "L " + kg(r.L));
+    g.line(r.L, 1380, r.xC, 1380, "dim");
+    g.text(r.xC, 1420, "X " + (r.X < 0 ? "−" : "+") + kg(Math.abs(r.X)), r.X < 0 ? "end" : "start", "em");
+    g.line(r.xStart, -260, r.xEnd, -260, "dim");
+    g.line(r.xStart, -180, r.xStart, -340, "dim"); g.line(r.xEnd, -180, r.xEnd, -340, "dim");
+    g.text((r.xStart + r.xEnd) / 2, -440, "Innenlänge " + kg(p.li));
+    g.done($("za-svg"));
   }
 
   function computeZA() {
