@@ -903,7 +903,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Doppel- und Dreifachachsen:</b> zulässig ist die Summe der zulässigen Einzelachslasten, höchstens aber der Grenzwert nach Art. 95 Abs. 2. Der kleinere Wert ist massgebend.</li>
           <li><b>Ziffer 243:</b> Eine Doppel- oder Dreifachachse wird nur eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen. Ist die Summe kleiner oder gleich, genügen die Einzelachsen.</li>
           <li><b>Achsgruppen:</b> Achsen mit weniger als 1,80 m Abstand bilden eine Gruppe. Doppelachse: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t, mit Bst. f 19 t.</li>
-          <li><b>Dreifachachse:</b> Drei Achsen mit Abständen unter 1,80 m bilden eine Dreifachachse. Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Innerhalb einer Dreifachachse werden keine Doppelachsen gebildet.</li>
+          <li><b>Dreifachachse:</b> Drei Achsen mit Abständen unter 1,80 m bilden eine Dreifachachse. Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Zusätzlich werden die beiden Doppelachsen innerhalb der Dreifachachse nach ihrem Abstand berechnet und in Ziffer 243 eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen.</li>
           <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder jede Antriebsachse doppelbereift und höchstens 9,5 t je Achse. Liegen die Achslasten schon bei höchstens 9,5 t, gilt der höhere Grenzwert direkt. Liegen sie darüber, setzt die App die Achsen nur dann auf 9500 kg, wenn das ein höheres Gesamtgewicht ergibt.</li>
           <li>Nicht abgedeckt: Gesellschaftswagen (19,5 t), Gelenkbusse, unbegleiteter kombinierter Verkehr (44 t), Anfahrhilfen, land- und forstwirtschaftliche Fahrzeuge.</li>
         </ul>
@@ -1454,7 +1454,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       if (!f.a && f.b && capOn) idx.forEach(function (i) { cap[i] = true; });
     }
     plan.forEach(function (u) {
-      if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);   // Dreifachachsen haben eigene Grenzwerte (Bst. g–i), keine Doppelachsen darin
+      if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);
+      if (u.type === "triple") { markDoubleCap([u.idx[0], u.idx[1]], sp[u.idx[1]]); markDoubleCap([u.idx[1], u.idx[2]], sp[u.idx[2]]); }
     });
 
     // Bst. f für 3-achsige Motorwagen (26 t)
@@ -1497,10 +1498,13 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         entries.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v, grp: true, sum: d.sum });
       } else if (u.type === "triple") {
         var i0 = u.idx[0], i1 = u.idx[1], i2 = u.idx[2];
+        var p1 = doubleUnit([i0, i1]), p2 = doubleUnit([i1, i2]);   // Doppelachsen innerhalb der Dreifachachse
         var maxSp = Math.max(sp[i1], sp[i2]);
         var tl = tripleLimit(maxSp);
         var tsum = single[i0].v + single[i1].v + single[i2].v;
         var tv = Math.min(tl.v, tsum);
+        entries.push({ label: ord(i0) + "+" + ord(i1) + " Achse", kind: "Doppelachse", v: p1.v, grp: true, sum: p1.sum });
+        entries.push({ label: ord(i1) + "+" + ord(i2) + " Achse", kind: "Doppelachse", v: p2.v, grp: true, sum: p2.sum });
         entries.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv, grp: true, sum: tsum });
         units.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv,
           why: tv < tl.v ? "Summe Einzelachsen" :"VTS Art. 95 " + tl.ref + " (grösserer Abstand " + fmt(maxSp / 1000, 2) + " m)" });
