@@ -1976,23 +1976,23 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var axles = [0, sp[1]]; if (n === 3) axles.push(sp[1] + sp[2]);
     var last = axles[axles.length - 1], plate = last - D;
     var front = -1650, end = Math.max(last + 1150, plate + 700);
-    var g = sketch(front, end, 3650, n === 3 ? -1250 : -950);
+    var g = sketch(front, end, 3300, n === 3 ? -1250 : -950);
     var tr = 520, fr0 = 880, fr1 = 1120;   // Reifenradius, Rahmen unten/oben
     g.ground();
     // Rahmen, Tank, Auspuff
     g.rect(-1350, fr0, last + 950, fr1, "chassis");
-    var tank0 = 1050, tank1 = axles[1] - 780;
+    var tank0 = 880, tank1 = axles[1] - 780;
     if (tank1 - tank0 > 500) { g.rect(tank0, 470, Math.min(tank1, tank0 + 1500), 930, "metal", 6); }
-    g.rect(960, fr1, 1050, 3250, "metal");
-    // Kabine (Seitenansicht, Front links)
+    g.rect(780, fr1, 860, 2900, "metal");
+    // Kabine (Seitenansicht, Front links), kompakte Bauform
     g.rect(-1560, 430, -1120, 900, "dark", 3);                       // Stossfänger
     g.rect(-1575, 640, -1535, 820, "lampw", 1);                      // Scheinwerfer
-    g.poly([[-1470, 900], [-1470, 2280], [-1360, 2930], [-1250, 3060], [880, 3060], [920, 2960], [920, 900], [620, 900], [600, 1150], [-600, 1150], [-620, 900]], "cab");
-    g.poly([[-1350, 2380], [-1265, 2870], [-330, 2870], [-330, 2380]], "glass");      // Seitenfenster
-    g.poly([[-1240, 1240], [-1240, 2880], [-280, 2880], [-280, 1240]], "seam");       // Türfuge
-    g.rect(-120, 2400, 760, 2870, "glass", 2);                       // Schlafkabinenfenster
-    g.rect(-1700, 2200, -1640, 2720, "dark", 2);                     // Spiegel
-    g.line(-1640, 2650, -1470, 2700, "seam");
+    g.poly([[-1470, 900], [-1470, 2100], [-1370, 2620], [-1270, 2740], [700, 2740], [740, 2650], [740, 900], [620, 900], [600, 1150], [-600, 1150], [-620, 900]], "cab");
+    g.poly([[-1355, 2200], [-1285, 2580], [-330, 2580], [-330, 2200]], "glass");      // Seitenfenster
+    g.poly([[-1240, 1240], [-1240, 2600], [-280, 2600], [-280, 1240]], "seam");       // Türfuge
+    g.rect(-120, 2200, 580, 2580, "glass", 2);                       // hinteres Seitenfenster
+    g.rect(-1700, 2000, -1640, 2450, "dark", 2);                     // Spiegel
+    g.line(-1640, 2400, -1470, 2440, "seam");
     g.rect(-760, 620, -380, 690, "dark");                            // Trittstufe
     // Kotflügel und Räder
     g.fender(0, 610, tr);
@@ -2003,21 +2003,21 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     // Sattelkupplung mit Sattelplatte
     g.rect(plate - 520, fr1, plate + 520, fr1 + 120, "chassis");
     g.rect(plate - 470, fr1 + 120, plate + 470, fr1 + 220, "plate5", 2);
-    g.line(plate, 2500, plate, fr1 + 300, "fender", "stroke:var(--warn);stroke-width:2.5");
+    g.line(plate, 2250, plate, fr1 + 300, "fender", "stroke:var(--warn);stroke-width:2.5");
     g.s += '<path class="cog" d="M' + g.P(plate) + " " + (g.Y(fr1 + 230) - 1) + ' l-6 -10 h12 z"/>';
     var sLbl = "Sattellast " + kg(S) + " kg", sW = sLbl.length * 6.8 / g.k;   // Textbreite in mm
-    if (plate - 120 - sW > 1100) g.text(plate - 120, 2380, sLbl, "end", "em");      // links über dem Rahmen
-    else g.text(plate + 120, 2380, sLbl, "start", "em");                             // sonst rechts der Sattelplatte
+    if (plate - 120 - sW > 900) g.text(plate - 120, 2130, sLbl, "end", "em");       // links über dem Rahmen
+    else g.text(plate + 120, 2130, sLbl, "start", "em");                             // sonst rechts der Sattelplatte
     // Beladene Achslasten unter den Rädern
     axles.forEach(function (a, i) {
       var load = ax[i].leer + (i === 0 ? S * fF : S * fR / rear.length);
       g.text(a, -260, kg(Math.round(load)) + " kg");
     });
     // Masslinien: R oben, d (und x) unten
-    g.line(R, 3480, R, 0, "mark");
-    g.line(0, 3480, R, 3480, "dim");
-    g.line(0, 3400, 0, 3560, "dim");
-    g.text(R / 2, 3530, "R " + kg(R));
+    g.line(R, 3130, R, 0, "mark");
+    g.line(0, 3130, R, 3130, "dim");
+    g.line(0, 3050, 0, 3210, "dim");
+    g.text(R / 2, 3180, "R " + kg(R));
     g.line(plate, -380, plate, n === 3 ? -980 : -680, "mark", "stroke:var(--warn)");
     g.line(last, -380, last, -680, "dim");
     g.line(plate, -600, last, -600, "dim");
@@ -2115,7 +2115,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var last = r.axles[r.axles.length - 1];
     var front = Math.min(-350, r.xStart - 150), end = Math.max(r.xEnd, last + 450) + 150;
     var g = sketch(front, end, 1750, -560);
-    var tr = 330, deck0 = 640, deck1 = 740, sideTop = 1120, cpl = 450;
+    var tr = 260, deck0 = 640, deck1 = 740, sideTop = 1120, cpl = 450;
     g.ground();
     // Deichsel mit Zugkugelkupplung und Stützrad
     var dEnd = Math.max(r.xStart + 250, 400);
@@ -2128,7 +2128,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     // Rahmen, Kotflügel, Räder
     g.rect(r.xStart, deck0 - 90, r.xEnd, deck0, "chassis");
-    r.axles.forEach(function (a) { g.fender(a, 410, deck0 - 90 - 0); });
+    r.axles.forEach(function (a) { g.fender(a, tr + 60, tr); });
     r.axles.forEach(function (a) { g.wheel(a, tr, false); });
     // Ladefläche mit Bordwänden und Rungen
     g.rect(r.xStart, deck0, r.xEnd, deck1, "deck");
