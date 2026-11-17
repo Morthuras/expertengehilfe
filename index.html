@@ -852,7 +852,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <ul>
           <li>Referenz ist die <b>grösste Spur</b> aus der Typengenehmigung zusammen mit der <b>kleinsten dort aufgeführten ET</b>.</li>
           <li>Gesamt-ET = ET der Felge − Dicke der Distanzscheibe. Eine kleinere ET schiebt das Rad nach aussen.</li>
-          <li>Spuränderung pro Rad = ET<sub>Referenz</sub> − Gesamt-ET. Zulässig sind höchstens <b>1 % der Referenzspur</b> pro Rad.</li>
+          <li>Spuränderung pro Rad = ET<sub>Referenz</sub> − Gesamt-ET. Bis <b>1 % der Referenzspur</b> pro Rad genügt eine Eignungserklärung, darüber ist eine APS erforderlich.</li>
           <li>Mindest-ET der Felge = ET<sub>Referenz</sub> − 1 % · Spur + Distanzscheibe. Felgen-ETs gibt es in ganzen mm, deshalb steht darunter auch der aufgerundete Wert.</li>
           <li>Resultierende Spur = Referenzspur + 2 · Spuränderung pro Rad. Freigängigkeit, Radabdeckung und Tragfähigkeit prüft die App nicht.</li>
         </ul>
@@ -1332,9 +1332,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     st.hidden = false;
     st.className = "status " + (okay ? "ok" : "warn");
-    if (!okay) st.textContent = "Zu breit, " + fmt(dwheel - dmax, 1) + " mm über 1 %";
-    else if (dwheel < 0) st.textContent = "Zulässig, Spur schmaler";
-    else st.textContent = "Zulässig";
+    if (!okay) st.textContent = "APS erforderlich, " + fmt(dwheel - dmax, 1) + " mm über 1 %";
+    else if (dwheel < 0) st.textContent = "Eignungserklärung ausreichend, Spur schmaler";
+    else st.textContent = "Eignungserklärung ausreichend";
 
     $(p + "formula").innerHTML =
       '<span class="k">ET min  = ET ref − 1 % · Spur + Distanzscheibe</span>\n' +
