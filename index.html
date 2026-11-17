@@ -1535,16 +1535,17 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         warns.push("Achsen " + ord(j0) + "–" + ord(j2) + ": beide Abstände über 1,40 m, keine Dreifachachse. Gerechnet mit der ungünstigeren Aufteilung Doppelachse plus Einzelachse.");
         entries.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, grp: true, sum: q1.sum });
         entries.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, grp: true, sum: q2.sum });
-        if (optA <= optB) {
-          units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, why: "Aufteilung (" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) });
-          units.push({ label: ord(j2) + " Achse", kind: "Einzelachse", v: single[j2].v, why: single[j2].why });
-        } else {
-          units.push({ label: ord(j0) + " Achse", kind: "Einzelachse", v: single[j0].v, why: single[j0].why });
-          units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, why: "Aufteilung " + ord(j0) + " + (" + ord(j1) + "+" + ord(j2) + ")" });
-        }
+        // Beide Doppelachsen ausweisen; die mittlere Achse gehört zu beiden und zählt in der Summe nur einmal
+        units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, info: true,
+          why: (q1.v < q1.lim.v ? "Summe Einzelachsen" : "VTS Art. 95 " + q1.lim.ref + " (Abstand " + fmt(q1.sp / 1000, 2) + " m)") + ", nicht einzeln in der Summe" });
+        units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, info: true,
+          why: (q2.v < q2.lim.v ? "Summe Einzelachsen" : "VTS Art. 95 " + q2.lim.ref + " (Abstand " + fmt(q2.sp / 1000, 2) + " m)") + ", nicht einzeln in der Summe" });
+        units.push({ label: ord(j0) + "+" + ord(j1) + "+" + ord(j2) + " Achse", kind: "zwei Doppelachsen", v: Math.min(optA, optB),
+          why: "(" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) + " = " + kg(q1.v) + " + " + kg(single[j2].v) + " = " + kg(optA) +
+            "; " + ord(j0) + " + (" + ord(j1) + "+" + ord(j2) + ") = " + kg(single[j0].v) + " + " + kg(q2.v) + " = " + kg(optB) + "; " + ord(j1) + " Achse nur einmal gezählt, kleinerer Wert" });
       }
     });
-    units.forEach(function (u) { total += u.v; });
+    units.forEach(function (u) { if (!u.info) total += u.v; });
 
     var legal;
     if (n === 2) legal = { v: 18000, ref: "Abs. 1 Bst. d" };
@@ -1611,7 +1612,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var cands = [
       { t: "Garantiegewicht", s: "Herstellerschild", v: gar.v },
       { t: "Grenzwert VTS", s: "Art. 95 " + res.legal.ref + (bonus ? " + " + kg(bonus) + " kg Abs. 1" + (n > 4 ? "ter" : "bis") : ""), v: res.legal.v + bonus },
-      { t: "Summe zulässiger Achslasten", s: res.units.map(function (u) { return kg(u.v); }).join(" + "), v: res.total }
+      { t: "Summe zulässiger Achslasten", s: res.units.filter(function (u) { return !u.info; }).map(function (u) { return kg(u.v); }).join(" + ") +
+          res.units.filter(function (u) { return u.info; }).map(function (u, k, a) { return k === 0 ? " (darin Doppelachsen " + a.map(function (d) { return d.label.replace(" Achse", "") + " " + kg(d.v); }).join(" und ") + ")" : ""; }).join(""), v: res.total }
     ];
     var minV = Math.min(cands[0].v, cands[1].v, cands[2].v);
     $("lk-cands").innerHTML = cands.map(function (c) {
