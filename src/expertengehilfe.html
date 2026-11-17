@@ -1315,9 +1315,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     st.hidden = false;
     st.className = "status " + (okay ? "ok" : "warn");
-    if (!okay) st.textContent = "APS erforderlich, " + fmt(dwheel - dmax, 1) + " mm über 1 %";
-    else if (dwheel < 0) st.textContent = "Eignungserklärung ausreichend, Spur schmaler";
-    else st.textContent = "Eignungserklärung ausreichend";
+    st.textContent = okay ? "Eignungserklärung ausreichend" : "APS erforderlich";
 
     $(p + "formula").innerHTML =
       '<span class="k">ET min  = ET ref − 1 % · Spur + Distanzscheibe</span>\n' +
