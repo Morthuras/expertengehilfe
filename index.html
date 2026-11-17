@@ -1655,8 +1655,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           res.units.filter(function (u) { return u.info; }).map(function (u, k, a) { return k === 0 ? " (darin " + (a.some(function (d) { return d.kind === "Dreifachachse"; }) ? "Achsgruppen " : "Doppelachsen ") + a.map(function (d) { return d.label.replace(" Achse", "") + " " + kg(d.v); }).join(" und ") + ")" : ""; }).join(""), v: res.total }
     ];
     var minV = Math.min(cands[0].v, cands[1].v, cands[2].v);
-    // Summe zulässiger Achslasten nur zeigen, wenn sie das Gesamtgewicht begrenzt
-    if (cands[2].v > minV) cands.pop();
     $("lk-cands").innerHTML = cands.map(function (c) {
       return '<div class="cand' + (c.v === minV ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === minV ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
     }).join("");
