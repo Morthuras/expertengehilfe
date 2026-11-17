@@ -2013,6 +2013,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       var load = ax[i].leer + (i === 0 ? S * fF : S * fR / rear.length);
       g.text(a, -260, kg(Math.round(load)) + " kg");
     });
+    g.text(front + 60, -600, "Achslasten voll beladen", "start");
     // Masslinien: R oben, d (und x) unten
     g.line(R, 3480, R, 0, "mark");
     g.line(0, 3480, R, 3480, "dim");
@@ -2111,10 +2112,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     return g;
   }
 
-  function zaDraw(p, r) {
+  function zaDraw(p, r, S) {
     var last = r.axles[r.axles.length - 1];
     var front = Math.min(-350, r.xStart - 150), end = Math.max(r.xEnd, last + 450) + 150;
-    var g = sketch(front, end, 1750, -520);
+    var g = sketch(front, end, 1750, -720);
     var tr = 330, deck0 = 640, deck1 = 740, sideTop = 1120, cpl = 450;
     g.ground();
     // Deichsel mit Zugkugelkupplung und Stützrad
@@ -2146,9 +2147,17 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     g.text(r.L / 2, 1660, "L " + kg(r.L));
     g.line(r.L, 1380, r.xC, 1380, "dim");
     g.text(r.xC, 1420, "X " + (r.X < 0 ? "−" : "+") + kg(Math.abs(r.X)), r.X < 0 ? "end" : "start", "em");
-    g.line(r.xStart, -260, r.xEnd, -260, "dim");
-    g.line(r.xStart, -180, r.xStart, -340, "dim"); g.line(r.xEnd, -180, r.xEnd, -340, "dim");
-    g.text((r.xStart + r.xEnd) / 2, -440, "Innenlänge " + kg(p.li));
+    g.line(r.xStart, -300, r.xEnd, -300, "dim");
+    g.line(r.xStart, -220, r.xStart, -380, "dim"); g.line(r.xEnd, -220, r.xEnd, -380, "dim");
+    g.text((r.xStart + r.xEnd) / 2, -470, "Innenlänge " + kg(p.li));
+    // Lasten voll beladen: Nutzlast in der Ladeflächenmitte, Stützlast an der Kupplung, Achslasten unter den Rädern
+    var nl = p.gg - p.lg, axLoad = (p.gg - S) / r.axles.length;
+    g.s += '<text x="' + g.P(r.xC) + '" y="' + g.Y((deck1 + sideTop) / 2 - 40) + '" text-anchor="middle" style="fill:#fff;font-weight:600">Nutzlast ' + kg(Math.round(nl)) + " kg</text>";
+    g.line(0, 1000, 0, cpl + 90, "fender", "stroke:var(--warn);stroke-width:2.5");
+    g.s += '<path class="cog" d="M' + g.P(0) + " " + (g.Y(cpl + 80) - 1) + ' l-5 -9 h10 z"/>';
+    g.text(-120, 1250, "Stützlast " + (S < 0 ? "−" : "") + kg(Math.abs(Math.round(S))) + " kg", "start", "em");
+    r.axles.forEach(function (a) { g.text(a, -150, kg(Math.round(axLoad)) + " kg"); });
+    g.text(end - 60, -660, "Achslasten und Stützlast voll beladen", "end");
     g.done($("za-svg"));
   }
 
@@ -2212,7 +2221,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       "         = " + kg(r.nl) + " · " + (r.X > 0 ? "−" : "") + kg(Math.abs(r.X)) + " / " + kg(r.L) + " = " + fmt(Snl, 1) + " kg\n" +
       '<span class="k">S gesamt  = S leer + S Nutzlast</span>\n' +
       "         = " + kg(v.sl) + " + " + fmt(Snl, 1) + " = " + fmt(S, 1) + " kg";
-    zaDraw(p, r);
+    zaDraw(p, r, S);
   }
   (function () { var s = Number(load("za-n")); zaSetN(s >= 1 && s <= 3 ? s : zaDef.n); })();
 
