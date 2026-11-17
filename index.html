@@ -920,7 +920,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Doppel- und Dreifachachsen:</b> zulässig ist die Summe der zulässigen Einzelachslasten, höchstens aber der Grenzwert nach Art. 95 Abs. 2. Der kleinere Wert ist massgebend.</li>
           <li><b>Ziffer 243:</b> Eine Doppel- oder Dreifachachse wird nur eingetragen, wenn ihr Grenzwert kleiner ist als die Summe der Einzelachsen. Ist die Summe kleiner oder gleich, genügen die Einzelachsen.</li>
           <li><b>Achsgruppen:</b> Achsen mit weniger als 1,80 m Abstand bilden eine Gruppe. Doppelachse: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t, mit Bst. f 19 t.</li>
-          <li><b>Dreifachachse:</b> Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Nur ein Abstand darf über 1,40 m liegen. Sonst rechnet die App die drei Achsen als Doppelachse plus Einzelachse und nimmt die ungünstigere Aufteilung.</li>
+          <li><b>Dreifachachse:</b> Drei Achsen mit Abständen unter 1,80 m bilden eine Dreifachachse. Der grössere Abstand bestimmt den Grenzwert (bis 1,30 m 21 t, über 1,30 bis 1,40 m 24 t, über 1,40 m 27 t). Innerhalb einer Dreifachachse werden keine Doppelachsen gebildet.</li>
           <li><b>Bst. f (26 t bzw. 19 t):</b> Antriebsachse mit Doppelbereifung und Luftfederung, oder jede Antriebsachse doppelbereift und höchstens 9,5 t je Achse. Liegen die Achslasten schon bei höchstens 9,5 t, gilt der höhere Grenzwert direkt. Liegen sie darüber, setzt die App die Achsen nur dann auf 9500 kg, wenn das ein höheres Gesamtgewicht ergibt.</li>
           <li>Nicht abgedeckt: Gesellschaftswagen (19,5 t), Gelenkbusse, unbegleiteter kombinierter Verkehr (44 t), Anfahrhilfen, land- und forstwirtschaftliche Fahrzeuge.</li>
         </ul>
@@ -950,10 +950,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="input-unit"><input id="ss-gar" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
           <span class="err" hidden></span>
         </div>
-        <div class="field" id="f-ss-x">
-          <label for="ss-x">Abstand x</label>
-          <div class="input-unit"><input id="ss-x" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
-          <span class="hint">Mitte hinteres Achspaket bis Königszapfen, nach vorne positiv</span>
+        <div class="field" id="f-ss-xh">
+          <label for="ss-xh">Abstand hinterste Achse – Sattelplatte</label>
+          <div class="input-unit"><input id="ss-xh" type="text" inputmode="numeric" autocomplete="off"><span class="unit">mm</span></div>
+          <span class="hint">Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv</span>
           <span class="err" hidden></span>
         </div>
       </div>
@@ -974,10 +974,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
                 <div class="input-unit"><input id="ss-gzg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
                 <span class="err" hidden></span>
               </div>
-              <div class="field">
-                <span class="row-label">Kombinierter Verkehr</span>
-                <label class="tog" style="max-width:120px"><input type="checkbox" id="ss-kv" aria-label="Unbegleiteter kombinierter Verkehr (44 t)"><span aria-hidden="true"></span></label>
-              </div>
             </div>
             <span class="hint">Motorleistung und Gesamtzugsgewicht Schild sind freiwillig. Leere Felder werden übersprungen.</span>
           </div>
@@ -991,7 +987,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="tbl-wrap"><table class="tbl" id="ss-tbl"></table></div>
           <span class="answer-label" style="margin-top:6px">VTS Art. 39 Abs. 2 und 3</span>
           <div class="tbl-wrap"><table class="tbl" id="ss-a39"></table></div>
-          <span class="answer-label" style="margin-top:6px">Höchstmögliches Gesamtzugsgewicht</span>
+          <span class="answer-label" style="margin-top:6px">Gesamtzugsgewicht (höchstens 40 t)</span>
           <div class="answer" id="ss-gzgmax" style="font-size:clamp(34px,4.5vw,46px)">–</div>
           <p class="answer-note" id="ss-gzgnote"></p>
           <details class="more" id="more-ssgzg" style="border-top:0">
@@ -1012,12 +1008,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <div class="notes">
         <ul>
           <li><b>Achse 1</b> ist die Vorderachse. Die übrigen Achsen bilden das hintere Achspaket. Dessen Mitte liegt bei 3 Achsen zwischen 2. und 3. Achse.</li>
-          <li><b>R</b> = Abstand Vorderachse bis Mitte hinteres Achspaket. <b>x</b> = Abstand Mitte hinteres Achspaket bis Königszapfen, nach vorne positiv.</li>
+          <li><b>R</b> = Abstand Vorderachse bis Mitte hinteres Achspaket. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Abstand Mitte hinteres Achspaket bis Sattelplatte: bei 2 Achsen x = d, bei 3 Achsen x = d − Abstand 2.–3. Achse / 2.</li>
           <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Bei 3 Achsen verteilt sich der hintere Anteil gleichmässig auf beide Achsen.</li>
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
           <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f).</li>
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
-          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und beladen. Die Lenkachse (Abs. 2) bezieht sich nur auf das Betriebsgewicht des Sattelschleppers. Beim Gesamtzug wird nur das Adhäsionsgewicht (Abs. 3) im Verhältnis zum Gesamtzugsgewicht geprüft.</li>          <li><b>Höchstmögliches Gesamtzugsgewicht</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (40 t, im kombinierten Verkehr 44 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %), VTS Art. 97 Abs. 2 Bst. a (Motorleistung ÷ 5,0 kW je t, nur wenn eingegeben) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
+          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und beladen. Die Lenkachse (Abs. 2) bezieht sich nur auf das Betriebsgewicht des Sattelschleppers. Beim Gesamtzug wird nur das Adhäsionsgewicht (Abs. 3) im Verhältnis zum Gesamtzugsgewicht geprüft.</li>          <li><b>Gesamtzugsgewicht für den Fahrzeugausweis</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (höchstens 40 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %), VTS Art. 97 Abs. 2 Bst. a (Motorleistung ÷ 5,0 kW je t, nur wenn eingegeben) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
           <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Daten des Aufliegers.</li>
         </ul>
       </div>
@@ -1458,14 +1454,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     chains.forEach(function (c) {
       if (c.length === 1) plan.push({ type: "single", idx: c });
       else if (c.length === 2) plan.push({ type: "double", idx: c });
-      else if (c.length === 3) {
-        var s1 = sp[c[1]], s2 = sp[c[2]];
-        if (s1 > 1400 && s2 > 1400) plan.push({ type: "split3", idx: c });
-        else plan.push({ type: "triple", idx: c });
-      } else {
-        warns.push("Mehr als drei Achsen mit weniger als 1,80 m Abstand: als zwei Doppelachsen gerechnet, bitte manuell prüfen.");
+      else if (c.length === 3) plan.push({ type: "triple", idx: c });   // Art. 95 Abs. 2 Bst. g–i, auch über 1,40 m (Bst. i, 27 t)
+      else {
+        var restN = c.length - 2;   // 4 Achsen: Doppel + Doppel, 5 Achsen: Doppel + Dreifach
+        warns.push("Mehr als drei Achsen mit weniger als 1,80 m Abstand: als Doppelachse plus " + (restN === 3 ? "Dreifachachse" : "Doppelachse") + " gerechnet, bitte manuell prüfen.");
         plan.push({ type: "double", idx: c.slice(0, 2) });
-        plan.push({ type: c.length - 2 === 1 ? "single" : "double", idx: c.slice(2) });
+        plan.push({ type: restN === 3 ? "triple" : "double", idx: c.slice(2) });
       }
     });
 
@@ -1477,8 +1471,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       if (!f.a && f.b && capOn) idx.forEach(function (i) { cap[i] = true; });
     }
     plan.forEach(function (u) {
-      if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);
-      if (u.type === "triple") { markDoubleCap([u.idx[0], u.idx[1]], sp[u.idx[1]]); markDoubleCap([u.idx[1], u.idx[2]], sp[u.idx[2]]); }
+      if (u.type === "double") markDoubleCap(u.idx, sp[u.idx[1]]);   // Dreifachachsen haben eigene Grenzwerte (Bst. g–i), keine Doppelachsen darin
     });
 
     // Bst. f für 3-achsige Motorwagen (26 t)
@@ -1521,30 +1514,13 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         entries.push({ label: ord(u.idx[0]) + "+" + ord(u.idx[1]) + " Achse", kind: "Doppelachse", v: d.v, grp: true, sum: d.sum });
       } else if (u.type === "triple") {
         var i0 = u.idx[0], i1 = u.idx[1], i2 = u.idx[2];
-        var p1 = doubleUnit([i0, i1]), p2 = doubleUnit([i1, i2]);
         var maxSp = Math.max(sp[i1], sp[i2]);
         var tl = tripleLimit(maxSp);
         var tsum = single[i0].v + single[i1].v + single[i2].v;
         var tv = Math.min(tl.v, tsum);
-        entries.push({ label: ord(i0) + "+" + ord(i1) + " Achse", kind: "Doppelachse", v: p1.v, grp: true, sum: p1.sum });
-        entries.push({ label: ord(i1) + "+" + ord(i2) + " Achse", kind: "Doppelachse", v: p2.v, grp: true, sum: p2.sum });
         entries.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv, grp: true, sum: tsum });
         units.push({ label: ord(i0) + "+" + ord(i1) + "+" + ord(i2) + " Achse", kind: "Dreifachachse", v: tv,
           why: tv < tl.v ? "Summe Einzelachsen" :"VTS Art. 95 " + tl.ref + " (grösserer Abstand " + fmt(maxSp / 1000, 2) + " m)" });
-      } else if (u.type === "split3") {
-        var j0 = u.idx[0], j1 = u.idx[1], j2 = u.idx[2];
-        var q1 = doubleUnit([j0, j1]), q2 = doubleUnit([j1, j2]);
-        var optA = q1.v + single[j2].v, optB = single[j0].v + q2.v;
-        warns.push("Achsen " + ord(j0) + "–" + ord(j2) + ": beide Abstände über 1,40 m, keine Dreifachachse. Gerechnet mit der ungünstigeren Aufteilung Doppelachse plus Einzelachse.");
-        entries.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, grp: true, sum: q1.sum });
-        entries.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, grp: true, sum: q2.sum });
-        if (optA <= optB) {
-          units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", kind: "Doppelachse", v: q1.v, why: "Aufteilung (" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) });
-          units.push({ label: ord(j2) + " Achse", kind: "Einzelachse", v: single[j2].v, why: single[j2].why });
-        } else {
-          units.push({ label: ord(j0) + " Achse", kind: "Einzelachse", v: single[j0].v, why: single[j0].why });
-          units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, why: "Aufteilung " + ord(j0) + " + (" + ord(j1) + "+" + ord(j2) + ")" });
-        }
       }
     });
     units.forEach(function (u) { total += u.v; });
@@ -1710,7 +1686,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
     }
   }
-  ssBind("ss-gar", ssDef.gar); ssBind("ss-x", ssDef.x);  ssBind("ss-kw", "330"); ssBind("ss-gzg", "40000"); ssBind("ss-kv", false, true);
+  ssBind("ss-gar", ssDef.gar); ssBind("ss-xh", ssDef.x);  ssBind("ss-kw", "330"); ssBind("ss-gzg", "40000");
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
@@ -1762,7 +1738,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   function computeSS() {
     var n = ssN, ok = true, v = {};
     function get(id, opts) { var r = parseVal($(id), opts); var f = $("f-" + id); if (f) showErr(f, r); ok = ok && r.ok; return r; }
-    var gar = get("ss-gar", { positive: true }), x = get("ss-x");
+    var gar = get("ss-gar", { positive: true }), x = get("ss-xh");
     var ax = [], sp = [0, 0, 0];
     for (var i = 0; i < n; i++) {
       var l = get("ss-leer" + i, { positive: true }), g = get("ss-schild" + i, { positive: true });
@@ -1785,7 +1761,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     var rear = n === 3 ? [1, 2] : [1];
     var R = n === 3 ? sp[1] + sp[2] / 2 : sp[1];
-    var X = x.v;
+    var D = x.v;                                 // Eingabe: Mitte hinterste Achse bis Sattelplatte
+    var X = n === 3 ? D - sp[2] / 2 : D;         // umgerechnet auf Mitte hinteres Achspaket
     var fF = X / R, fR = (R - X) / R;          // Anteil vorne / hinten pro kg Sattellast
     var leerTot = ax.reduce(function (t, a) { return t + a.leer; }, 0);
     var leerRear = rear.reduce(function (t, i) { return t + ax[i].leer; }, 0);
@@ -1842,15 +1819,14 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     // Höchstmögliches Gesamtzugsgewicht
     var kw = parseVal($("ss-kw"), { positive: true }), gzs = parseVal($("ss-gzg"), { positive: true });
     showErr($("f-ss-kw"), kw.empty ? { ok: true } : kw); showErr($("f-ss-gzg"), gzs.empty ? { ok: true } : gzs);
-    var kv = $("ss-kv").checked;
     var gc = [
-      { t: "SVG Art. 9 Abs. 1", s: kv ? "kombinierter Verkehr" : "Fahrzeugkombination", v: kv ? 44000 : 40000 },
+      { t: "SVG Art. 9 Abs. 1", s: "Fahrzeugkombination, höchstens", v: 40000 },
       { t: "VTS Art. 39 Abs. 3", s: "Adhäsion beladen " + kg(Math.round(A1.drv)) + " kg ÷ 25 %", v: Math.floor(A1.drv / 0.25) }
     ];
     if (kw.ok) gc.push({ t: "VTS Art. 97 Abs. 2 Bst. a", s: kg(kw.v) + " kW ÷ 5,0 kW/t", v: Math.floor(kw.v / 5 * 1000) });
     if (gzs.ok) gc.push({ t: "Herstellerschild", s: "Gesamtzugsgewicht", v: gzs.v });
     var gzMax = Math.min.apply(null, gc.map(function (c) { return c.v; }));
-    $("ss-gzgmax").innerHTML = kg(gzMax) + " <small>kg</small>";
+    $("ss-gzgmax").innerHTML = kg(gzMax) + " <small>kg für den Fahrzeugausweis</small>";
     $("ss-gzgc").innerHTML = gc.map(function (c) {
       return '<div class="cand' + (c.v === gzMax ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === gzMax ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
     }).join("");
@@ -1887,8 +1863,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
 
     var warns = [];
-    if (X <= 0) warns.push("x ist 0 oder negativ: Der Königszapfen liegt hinter der Mitte des Achspakets, die Vorderachse wird entlastet.");
-    if (X >= R) warns.push("x ist gleich gross wie oder grösser als R: Der Königszapfen liegt vor oder über der Vorderachse. Bitte Masse prüfen.");
+    if (X <= 0) warns.push("Die Sattelplatte liegt auf oder hinter der Mitte des hinteren Achspakets (x = " + kg(X) + " mm): Die Vorderachse wird entlastet.");
+    if (X >= R) warns.push("Die Sattelplatte liegt auf oder vor der Vorderachse. Bitte Masse prüfen.");
     if (L.capped) warns.push("Hinterachsen auf 9500 kg je Achse begrenzt, damit Bst. f (19 t) gilt.");
     if (!ax.some(function (a) { return a.drv; })) warns.push("Keine Achse als angetrieben markiert: Adhäsionsgewicht ist 0.");
     if (n === 3 && sp[1] < 1800) warns.push("1. und 2. Achse liegen weniger als 1,80 m auseinander und bilden nach Art. 95 eine Doppelachse. Der Rechner nimmt Achse 1 als einzelne Lenkachse an. Bitte manuell prüfen.");
@@ -1899,6 +1875,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     $("ss-formula").innerHTML =
       '<span class="k">R = Vorderachse bis Mitte hinteres Achspaket</span>\n' +
       "  = " + (n === 3 ? kg(sp[1]) + " + " + kg(sp[2]) + " / 2" : kg(sp[1])) + " = " + kg(R) + " mm\n" +
+      '<span class="k">x = Mitte hinteres Achspaket bis Sattelplatte' + (n === 3 ? " = d − Abstand 2.–3. Achse / 2" : " = d") + '</span>\n' +
+      "  = " + (n === 3 ? kg(D) + " − " + kg(sp[2]) + " / 2 = " : "") + kg(X) + " mm\n" +
       '<span class="k">Anteil vorne  = x / R</span>\n' +
       "  = " + kg(X) + " / " + kg(R) + " = " + fmt(fF * 100, 1) + " %  (" + kg(Math.round(fF * 1000)) + " kg je t Sattellast)\n" +
       '<span class="k">Anteil hinten = (R − x) / R</span>\n' +

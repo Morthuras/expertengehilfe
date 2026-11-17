@@ -137,12 +137,13 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
       ['Anzahl', '2', 'Pflicht, wenn die Fahrzeugbreite mehr als 1,60 m beträgt, sonst fakultativ.', V, 'Art. 192 Abs. 1 Bst. a, Art. 193 Abs. 1 Bst. a'],
       ['Abstand vom Fahrzeugrand', 'höchstens 0,15 m', 'Bei Anhängern: äusserster Rand der Leuchtfläche seitlich höchstens 0,15 m von den äussersten, festen Teilen des Fahrzeugs (statt 0,40 m).', V, 'Anh. 10 Ziff. 22'],
       ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '.', V, 'Anh. 10 Ziff. 312, 322'],
+      ['Höhe bei Klassen O1 und O2', 'bis 2,10 m', 'Bei Anhängern der Klassen O1 und O2 darf der obere Rand der Leuchtfläche der Standlichter bis 2,10 m über dem Boden liegen.', V, 'Anh. 10 Ziff. 322.3'],
       ['Sichtwinkel horizontal', 'aussen 80°, innen 45°', '', A, 'Anh. 10 Ziff. 63'],
       ['Sichtwinkel vertikal', 'oben 15°, unten 15°', low, V, 'Anh. 10 Ziff. 61'],
       ['Homologationszeichen', 'A', '', R, 'ASTRA-Liste'],
       ['Lichtstärke', '4 bis 60 cd', '', V, 'Anh. 10 Ziff. 43']
     ]},
-    { id:'rsv', g:'Vorn', n:'Rückstrahler vorn', c:'w', st:'must', rows:[
+    { id:'rsv', g:'Vorn', n:'Rückstrahler nach vorne gerichtet', c:'w', st:'must', rows:[
       ['Anzahl', '2', 'Pflicht, an der Vorderseite des Fahrzeugs. Nicht dreieckig.', V, 'Art. 192 Abs. 1 Bst. a'],
       rand,
       ['Höhe über Boden', '0,25 bis 0,90 m', 'Bis 1,50 m, wenn es die Form des Aufbaus erfordert.', V, 'Anh. 10 Ziff. 313, 324'],
@@ -150,7 +151,7 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
       ['Sichtwinkel vertikal', 'oben 10°, unten 10°', low, R, 'R 48'],
       ['Homologationszeichen', 'IA, IB', '', R, 'ASTRA-Liste']
     ]},
-    { id:'mkv', g:'Vorn', n:'Markierlicht vorn', c:'w', st:'cond', rows:[
+    { id:'mkv', g:'Vorn', n:'Markierlicht nach vorne gerichtet', c:'w', st:'cond', rows:[
       ['Anzahl', '2', 'Pflicht bei Anhängern über 2,10 m Breite, sonst fakultativ.', V, 'Art. 192 Abs. 2, Art. 193 Abs. 1 Bst. a'],
       ['Abstand vom Fahrzeugrand', 'möglichst aussen, höchstens 0,40 m', '', V, 'Anh. 10 Ziff. 22'],
       ['Höhe über Boden', '0,35 bis 4,00 m', '', V, 'Anh. 10 Ziff. 312, 323'],
@@ -177,7 +178,7 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
       ['Lichtstärke', '60 bis 185 cd', '', V, 'Anh. 10 Ziff. 43'],
       ['Weitere Vorschriften', 'Leuchtet bei jeder Betätigung der Betriebsbremse', '', V, 'Art. 75 Abs. 3']
     ]},
-    { id:'blh', g:'Hinten', n:'Richtungsblinker hinten', c:'a', st:'must', rows:[
+    { id:'blh', g:'Hinten', n:'Richtungsblinker nach hinten gerichtet', c:'a', st:'must', rows:[
       ['Anzahl', '2 (4)', 'Pflicht an der Rückseite. 4 mit 2 zusätzlichen hoch angeordneten.', V, 'Art. 194, Art. 193 Abs. 1 Bst. o'],
       rand, zw,
       ['Höhe über Boden', '0,35 bis 1,50 m', aufbau + '. Gilt nicht für die zusätzlichen hoch angeordneten.', V, 'Anh. 10 Ziff. 312, 322'],
@@ -187,7 +188,7 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
       ['Lichtstärke', '50 bis 350 cd', '', V, 'Anh. 10 Ziff. 43'],
       ['Weitere Vorschriften', 'Blinkfrequenz 90 ± 30 pro Minute', '', V, 'Art. 79']
     ]},
-    { id:'rsh', g:'Hinten', n:'Rückstrahler hinten (dreieckig)', c:'r', st:'must', tri:true, rows:[
+    { id:'rsh', g:'Hinten', n:'Rückstrahler nach hinten gerichtet (dreieckig)', c:'r', st:'must', tri:true, rows:[
       ['Anzahl', '2', 'Pflicht, dreieckig. Nicht dreieckige Rückstrahler hinten sind nur zusätzlich und nur mit einer hinteren Leuchte zusammengebaut erlaubt.', V, 'Art. 192 Abs. 1 Bst. b, Art. 193 Abs. 1 Bst. l'],
       ['Form', 'gleichseitiges Dreieck, Spitze oben', 'Seitenlänge mindestens 0,15 m und höchstens 0,20 m. Darf aus retroreflektierendem Belag bestehen.', V, 'Art. 193 Abs. 2'],
       rand,
@@ -208,8 +209,9 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
       ['Sichtwinkel horizontal', 'je 30° beidseits der Längsachse', '', V, 'Art. 45 Abs. 2'],
       ['Weitere Vorschriften', 'Gut lesbar, nicht verdeckt', 'Ladung, Arbeitsgeräte und Lastenträger dürfen es nicht verdecken.', V, 'Art. 45 Abs. 2 und 3']
     ]},
-    { id:'mkh', g:'Hinten', n:'Markierlicht hinten', c:'r', st:'cond', rows:[
+    { id:'mkh', g:'Hinten', n:'Markierlicht nach hinten gerichtet', c:'r', st:'cond', rows:[
       ['Anzahl', '2', 'Pflicht bei Anhängern über 2,10 m Breite, sonst fakultativ.', V, 'Art. 192 Abs. 2, Art. 193 Abs. 1 Bst. a'],
+      ['Anhänger mit BAV-Typengenehmigung', 'nur nötig, wenn das Schlusslicht mehr als 0,10 m vom äussersten Rand entfernt ist', 'Gilt für nach BAV typengenehmigte Anhänger über 2,10 m Breite. Liegt das Schlusslicht höchstens 0,10 m vom äussersten Rand, sind keine Markierlichter hinten erforderlich.', 'bav', 'Typengenehmigung BAV'],
       ['Abstand vom Fahrzeugrand', 'möglichst aussen, höchstens 0,40 m', '', V, 'Anh. 10 Ziff. 22'],
       ['Höhe über Boden', '0,35 bis 4,00 m', '', V, 'Anh. 10 Ziff. 312, 323'],
       ['Sichtwinkel horizontal', 'aussen 80°', '', V, 'Anh. 10 Ziff. 62'],
@@ -291,7 +293,7 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
   /* ---------- Auswahlleiste und Vorschriftenblatt ---------- */
   var chipBox = document.getElementById('chips');
   ['Vorn', 'Hinten', 'Seitlich'].forEach(function(g){
-    var h = '<div class="group"><b>' + g + '</b><div class="chips">';
+    var h = '<div class="group"><b>' + ({ Vorn: 'Nach vorne gerichtet', Hinten: 'Nach hinten gerichtet' }[g] || g) + '</b><div class="chips">';
     LAMPS.filter(function(l){ return l.g === g; }).forEach(function(l){
       var dot = l.plate ? '<span class="dot sq" style="background:#f4f6f8"></span>'
         : (l.tri ? '<span class="dot tri"></span>' : '<span class="dot" style="background:' + CSS[l.c] + '"></span>');
@@ -316,8 +318,8 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
       '<div class="maxbox"><span class="maxlabel">Maximal erlaubte Anzahl</span><span class="maxnum' + (l.rows[0][1].length > 6 ? ' long' : '') + '">' + l.rows[0][1] + '</span>' +
       '<span class="maxnote">' + l.rows[0][2] + ' <span class="tag vts" style="margin:0">VTS</span> ' + l.rows[0][4] + '</span></div><dl>';
     l.rows.slice(1).forEach(function(r){
-      var tag = r[3] === 'vts' ? 'VTS' : (r[3] === 'abb' ? 'VTS Abb.' : 'R 48');
-      h += '<div class="item"><dt>' + r[0] + '</dt><dd><span class="v">' + r[1] + '</span><span class="tag ' + r[3] + '">' + tag + '</span>' +
+      var tag = r[3] === 'vts' ? 'VTS' : (r[3] === 'abb' ? 'VTS Abb.' : (r[3] === 'bav' ? 'BAV' : 'R 48'));
+      h += '<div class="item"><dt>' + r[0] + '</dt><dd><span class="v">' + r[1] + '</span><span class="tag ' + (r[3] === 'bav' ? 'r48' : r[3]) + '">' + tag + '</span>' +
         '<span class="more">' + (r[2] ? r[2] + ' ' : '') + r[4] + '</span></dd></div>';
     });
     sheet.innerHTML = h + '</dl>';
@@ -346,8 +348,8 @@ dd .more{display:block;font-size:.88rem;color:var(--muted)}
     var sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(5, 9, 6); scene.add(sun);
     var fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-6, 4, -5); scene.add(fill);
 
-    var bodyM  = new THREE.MeshPhongMaterial({ color:0xe9edf1, specular:0x9aa6b2, shininess:40 });
-    var stripe = new THREE.MeshPhongMaterial({ color:0x0b57a4, specular:0x6f8fb0, shininess:60 });
+    var bodyM  = new THREE.MeshPhongMaterial({ color:0x24507c, specular:0x8fa3b5, shininess:70 });   // gleiches Blau wie der Motorwagen
+    var stripe = new THREE.MeshPhongMaterial({ color:0x9aa3ad, specular:0x9aa6b2, shininess:50 });
     var trim   = new THREE.MeshPhongMaterial({ color:0x9aa5b1, specular:0xffffff, shininess:90 });
     var steel  = new THREE.MeshPhongMaterial({ color:0x2b3238, specular:0x55606a, shininess:40 });
     var galv   = new THREE.MeshPhongMaterial({ color:0xb7bfc6, specular:0xffffff, shininess:70 });
