@@ -2151,12 +2151,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     g.line(r.xStart, -220, r.xStart, -380, "dim"); g.line(r.xEnd, -220, r.xEnd, -380, "dim");
     g.text((r.xStart + r.xEnd) / 2, -470, "Innenlänge " + kg(p.li));
     // Lasten voll beladen: Nutzlast in der Ladeflächenmitte, Stützlast an der Kupplung, Achslasten unter den Rädern
-    var nl = p.gg - p.lg, axLoad = (p.gg - S) / r.axles.length;
+    var nl = p.gg - p.lg;
     g.s += '<text x="' + g.P(r.xC) + '" y="' + g.Y((deck1 + sideTop) / 2 - 40) + '" text-anchor="middle" style="fill:#fff;font-weight:600">Nutzlast ' + kg(Math.round(nl)) + " kg</text>";
     g.line(0, 1000, 0, cpl + 90, "fender", "stroke:var(--warn);stroke-width:2.5");
     g.s += '<path class="cog" d="M' + g.P(0) + " " + (g.Y(cpl + 80) - 1) + ' l-5 -9 h10 z"/>';
     g.text(-120, 1250, "Stützlast " + (S < 0 ? "−" : "") + kg(Math.abs(Math.round(S))) + " kg", "start", "em");
-    r.axles.forEach(function (a) { g.text(a, -150, kg(Math.round(axLoad)) + " kg"); });
     g.done($("za-svg"));
   }
 
