@@ -1414,7 +1414,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   function condF(ax, idx) {
     var drivers = idx.filter(function (i) { return ax[i].drv; });
     if (!drivers.length) return { a: false, b: false, drivers: drivers };
-    var a = drivers.some(function (i) { return ax[i].dual && ax[i].air; });
+    // Bst. f Variante 1: JEDE Antriebsachse doppelbereift und luftgefedert (Art. 57 Abs. 1)
+    var a = drivers.every(function (i) { return ax[i].dual && ax[i].air; });
     var b = drivers.every(function (i) { return ax[i].dual; });
     return { a: a, b: b, drivers: drivers };
   }
@@ -1464,7 +1465,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     // Bst. f für 3-achsige Motorwagen (26 t)
     var gg3 = null;
     if (n === 3) {
-      var a3 = [0, 1, 2].some(function (i) { return ax[i].drv && ax[i].dual && ax[i].air; });
+      var a3 = condF(ax, [0, 1, 2]).a;
       var b3 = ax[1].drv && ax[1].dual && ax[2].drv && ax[2].dual;
       if (a3) gg3 = { v: 26000, ref: "Abs. 1 Bst. f" };
       else if (b3 && capOn) { cap[1] = true; cap[2] = true; gg3 = { v: 26000, ref: "Abs. 1 Bst. f" }; }
@@ -1523,9 +1524,14 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           why: (q1.v < q1.lim.v ? "Summe Einzelachsen" : "VTS Art. 95 " + q1.lim.ref + " (Abstand " + fmt(q1.sp / 1000, 2) + " m)") + ", nicht einzeln in der Summe" });
         units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", kind: "Doppelachse", v: q2.v, info: true,
           why: (q2.v < q2.lim.v ? "Summe Einzelachsen" : "VTS Art. 95 " + q2.lim.ref + " (Abstand " + fmt(q2.sp / 1000, 2) + " m)") + ", nicht einzeln in der Summe" });
-        units.push({ label: ord(j0) + "+" + ord(j1) + "+" + ord(j2) + " Achse", kind: "zwei Doppelachsen", v: Math.min(optA, optB),
-          why: "(" + ord(j0) + "+" + ord(j1) + ") + " + ord(j2) + " = " + kg(q1.v) + " + " + kg(single[j2].v) + " = " + kg(optA) +
-            "; " + ord(j0) + " + (" + ord(j1) + "+" + ord(j2) + ") = " + kg(single[j0].v) + " + " + kg(q2.v) + " = " + kg(optB) + "; " + ord(j1) + " Achse nur einmal gezählt, kleinerer Wert" });
+        // Für die Summe zählt die ungünstigere Aufteilung (mittlere Achse nur einmal); im Rechenweg nicht als eigene Zeile
+        if (optA <= optB) {
+          units.push({ label: ord(j0) + "+" + ord(j1) + " Achse", v: q1.v, hide: true });
+          units.push({ label: ord(j2) + " Achse", v: single[j2].v, hide: true });
+        } else {
+          units.push({ label: ord(j0) + " Achse", v: single[j0].v, hide: true });
+          units.push({ label: ord(j1) + "+" + ord(j2) + " Achse", v: q2.v, hide: true });
+        }
       }
     });
     units.forEach(function (u) { if (!u.info) total += u.v; });
@@ -1626,7 +1632,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     });
     rows += '<tr><th colspan="5" style="padding-top:12px">Einheiten für die Summe</th></tr>';
     res.units.forEach(function (u) {
-      rows += "<tr><td>" + u.label + "</td><td></td><td></td><td class=\"r\">" + kg(u.v) + "</td><td>" + u.kind + ": " + u.why + "</td></tr>";
+      if (u.hide) return;
+      rows +="<tr><td>" + u.label + "</td><td></td><td></td><td class=\"r\">" + kg(u.v) + "</td><td>" + u.kind + ": " + u.why + "</td></tr>";
     });
     rows += '<tr><td><b>Summe</b></td><td></td><td></td><td class="r"><b>' + kg(res.total) + "</b></td><td></td></tr>";
     $("lk-detail").innerHTML = rows;
@@ -1732,7 +1739,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         var dl = doubleLimit(s, qual);
         grp = { v: Math.min(dl.v, lim[1].v + lim[2].v), ref: dl.ref, sum: lim[1].v + lim[2].v, lim: dl.v, sp: s };
       }
-      var a3 = ax.some(function (a) { return a.drv && a.dual && a.air; });
+      var a3 = condF(ax, [0, 1, 2]).a;
       var b3 = ax[1].drv && ax[1].dual && ax[2].drv && ax[2].dual && lim[1].v <= 9500 && lim[2].v <= 9500;
       legal = (a3 || b3) ? { v: 26000, ref: "Abs. 1 Bst. f" } : { v: 25000, ref: "Abs. 1 Bst. e" };
     } else {
