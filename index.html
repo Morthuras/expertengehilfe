@@ -2050,7 +2050,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
 
     var warns = [];
-    if (X <= 0) warns.push("Die Sattelplatte liegt auf oder hinter der theoretischen Hinterachse (x = " + kg(X) + " mm): Die Vorderachse wird entlastet.");
+    if (X <= 0) warns.push("Die Sattelplatte liegt auf oder hinter der theoretischen Hinterachse (x = " + kg(Math.round(X)) + " mm): Die Vorderachse wird um " + kg(Math.round(-S * fF)) + " kg entlastet. Dieses Gewicht kommt zusätzlich auf die virtuelle Achse (" + kg(Math.round(S * fR)) + " kg statt " + kg(S) + " kg).");
     if (li >= 0 && ax[li].drv) warns.push("Die Liftachse (" + (li + 1) + ". Achse) ist als angetrieben markiert. Beim Anheben fällt ihr Adhäsionsgewicht weg. Bitte prüfen.");
     if (U && U.pP > U.Ru) warns.push("Liftachse angehoben: Die Sattelplatte liegt hinter der " + (U.ra + 1) + ". Achse. Die Vorderachse wird entlastet.");
     if (X >= R) warns.push("Die Sattelplatte liegt auf oder vor der Vorderachse. Bitte Masse prüfen.");
@@ -2085,6 +2085,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       "  = " + kg(Math.round(X)) + " / " + kg(Math.round(R)) + " = " + fmt(fF * 100, 1) + " %  (" + kg(Math.round(fF * 1000)) + " kg je t Sattellast)\n" +
       '<span class="k">Anteil hinten = (R − x) / R</span>\n' +
       "  = " + fmt(fR * 100, 1) + " %  (" + kg(Math.round(fR * 1000)) + " kg je t Sattellast)\n" +
+      (X < 0 ? '<span class="k">x negativ: Entlastung Vorderachse kommt hinten dazu</span>\n' +
+        "  Vorderachse " + kg(Math.round(S * fF)) + " kg, hinten " + kg(S) + " + " + kg(Math.round(-S * fF)) + " = " + kg(Math.round(S * fR)) + " kg\n" : "") +
       (n === 3 ? '<span class="k">Verteilung virtuelle Achse: Antriebsachse S_H / V, andere Achse Rest</span>\n' +
         "  S_H = " + kg(S) + " · " + fmt(fR, 4) + " = " + kg(Math.round(S * fR)) + " kg\n" +
         "  " + (dA + 1) + ". Achse (Antrieb): " + kg(Math.round(S * fR)) + " / " + fmt(V, 3) + " = " + kg(Math.round(S * fR / V)) + " kg\n" +
