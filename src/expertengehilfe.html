@@ -1004,7 +1004,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="tbl-wrap"><table class="tbl" id="ss-tbl"></table></div>
           <span class="answer-label" style="margin-top:6px">VTS Art. 39 Abs. 2 und 3</span>
           <div class="tbl-wrap"><table class="tbl" id="ss-a39"></table></div>
-          <span class="answer-label" style="margin-top:6px">Gesamtzugsgewicht (höchstens 40 t)</span>
+          <span class="answer-label" style="margin-top:6px">Gesamtzugsgewicht (höchstens 40 t, plus Zuschlag Antrieb)</span>
           <div class="answer" id="ss-gzgmax" style="font-size:clamp(34px,4.5vw,46px)">–</div>
           <details class="more" id="more-ssgzg" style="border-top:0">
             <summary style="padding-inline:0">Grenzen Gesamtzugsgewicht anzeigen</summary>
@@ -1029,8 +1029,8 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
           <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f) plus Zuschlag nach Abs. 1<sup>bis</sup>. Alternativer Antrieb: plus Mehrgewicht, höchstens 1 t, emissionsfrei höchstens 2 t.</li>
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
-          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und beladen. Die Lenkachse (Abs. 2) bezieht sich nur auf das Betriebsgewicht des Sattelschleppers. Beim Gesamtzug wird nur das Adhäsionsgewicht (Abs. 3) im Verhältnis zum Gesamtzugsgewicht geprüft.</li>          <li><b>Gesamtzugsgewicht für den Fahrzeugausweis</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (höchstens 40 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
-          <li>Nicht berücksichtigt: Motorleistung (VTS Art. 97), Zuschlag für alternativen Antrieb beim Gesamtzugsgewicht, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Daten des Aufliegers.</li>
+          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und beladen. Die Lenkachse (Abs. 2) bezieht sich nur auf das Betriebsgewicht des Sattelschleppers. Beim Gesamtzug wird nur das Adhäsionsgewicht (Abs. 3) im Verhältnis zum Gesamtzugsgewicht geprüft.</li>          <li><b>Gesamtzugsgewicht für den Fahrzeugausweis</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (höchstens 40 t, bei alternativem bzw. emissionsfreiem Antrieb plus dasselbe Mehrgewicht wie beim Sattelschlepper, höchstens 1 t bzw. 2 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
+          <li>Nicht berücksichtigt: Motorleistung (VTS Art. 97), zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Daten des Aufliegers.</li>
         </ul>
       </div>
     </details>
@@ -1912,7 +1912,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var gzs = parseVal($("ss-gzg"), { positive: true });
     showErr($("f-ss-gzg"), gzs.empty ? { ok: true } : gzs);
     var gc = [
-      { t: "SVG Art. 9 Abs. 1", s: "Fahrzeugkombination, höchstens", v: 40000 },
+      { t: "SVG Art. 9 Abs. 1", s: "Fahrzeugkombination, höchstens 40 t" + (bonus ? " + " + kg(bonus) + " kg Antrieb" : ""), v: 40000 + bonus },
       { t: "VTS Art. 39 Abs. 3", s: "Adhäsion beladen " + kg(Math.round(A1.drv)) + " kg ÷ 25 %", v: Math.floor(A1.drv / 0.25) }
     ];
     if (gzs.ok) gc.push({ t: "Herstellerschild", s: "Gesamtzugsgewicht", v: gzs.v });
