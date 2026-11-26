@@ -972,6 +972,21 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <div class="in">
           <div class="axtab ss-tab" id="ss-axles"><!-- per Script --></div>
           <div class="za-fig" aria-hidden="true"><svg id="ss-svg" viewBox="0 0 600 192" preserveAspectRatio="xMidYMid meet"></svg></div>
+          <div class="group" id="ss-liftgrp" hidden>
+            <div class="group-label">Liftachse · Lastaufteilung hinteres Achspaket</div>
+            <div class="ss-trl">
+              <div class="field" id="f-ss-kl">
+                <label for="ss-kl">Lastanteil Liftachse</label>
+                <div class="input-unit"><input id="ss-kl" type="text" inputmode="decimal" autocomplete="off"><span class="unit">%</span></div>
+                <span class="err" hidden></span>
+              </div>
+              <div class="field">
+                <span class="row-label">Bauart</span>
+                <span class="hint" id="ss-liftart" style="font-size:15px;color:inherit"></span>
+              </div>
+            </div>
+            <span class="hint">Anteil der Liftachse an der Last des hinteren Achspakets bei abgesenkter Achse, laut Hersteller (Aufbaurichtlinie) oder Wägung. Festgelegt durch den Druck im Liftachsbalg, typisch 40–50 %.</span>
+          </div>
           <div class="group">
             <div class="group-label">Antrieb · VTS Art. 95 Abs. 1<sup>bis</sup></div>
             <div class="ss-trl">
@@ -1011,6 +1026,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="tbl-wrap"><table class="tbl" id="ss-tbl"></table></div>
           <span class="answer-label" style="margin-top:6px">VTS Art. 39 Abs. 2 und 3</span>
           <div class="tbl-wrap"><table class="tbl" id="ss-a39"></table></div>
+          <div id="ss-liftout" hidden style="display:grid;gap:10px">
+            <span class="answer-label" style="margin-top:6px">Liftachse angehoben</span>
+            <div class="tbl-wrap"><table class="tbl" id="ss-lifttbl"></table></div>
+            <ul class="lims" id="ss-liftgov"></ul>
+          </div>
           <span class="answer-label" style="margin-top:6px">Gesamtzugsgewicht (höchstens 40 t, plus Zuschlag Antrieb)</span>
           <div class="answer" id="ss-gzgmax" style="font-size:clamp(34px,4.5vw,46px)">–</div>
           <details class="more" id="more-ssgzg" style="border-top:0">
@@ -1030,10 +1050,11 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <summary>Grundlage und Annahmen</summary>
       <div class="notes">
         <ul>
-          <li><b>Achse 1</b> ist die Vorderachse. Die übrigen Achsen bilden das hintere Achspaket. Dessen Mitte liegt bei 3 Achsen zwischen 2. und 3. Achse.</li>
-          <li><b>Liftachse:</b> Die Checkbox kennzeichnet die Achse nur in Tabelle und Skizze. Gerechnet wird immer mit abgesenkter Liftachse.</li>
-          <li><b>R</b> = Abstand Vorderachse bis Mitte hinteres Achspaket. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Abstand Mitte hinteres Achspaket bis Sattelplatte: bei 2 Achsen x = d, bei 3 Achsen x = d − Abstand 2.–3. Achse / 2.</li>
-          <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Bei 3 Achsen verteilt sich der hintere Anteil gleichmässig auf beide Achsen.</li>
+          <li><b>Achse 1</b> ist die Vorderachse. Die übrigen Achsen bilden das hintere Achspaket. Bei 3 Achsen werden 2. und 3. Achse zu einer theoretischen Hinterachse zusammengefasst. Sie liegt zwischen den beiden Achsen, gewichtet nach der Lastaufteilung.</li>
+          <li><b>Liftachse:</b> Bei 3 Achsen kann die 2. Achse (Vorlaufachse) oder die 3. Achse (Nachlaufachse) als Liftachse markiert werden. Mit drei Achsen am Boden ist die Lastverteilung statisch unbestimmt. Die Aufteilung im hinteren Achspaket legt die Luftfederung fest (Druck im Liftachsbalg). Eingabe: <b>Lastanteil Liftachse k</b> in % laut Hersteller oder Wägung. Ohne Liftachse rechnet die App mit 50 / 50. Die grösstmögliche Sattellast gilt mit abgesenkter Liftachse. Zusätzlich wird der Zustand mit angehobener Liftachse gerechnet.</li>
+          <li><b>t</b> = Abstand 2.–3. Achse. <b>e</b> = Abstand hinterste Achse bis theoretische Hinterachse: Vorlaufachse e = t · k, Nachlaufachse e = t · (1 − k), ohne Liftachse e = t / 2. <b>R</b> = Vorderachse bis theoretische Hinterachse = Abstand 1.–hinterste Achse − e. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Sattelvormass = theoretische Hinterachse bis Sattelplatte = d − e (bei 2 Achsen x = d).</li>
+          <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Davon trägt die Liftachse den Anteil k, die andere Achse 1 − k.</li>
+          <li><b>Liftachse angehoben:</b> Das Fahrzeug wird als Zweiachser mit der verbleibenden Hinterachse gerechnet (Radstand R'). a = Vorderachse bis Sattelplatte. Sattellast vorne S · (R' − a) / R', hinten S · a / R'. Die Leerlast der Liftachse G<sub>L</sub> verteilt sich nach dem Hebelgesetz: vorne G<sub>L</sub> · (R' − l) / R', hinten G<sub>L</sub> · l / R' (l = Vorderachse bis Liftachse). Bei einer Nachlaufachse wird die Vorderachse dadurch entlastet, bei einer Vorlaufachse belastet. Geprüft wird gegen die Einzelachsgrenzen (keine Doppelachse) und das Gesamtgewicht. Wird eine Grenze überschritten, muss die Liftachse abgesenkt sein.</li>
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
           <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f) plus Zuschlag nach Abs. 1<sup>bis</sup>. Alternativer Antrieb: plus Mehrgewicht, höchstens 1 t, emissionsfrei höchstens 2 t.</li>
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
@@ -1729,7 +1750,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     n: 2, gar: "18000", x: "600", s: "",
     leer: ["5000", "2500", "1500"], schild: ["7500", "11500", "11500"],
     drv: [false, true, false], dual: [false, true, true], air: [false, true, true],
-    sp: ["3600", "1350"]
+    sp: ["3600", "1350"], kl: "50"
   };
   var ssN = ssDef.n;
   (function buildSS() {
@@ -1760,7 +1781,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     }
     var f = document.createElement("div");
     f.className = "hint"; f.style.paddingTop = "8px";
-    f.textContent = "Achse 1 = Vorderachse. Achsabstände in mm von Achsmitte zu Achsmitte. Liftachse nur zur Kennzeichnung, Berechnung mit abgesenkter Achse.";
+    f.textContent = "Achse 1 = Vorderachse. Achsabstände in mm von Achsmitte zu Achsmitte. Liftachse bei 3 Achsen: 2. Achse = Vorlaufachse, 3. Achse = Nachlaufachse.";
     w.appendChild(f);
   })();
   function ssBind(id, def, isCheck) {
@@ -1774,7 +1795,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
     }
   }
-  ssBind("ss-gar", ssDef.gar); ssBind("ss-xh", ssDef.x); ssBind("ss-mehr", "0"); ssBind("ss-gzg", "40000");
+  ssBind("ss-gar", ssDef.gar); ssBind("ss-xh", ssDef.x); ssBind("ss-kl", ssDef.kl); ssBind("ss-mehr", "0"); ssBind("ss-gzg", "40000");
   (function () {
     var el = $("ss-alt"), s = load("ss-alt");
     el.value = s || "none";
@@ -1785,6 +1806,13 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
     if (q > 0) { ssBind("ss-sp" + q, ssDef.sp[q - 1]); ssBind("ss-lift" + q, false, true); }
   }
+  // Nur eine Liftachse: 2. oder 3. Achse
+  [1, 2].forEach(function (i) {
+    var o = 3 - i;
+    $("ss-lift" + i).addEventListener("change", function () {
+      if ($("ss-lift" + i).checked && $("ss-lift" + o).checked) { $("ss-lift" + o).checked = false; store("ss-lift" + o, "0"); computeSS(); }
+    });
+  });
   function ssSetN(n) {
     ssN = n; store("ss-n", String(n));
     document.querySelectorAll("#ss-n button").forEach(function (b) {
@@ -1852,17 +1880,35 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         $("ss-spinfo" + i).textContent = s.ok ? "= " + fmt(sp[i] / 1000, 2) + " m" + (i === 2 ? (sp[i] < 1800 ? " · Doppelachse" : " · keine Gruppe") : "") : "";
       }
     }
+    // Liftachse (nur bei 3 Achsen): 2. Achse = Vorlaufachse, 3. Achse = Nachlaufachse
+    var li = n === 3 ? (ax[1].lift ? 1 : ax[2].lift ? 2 : -1) : -1;
+    $("ss-liftgrp").hidden = li < 0;
+    var kl = { ok: true, v: 50 };
+    if (li >= 0) {
+      $("ss-liftart").textContent = li === 1 ? "Vorlaufachse (vor der Antriebsachse)" : "Nachlaufachse (hinter der Antriebsachse)";
+      kl = parseVal($("ss-kl"), { positive: true });
+      if (kl.ok && kl.v >= 100) kl = { ok: false, msg: "Muss kleiner als 100 % sein." };
+      showErr($("f-ss-kl"), kl); ok = ok && kl.ok;
+    }
     var out = ["ss-smax"];
     if (!ok) {
+      $("ss-liftout").hidden = true;
       $("ss-smax").textContent = "–"; $("ss-gov").innerHTML = "<li><span>Bitte die Felder links ausfüllen.</span></li>";
       $("ss-svg").innerHTML = ""; $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
       return;
     }
 
     var rear = n === 3 ? [1, 2] : [1];
-    var R = n === 3 ? sp[1] + sp[2] / 2 : sp[1];
+    // Lastanteile im hinteren Achspaket (Summe 1)
+    var kSh = [0, 1, 0];
+    if (n === 3) {
+      var kL = li >= 0 ? kl.v / 100 : 0.5;
+      kSh[1] = li === 2 ? 1 - kL : kL; kSh[2] = 1 - kSh[1];
+    }
+    var E = n === 3 ? kSh[1] * sp[2] : 0;        // hinterste Achse bis theoretische Hinterachse
+    var R = sp[1] + (n === 3 ? sp[2] : 0) - E;   // Vorderachse bis theoretische Hinterachse
     var D = x.v;                                 // Eingabe: Mitte hinterste Achse bis Sattelplatte
-    var X = n === 3 ? D - sp[2] / 2 : D;         // umgerechnet auf Mitte hinteres Achspaket
+    var X = D - E;                               // Sattelvormass: theoretische Hinterachse bis Sattelplatte
     var fF = X / R, fR = (R - X) / R;          // Anteil vorne / hinten pro kg Sattellast
     var leerTot = ax.reduce(function (t, a) { return t + a.leer; }, 0);
     var leerRear = rear.reduce(function (t, i) { return t + ax[i].leer; }, 0);
@@ -1871,7 +1917,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       var c = [];
       c.push({ name: "Gesamtgewicht", v: L.gg.v - leerTot });
       if (fF > 0) c.push({ name: "Vorderachse", v: (L.lim[0].v - ax[0].leer) / fF });
-      rear.forEach(function (i) { if (fR > 0) c.push({ name: (i + 1) + ". Achse", v: (L.lim[i].v - ax[i].leer) / (fR / rear.length) }); });
+      rear.forEach(function (i) { if (fR > 0) c.push({ name: (i + 1) + ". Achse", v: (L.lim[i].v - ax[i].leer) / (fR * kSh[i]) }); });
       if (L.grp && fR > 0) c.push({ name: "Doppelachse 2.+3. Achse", v: (L.grp.v - leerRear) / fR });
       var m = c.reduce(function (a, b) { return b.v < a.v ? b : a; });
       return { v: Math.max(0, Math.floor(m.v)), by: m.name, cands: c };
@@ -1883,7 +1929,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     var S = M.v;
     $("ss-smax").innerHTML = kg(S) + " <small>kg</small>";
-    ssDraw(n, sp, D, X, R, S, fF, fR, rear, ax);
+    ssDraw(n, sp, D, X, R, S, fF, fR, kSh, ax);
 
     // Achslasten beladen
     var rows = '<tr><th>Achse</th><th class="r">leer</th><th class="r">+ Sattellast</th><th class="r">beladen</th><th class="r">zulässig</th><th></th></tr>';
@@ -1894,7 +1940,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         '</td><td class="r" title="' + why + '">' + kg(lim) + '</td><td class="' + (okk ? "ok" : "bad") + '">' + (okk ? "✓" : "über " + kg(Math.round(bel - lim))) + '</td></tr>';
     }
     rows += row("1. Achse (vorne)", ax[0].leer, S * fF, L.lim[0].v, L.lim[0].why);
-    rear.forEach(function (i) { rows += row((i + 1) + ". Achse" + (ax[i].lift ? " (Liftachse)" : ""), ax[i].leer, S * fR / rear.length, L.lim[i].v, L.lim[i].why); });
+    rear.forEach(function (i) { rows += row((i + 1) + ". Achse" + (i === li ? " (Liftachse)" : ""), ax[i].leer, S * fR * kSh[i], L.lim[i].v, L.lim[i].why); });
     if (L.grp) rows += row("2.+3. Achse (Doppelachse, " + fmt(L.grp.sp / 1000, 2) + " m, " + L.grp.ref.replace("Abs. 2 ", "") + ")", leerRear, S * fR, L.grp.v,
       L.grp.v < L.grp.lim ? "Summe Einzelachsen" : "VTS Art. 95 " + L.grp.ref, "", true);
     rows += row("Gesamt", leerTot, S, L.gg.v, L.gg.why, "sum");
@@ -1902,7 +1948,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 
     // VTS Art. 39 Abs. 2 (Lenkachse >= 20 %) und Abs. 3 (Adhäsion >= 25 %)
     var loadsLeer = ax.map(function (a) { return a.leer; });
-    var loadsBel = ax.map(function (a, i) { return a.leer + (i === 0 ? S * fF : S * fR / rear.length); });
+    var loadsBel = ax.map(function (a, i) { return a.leer + (i === 0 ? S * fF : S * fR * kSh[i]); });
     function a39(loads) {
       var tot = loads.reduce(function (t, v) { return t + v; }, 0);
       var drv = loads.reduce(function (t, v, i) { return t + (ax[i].drv ? v : 0); }, 0);
@@ -1935,6 +1981,45 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var gzAdh = A1.drv / gzMax * 100;
     $("ss-a39").innerHTML += "<tr><td>Gesamtzug " + kg(gzMax) + ' kg</td><td class="r">–</td>' + cell(gzAdh, 25) + "</tr>";
 
+    // Liftachse angehoben: Zweiachser aus Vorderachse und verbleibender Hinterachse
+    $("ss-liftout").hidden = li < 0;
+    var U = null;
+    if (li >= 0) {
+      var ra = 3 - li;                                   // verbleibende Hinterachse (Index)
+      var pos = [0, sp[1], sp[1] + sp[2]];
+      var Ru = pos[ra], pL = pos[li], pP = pos[2] - D;    // Radstand R', Liftachse l, Sattelplatte a
+      var GL = ax[li].leer;
+      var upF = GL * (Ru - pL) / Ru, upR = GL * pL / Ru;  // Leerlast Liftachse umverteilt
+      var gF = (Ru - pP) / Ru, gR = pP / Ru;              // Anteil Sattellast vorne / hinten
+      var lF = ax[0].leer + upF, lR = ax[ra].leer + upR;
+      var sl = singleLimit(ax[ra].drv);
+      var limR = { v: Math.min(ax[ra].schild, sl.v), why: ax[ra].schild <= sl.v ? "Schild" : "VTS Art. 95 " + sl.ref };
+      var limF = L0.lim[0];
+      var uc = [{ name: "Gesamtgewicht", v: L.gg.v - leerTot }];
+      if (gF > 0) uc.push({ name: "Vorderachse", v: (limF.v - lF) / gF });
+      if (gR > 0) uc.push({ name: (ra + 1) + ". Achse", v: (limR.v - lR) / gR });
+      var um = uc.reduce(function (a, b) { return b.v < a.v ? b : a; });
+      var SU = Math.max(0, Math.floor(um.v));
+      var keepOk = allOk;
+      var urows = '<tr><th>Achse</th><th class="r">leer</th><th class="r">+ Sattellast</th><th class="r">beladen</th><th class="r">zulässig</th><th></th></tr>';
+      urows += row("1. Achse (vorne)", Math.round(lF), S * gF, limF.v, limF.why);
+      urows += row((ra + 1) + ". Achse", Math.round(lR), S * gR, limR.v, limR.why);
+      urows += '<tr><td>' + (li + 1) + '. Achse (Liftachse)</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r">–</td><td>angehoben</td></tr>';
+      urows += row("Gesamt", leerTot, S, L.gg.v, L.gg.why, "sum");
+      $("ss-lifttbl").innerHTML = urows;
+      var uOk = allOk; allOk = keepOk;
+      var uF = lF + S * gF, uDrv = (ax[0].drv ? uF : 0) + (ax[ra].drv ? lR + S * gR : 0), uTot = leerTot + S;
+      var ug = [];
+      ug.push("<b>Grösstmögliche Sattellast angehoben " + kg(SU) + " kg</b>: begrenzt durch " + um.name);
+      ug.push(uOk ? "Bei " + kg(S) + " kg Sattellast darf die Liftachse angehoben werden."
+        : "Bei " + kg(S) + " kg Sattellast muss die Liftachse abgesenkt sein. Anheben nur bis " + kg(SU) + " kg Sattellast.");
+      ug.push("Leerlast Liftachse " + kg(GL) + " kg umverteilt: Vorderachse " + (upF >= 0 ? "+" : "−") + kg(Math.abs(Math.round(upF))) + " kg, " + (ra + 1) + ". Achse +" + kg(Math.round(upR)) + " kg");
+      ug.push("Art. 39 angehoben, beladen: Lenkachse " + fmt(uF / uTot * 100, 1) + " % " + (uF / uTot >= 0.2 ? "✓" : "✗ (unter 20 %)") +
+        ", Adhäsion " + fmt(uDrv / uTot * 100, 1) + " % " + (uDrv / uTot >= 0.25 ? "✓" : "✗ (unter 25 %)"));
+      $("ss-liftgov").innerHTML = ug.map(function (t) { return "<li><span>" + t + "</span></li>"; }).join("");
+      U = { ra: ra, Ru: Ru, pL: pL, pP: pP, GL: GL, upF: upF, upR: upR, gF: gF, gR: gR, cands: uc };
+    }
+
     // Begrenzungen: welche Gewichte wodurch beschränkt wurden
     var lims = [];
     var byDetail = M.by === "Gesamtgewicht" ? L.gg.why
@@ -1962,7 +2047,9 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       : "Achslasten, Gesamtgewicht und Art. 39 eingehalten";
 
     var warns = [];
-    if (X <= 0) warns.push("Die Sattelplatte liegt auf oder hinter der Mitte des hinteren Achspakets (x = " + kg(X) + " mm): Die Vorderachse wird entlastet.");
+    if (X <= 0) warns.push("Die Sattelplatte liegt auf oder hinter der theoretischen Hinterachse (x = " + kg(X) + " mm): Die Vorderachse wird entlastet.");
+    if (li >= 0 && ax[li].drv) warns.push("Die Liftachse (" + (li + 1) + ". Achse) ist als angetrieben markiert. Beim Anheben fällt ihr Adhäsionsgewicht weg. Bitte prüfen.");
+    if (U && U.pP > U.Ru) warns.push("Liftachse angehoben: Die Sattelplatte liegt hinter der " + (U.ra + 1) + ". Achse. Die Vorderachse wird entlastet.");
     if (X >= R) warns.push("Die Sattelplatte liegt auf oder vor der Vorderachse. Bitte Masse prüfen.");
     if (mehr.v > bonusMax && bonusMax) warns.push("Mehrgewicht über " + kg(bonusMax) + " kg: Zuschlag auf " + kg(bonusMax) + " kg begrenzt.");
     if (L.capped) warns.push("Hinterachsen auf 9500 kg je Achse begrenzt, damit Bst. f (19 t) gilt.");
@@ -1973,22 +2060,34 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     $("ss-warns").hidden = !warns.length;
 
     $("ss-formula").innerHTML =
-      '<span class="k">R = Vorderachse bis Mitte hinteres Achspaket</span>\n' +
-      "  = " + (n === 3 ? kg(sp[1]) + " + " + kg(sp[2]) + " / 2" : kg(sp[1])) + " = " + kg(R) + " mm\n" +
-      '<span class="k">x = Mitte hinteres Achspaket bis Sattelplatte' + (n === 3 ? " = d − Abstand 2.–3. Achse / 2" : " = d") + '</span>\n' +
-      "  = " + (n === 3 ? kg(D) + " − " + kg(sp[2]) + " / 2 = " : "") + kg(X) + " mm\n" +
+      (n === 3 ? '<span class="k">Lastaufteilung hinteres Achspaket' + (li >= 0 ? " (Liftachse " + (li + 1) + ". Achse, " + (li === 1 ? "Vorlaufachse" : "Nachlaufachse") + ")" : " (ohne Liftachse 50 / 50)") + '</span>\n' +
+        "  2. Achse " + fmt(kSh[1] * 100, 1) + " %, 3. Achse " + fmt(kSh[2] * 100, 1) + " %\n" +
+        '<span class="k">e = hinterste Achse bis theoretische Hinterachse = t · Anteil 2. Achse</span>\n' +
+        "  = " + kg(sp[2]) + " · " + fmt(kSh[1], 3) + " = " + kg(Math.round(E)) + " mm\n" : "") +
+      '<span class="k">R = Vorderachse bis theoretische Hinterachse</span>\n' +
+      "  = " + (n === 3 ? kg(sp[1]) + " + " + kg(sp[2]) + " − " + kg(Math.round(E)) : kg(sp[1])) + " = " + kg(Math.round(R)) + " mm\n" +
+      '<span class="k">x = theoretische Hinterachse bis Sattelplatte' + (n === 3 ? " = d − e" : " = d") + '</span>\n' +
+      "  = " + (n === 3 ? kg(D) + " − " + kg(Math.round(E)) + " = " : "") + kg(Math.round(X)) + " mm\n" +
       '<span class="k">Anteil vorne  = x / R</span>\n' +
-      "  = " + kg(X) + " / " + kg(R) + " = " + fmt(fF * 100, 1) + " %  (" + kg(Math.round(fF * 1000)) + " kg je t Sattellast)\n" +
+      "  = " + kg(Math.round(X)) + " / " + kg(Math.round(R)) + " = " + fmt(fF * 100, 1) + " %  (" + kg(Math.round(fF * 1000)) + " kg je t Sattellast)\n" +
       '<span class="k">Anteil hinten = (R − x) / R</span>\n' +
       "  = " + fmt(fR * 100, 1) + " %  (" + kg(Math.round(fR * 1000)) + " kg je t Sattellast)\n" +
       '<span class="k">Grösstmögliche Sattellast je Grenze</span>\n' +
       M.cands.map(function (c) { return "  " + c.name + ": " + kg(Math.max(0, Math.floor(c.v))) + " kg"; }).join("\n") + "\n" +
       '<span class="k">Art. 39: Lenkachse / Gesamt, angetriebene Achsen / Gesamt</span>\n' +
       "  leer:     " + kg(ax[0].leer) + " / " + kg(A0.tot) + " = " + fmt(A0.lenk, 1) + " %   " + kg(A0.drv) + " / " + kg(A0.tot) + " = " + fmt(A0.adh, 1) + " %\n" +
-      "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %";
+      "  beladen:  " + kg(Math.round(loadsBel[0])) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.lenk, 1) + " %   " + kg(Math.round(A1.drv)) + " / " + kg(Math.round(A1.tot)) + " = " + fmt(A1.adh, 1) + " %" +
+      (U ? "\n" + '<span class="k">Liftachse angehoben: R\' = Vorderachse bis ' + (U.ra + 1) + ". Achse, a = Vorderachse bis Sattelplatte</span>\n" +
+        "  R' = " + kg(U.Ru) + " mm, a = " + kg(sp[1] + sp[2]) + " − " + kg(D) + " = " + kg(U.pP) + " mm, l = " + kg(U.pL) + " mm\n" +
+        '<span class="k">Leerlast Liftachse: vorne G_L · (R\' − l) / R\', hinten G_L · l / R\'</span>\n' +
+        "  " + kg(U.GL) + " · " + kg(U.Ru - U.pL) + " / " + kg(U.Ru) + " = " + kg(Math.round(U.upF)) + " kg,  " + kg(U.GL) + " · " + kg(U.pL) + " / " + kg(U.Ru) + " = " + kg(Math.round(U.upR)) + " kg\n" +
+        '<span class="k">Sattellast: vorne (R\' − a) / R\', hinten a / R\'</span>\n' +
+        "  " + fmt(U.gF * 100, 1) + " % / " + fmt(U.gR * 100, 1) + " %\n" +
+        '<span class="k">Grösstmögliche Sattellast angehoben je Grenze</span>\n' +
+        U.cands.map(function (c) { return "  " + c.name + ": " + kg(Math.max(0, Math.floor(c.v))) + " kg"; }).join("\n") : "");
   }
   // Skizze Sattelschlepper: Vorderachse links, Masse in mm ab Vorderachse
-  function ssDraw(n, sp, D, X, R, S, fF, fR, rear, ax) {
+  function ssDraw(n, sp, D, X, R, S, fF, fR, kSh, ax) {
     var axles = [0, sp[1]]; if (n === 3) axles.push(sp[1] + sp[2]);
     var last = axles[axles.length - 1], plate = last - D;
     var front = -1650, end = Math.max(last + 1150, plate + 700);
@@ -2026,14 +2125,14 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     else g.text(plate + 120, 2130, sLbl, "start", "em");                             // sonst rechts der Sattelplatte
     // Beladene Achslasten unter den Rädern
     axles.forEach(function (a, i) {
-      var load = ax[i].leer + (i === 0 ? S * fF : S * fR / rear.length);
-      g.text(a, -260, kg(Math.round(load)) + " kg" + (ax[i].lift ? " · Lift" : ""));
+      var load = ax[i].leer + (i === 0 ? S * fF : S * fR * kSh[i]);
+      g.text(a, -260, kg(Math.round(load)) + " kg" + (n === 3 && ax[i].lift ? " · Lift" : ""));
     });
     // Masslinien: R oben, d (und x) unten
     g.line(R, 3130, R, 0, "mark");
     g.line(0, 3130, R, 3130, "dim");
     g.line(0, 3050, 0, 3210, "dim");
-    g.text(R / 2, 3180, "R " + kg(R));
+    g.text(R / 2, 3180, "R " + kg(Math.round(R)));
     g.line(plate, -380, plate, n === 3 ? -980 : -680, "mark", "stroke:var(--warn)");
     g.line(last, -380, last, -680, "dim");
     g.line(plate, -600, last, -600, "dim");
@@ -2041,7 +2140,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     if (n === 3) {
       g.line(R, -380, R, -980, "dim");
       g.line(plate, -900, R, -900, "dim");
-      g.text(Math.max(plate, R) + 120, -940, "x " + kg(X), "start");
+      g.text(Math.max(plate, R) + 120, -940, "x " + kg(Math.round(X)), "start");
     }
     g.done($("ss-svg"));
   }
