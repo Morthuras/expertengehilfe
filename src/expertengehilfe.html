@@ -966,20 +966,33 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="axtab ss-tab" id="ss-axles"><!-- per Script --></div>
           <div class="za-fig" aria-hidden="true"><svg id="ss-svg" viewBox="0 0 600 192" preserveAspectRatio="xMidYMid meet"></svg></div>
           <div class="group">
-            <div class="group-label">Fahrzeugkombination · für das Gesamtzugsgewicht</div>
+            <div class="group-label">Antrieb · VTS Art. 95 Abs. 1<sup>bis</sup></div>
             <div class="ss-trl">
-              <div class="field" id="f-ss-kw">
-                <label for="ss-kw">Motorleistung</label>
-                <div class="input-unit"><input id="ss-kw" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kW</span></div>
+              <div class="field">
+                <label for="ss-alt">Antrieb</label>
+                <select id="ss-alt" class="select">
+                  <option value="none">Konventionell</option>
+                  <option value="alt">Alternativ (max. +1 t)</option>
+                  <option value="zero">Emissionsfrei (max. +2 t)</option>
+                </select>
+              </div>
+              <div class="field" id="f-ss-mehr">
+                <label for="ss-mehr">Mehrgewicht Antrieb</label>
+                <div class="input-unit"><input id="ss-mehr" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
                 <span class="err" hidden></span>
               </div>
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-label">Fahrzeugkombination · für das Gesamtzugsgewicht</div>
+            <div class="ss-trl">
               <div class="field" id="f-ss-gzg">
                 <label for="ss-gzg">Gesamtzugsgewicht Schild</label>
                 <div class="input-unit"><input id="ss-gzg" type="text" inputmode="numeric" autocomplete="off"><span class="unit">kg</span></div>
                 <span class="err" hidden></span>
               </div>
             </div>
-            <span class="hint">Motorleistung und Gesamtzugsgewicht Schild sind freiwillig. Leere Felder werden übersprungen.</span>
+            <span class="hint">Gesamtzugsgewicht Schild ist freiwillig. Ein leeres Feld wird übersprungen.</span>
           </div>
         </div>
 
@@ -993,7 +1006,6 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <div class="tbl-wrap"><table class="tbl" id="ss-a39"></table></div>
           <span class="answer-label" style="margin-top:6px">Gesamtzugsgewicht (höchstens 40 t)</span>
           <div class="answer" id="ss-gzgmax" style="font-size:clamp(34px,4.5vw,46px)">–</div>
-          <p class="answer-note" id="ss-gzgnote"></p>
           <details class="more" id="more-ssgzg" style="border-top:0">
             <summary style="padding-inline:0">Grenzen Gesamtzugsgewicht anzeigen</summary>
             <div class="cands" id="ss-gzgc"></div>
@@ -1015,10 +1027,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
           <li><b>R</b> = Abstand Vorderachse bis Mitte hinteres Achspaket. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Abstand Mitte hinteres Achspaket bis Sattelplatte: bei 2 Achsen x = d, bei 3 Achsen x = d − Abstand 2.–3. Achse / 2.</li>
           <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Bei 3 Achsen verteilt sich der hintere Anteil gleichmässig auf beide Achsen.</li>
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
-          <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f).</li>
+          <li><b>Zulässiges Gesamtgewicht</b> = kleinerer Wert aus Garantiegewicht und VTS Art. 95 Abs. 1 (2 Achsen 18 t, 3 Achsen 25 t bzw. 26 t nach Bst. f) plus Zuschlag nach Abs. 1<sup>bis</sup>. Alternativer Antrieb: plus Mehrgewicht, höchstens 1 t, emissionsfrei höchstens 2 t.</li>
           <li><b>Grösstmögliche Sattellast</b> = kleinster Wert, bei dem Vorderachse, hintere Achse(n), Doppelachse oder Gesamtgewicht ihre Grenze erreichen.</li>
-          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und beladen. Die Lenkachse (Abs. 2) bezieht sich nur auf das Betriebsgewicht des Sattelschleppers. Beim Gesamtzug wird nur das Adhäsionsgewicht (Abs. 3) im Verhältnis zum Gesamtzugsgewicht geprüft.</li>          <li><b>Gesamtzugsgewicht für den Fahrzeugausweis</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (höchstens 40 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %), VTS Art. 97 Abs. 2 Bst. a (Motorleistung ÷ 5,0 kW je t, nur wenn eingegeben) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
-          <li>Nicht berücksichtigt: Zuschlag für alternativen Antrieb, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Daten des Aufliegers.</li>
+          <li><b>VTS Art. 39 Abs. 2:</b> Die Lenkachse (Achse 1) muss mindestens 20 % des Betriebsgewichts tragen. <b>Abs. 3:</b> Das Adhäsionsgewicht (Summe der angetriebenen Achsen) muss mindestens 25 % betragen. Das Gesetz verlangt das für das leere, nur mit dem Fahrer besetzte Fahrzeug. Die App prüft leer (eingegebene Leergewichte) und beladen. Die Lenkachse (Abs. 2) bezieht sich nur auf das Betriebsgewicht des Sattelschleppers. Beim Gesamtzug wird nur das Adhäsionsgewicht (Abs. 3) im Verhältnis zum Gesamtzugsgewicht geprüft.</li>          <li><b>Gesamtzugsgewicht für den Fahrzeugausweis</b> = kleinster Wert aus: SVG Art. 9 Abs. 1 (höchstens 40 t), VTS Art. 39 Abs. 3 (Adhäsionsgewicht beladen ÷ 25 %) und Gesamtzugsgewicht laut Herstellerschild (nur wenn eingegeben). Das Adhäsionsgewicht gilt bei der grösstmöglichen Sattellast.</li>
+          <li>Nicht berücksichtigt: Motorleistung (VTS Art. 97), Zuschlag für alternativen Antrieb beim Gesamtzugsgewicht, zulässige Sattellast der Sattelkupplung, mitlenkende Hinterachsen, Daten des Aufliegers.</li>
         </ul>
       </div>
     </details>
@@ -1753,7 +1765,12 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       el.addEventListener("focus", function () { setTimeout(function () { try { el.select(); } catch (e) {} }, 0); });
     }
   }
-  ssBind("ss-gar", ssDef.gar); ssBind("ss-xh", ssDef.x);  ssBind("ss-kw", "330"); ssBind("ss-gzg", "40000");
+  ssBind("ss-gar", ssDef.gar); ssBind("ss-xh", ssDef.x); ssBind("ss-mehr", "0"); ssBind("ss-gzg", "40000");
+  (function () {
+    var el = $("ss-alt"), s = load("ss-alt");
+    el.value = s || "none";
+    el.addEventListener("change", function () { store("ss-alt", el.value); computeSS(); });
+  })();
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
@@ -1775,7 +1792,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   $("ss").addEventListener("submit", function (e) { e.preventDefault(); });
 
   // Grenzwerte für einen Durchgang (capOn: Variante 2 von Bst. f mit 9,5 t je Achse)
-  function ssLimits(ax, n, sp, gar, capOn) {
+  function ssLimits(ax, n, sp, gar, capOn, bonus) {
     var rear = n === 3 ? [1, 2] : [1];
     var lim = ax.map(function (a) {
       var l = singleLimit(a.drv);
@@ -1799,13 +1816,20 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     } else {
       legal = { v: 18000, ref: "Abs. 1 Bst. d" };
     }
-    return { lim: lim, grp: grp, gg: { v: Math.min(gar, legal.v), why: gar <= legal.v ? "Garantiegewicht" : "VTS Art. 95 " + legal.ref }, capped: capped };
+    var lv = legal.v + bonus, lref = "VTS Art. 95 " + legal.ref + (bonus ? " + " + kg(bonus) + " kg Abs. 1bis" : "");
+    return { lim: lim, grp: grp, gg: { v: Math.min(gar, lv), why: gar <= lv ? "Garantiegewicht" : lref }, capped: capped };
   }
 
   function computeSS() {
     var n = ssN, ok = true, v = {};
     function get(id, opts) { var r = parseVal($(id), opts); var f = $("f-" + id); if (f) showErr(f, r); ok = ok && r.ok; return r; }
     var gar = get("ss-gar", { positive: true }), x = get("ss-xh");
+    var altMode = $("ss-alt").value;
+    $("f-ss-mehr").hidden = altMode === "none";
+    var mehr = altMode === "none" ? { ok: true, v: 0 } : parseVal($("ss-mehr"), { nonneg: true, emptyAs: 0 });
+    showErr($("f-ss-mehr"), mehr); ok = ok && mehr.ok;
+    var bonusMax = altMode === "alt" ? 1000 : altMode === "zero" ? 2000 : 0;
+    var bonus = mehr.ok ? Math.min(mehr.v, bonusMax) : 0;
     var ax = [], sp = [0, 0, 0];
     for (var i = 0; i < n; i++) {
       var l = get("ss-leer" + i, { positive: true }), g = get("ss-schild" + i, { positive: true });
@@ -1822,7 +1846,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var out = ["ss-smax"];
     if (!ok) {
       $("ss-smax").textContent = "–"; $("ss-gov").innerHTML = "<li><span>Bitte die Felder links ausfüllen.</span></li>";
-      $("ss-svg").innerHTML = ""; $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-gzgnote").textContent = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
+      $("ss-svg").innerHTML = ""; $("ss-tbl").innerHTML = ""; $("ss-a39").innerHTML = ""; $("ss-gzgmax").textContent = "–"; $("ss-gzgc").innerHTML = ""; $("ss-status").hidden = true; $("ss-warns").hidden = true; $("ss-formula").textContent = "";
       return;
     }
 
@@ -1843,7 +1867,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       var m = c.reduce(function (a, b) { return b.v < a.v ? b : a; });
       return { v: Math.max(0, Math.floor(m.v)), by: m.name, cands: c };
     }
-    var L0 = ssLimits(ax, n, sp, gar.v, false), L1 = ssLimits(ax, n, sp, gar.v, true);
+    var L0 = ssLimits(ax, n, sp, gar.v, false, bonus), L1 = ssLimits(ax, n, sp, gar.v, true, bonus);
     var M0 = maxS(L0), M1 = maxS(L1);
     var L = L0, M = M0;
     if (L1.capped && M1.v > M0.v) { L = L1; M = M1; }
@@ -1885,20 +1909,18 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     $("ss-a39").innerHTML = a39rows;
 
     // Höchstmögliches Gesamtzugsgewicht
-    var kw = parseVal($("ss-kw"), { positive: true }), gzs = parseVal($("ss-gzg"), { positive: true });
-    showErr($("f-ss-kw"), kw.empty ? { ok: true } : kw); showErr($("f-ss-gzg"), gzs.empty ? { ok: true } : gzs);
+    var gzs = parseVal($("ss-gzg"), { positive: true });
+    showErr($("f-ss-gzg"), gzs.empty ? { ok: true } : gzs);
     var gc = [
       { t: "SVG Art. 9 Abs. 1", s: "Fahrzeugkombination, höchstens", v: 40000 },
       { t: "VTS Art. 39 Abs. 3", s: "Adhäsion beladen " + kg(Math.round(A1.drv)) + " kg ÷ 25 %", v: Math.floor(A1.drv / 0.25) }
     ];
-    if (kw.ok) gc.push({ t: "VTS Art. 97 Abs. 2 Bst. a", s: kg(kw.v) + " kW ÷ 5,0 kW/t", v: Math.floor(kw.v / 5 * 1000) });
     if (gzs.ok) gc.push({ t: "Herstellerschild", s: "Gesamtzugsgewicht", v: gzs.v });
     var gzMax = Math.min.apply(null, gc.map(function (c) { return c.v; }));
     $("ss-gzgmax").innerHTML = kg(gzMax) + " <small>kg für den Fahrzeugausweis</small>";
     $("ss-gzgc").innerHTML = gc.map(function (c) {
       return '<div class="cand' + (c.v === gzMax ? " gov" : "") + '"><span class="t">' + c.t + "<small>" + c.s + (c.v === gzMax ? " · massgebend" : "") + '</small></span><span class="v">' + kg(c.v) + " kg</span></div>";
     }).join("");
-    $("ss-gzgnote").textContent = kw.ok ? "" : "Ohne Motorleistung ist Art. 97 nicht geprüft.";
 
     // Art. 39 Abs. 3 beim Gesamtzugsgewicht (Abs. 2 gilt nur für den Sattelschlepper)
     var gzAdh = A1.drv / gzMax * 100;
@@ -1933,6 +1955,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var warns = [];
     if (X <= 0) warns.push("Die Sattelplatte liegt auf oder hinter der Mitte des hinteren Achspakets (x = " + kg(X) + " mm): Die Vorderachse wird entlastet.");
     if (X >= R) warns.push("Die Sattelplatte liegt auf oder vor der Vorderachse. Bitte Masse prüfen.");
+    if (mehr.v > bonusMax && bonusMax) warns.push("Mehrgewicht über " + kg(bonusMax) + " kg: Zuschlag auf " + kg(bonusMax) + " kg begrenzt.");
     if (L.capped) warns.push("Hinterachsen auf 9500 kg je Achse begrenzt, damit Bst. f (19 t) gilt.");
     if (!ax.some(function (a) { return a.drv; })) warns.push("Keine Achse als angetrieben markiert: Adhäsionsgewicht ist 0.");
     if (n === 3 && sp[1] < 1800) warns.push("1. und 2. Achse liegen weniger als 1,80 m auseinander und bilden nach Art. 95 eine Doppelachse. Der Rechner nimmt Achse 1 als einzelne Lenkachse an. Bitte manuell prüfen.");
