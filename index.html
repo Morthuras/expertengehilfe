@@ -315,9 +315,16 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
 .lk-top.ss-top { grid-template-columns: minmax(180px, 1fr) minmax(0, 1fr) minmax(0, 1.4fr); }
 @media (max-width: 760px) { .lk-top.ss-top { grid-template-columns: 1fr 1fr; } .lk-top.ss-top > .field:first-child { grid-column: 1 / -1; } }
 @media (max-width: 520px) { .lk-top.ss-top { grid-template-columns: 1fr; } }
-.axtab.ss-tab { --axcols: 34px minmax(0, 1fr) minmax(0, 1fr) repeat(3, minmax(46px, .5fr)); }
-@media (max-width: 1100px) and (min-width: 761px) { .axtab.ss-tab { --axcols: 28px minmax(0, 1fr) minmax(0, 1fr) repeat(3, 44px); gap: 6px; } }
-@media (max-width: 520px) { .axtab.ss-tab { --axcols: 26px minmax(0, 1fr) minmax(0, 1fr) repeat(3, 40px); } }
+.axtab.ss-tab { --axcols: 34px minmax(0, 1fr) minmax(0, 1fr) repeat(4, minmax(44px, .45fr)); }
+@media (max-width: 1100px) and (min-width: 761px) { .axtab.ss-tab { --axcols: 28px minmax(0, 1fr) minmax(0, 1fr) repeat(4, 40px); gap: 6px; } }
+@media (max-width: 520px) {   /* Handy: Schalter in zweiter Zeile unter den Eingabefeldern */
+  .axtab.ss-tab { --axcols: 30px repeat(4, minmax(0, 1fr)); }
+  .ss-tab .axhead > :nth-child(2), .ss-tab .axhead > :nth-child(3), .ss-tab .axrow > .field, .ss-tab .sprow > .input-unit { grid-column: span 2; }
+  .ss-tab .axhead > :nth-child(3) { text-align: left; }
+  .ss-tab .axhead > :nth-child(4), .ss-tab .axrow > :nth-child(4) { grid-column-start: 2; }
+  .ss-tab .sprow .grp { grid-column: 4 / -1; }
+  .ss-tab .tog span { height: 40px; }
+}
 .ss-tab .axhead span { font-size: 10.5px; letter-spacing: .02em; }
 .ss-tab .axrow .input-unit input { font-size: 17px; }
 .ss-tab .axrow .input-unit .unit { padding: 0 7px; font-size: 12px; }
@@ -1041,6 +1048,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       <div class="notes">
         <ul>
           <li><b>Achse 1</b> ist die Vorderachse. Die übrigen Achsen bilden das hintere Achspaket. Dessen Mitte liegt bei 3 Achsen zwischen 2. und 3. Achse.</li>
+          <li><b>Liftachse:</b> Die Checkbox kennzeichnet die Achse nur in Tabelle und Skizze. Gerechnet wird immer mit abgesenkter Liftachse.</li>
           <li><b>R</b> = Abstand Vorderachse bis Mitte hinteres Achspaket. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Abstand Mitte hinteres Achspaket bis Sattelplatte: bei 2 Achsen x = d, bei 3 Achsen x = d − Abstand 2.–3. Achse / 2.</li>
           <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Bei 3 Achsen verteilt sich der hintere Anteil gleichmässig auf beide Achsen.</li>
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
@@ -1745,7 +1753,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     var w = $("ss-axles");
     var h = document.createElement("div");
     h.className = "axhead";
-    h.innerHTML = '<span></span><span>Leer&shy;gewicht</span><span>Achs&shy;garantie Schild</span><span>Ange&shy;trieben</span><span>Doppel&shy;bereift</span><span>Luft&shy;gefedert</span>';
+    h.innerHTML = '<span></span><span>Leer&shy;gewicht</span><span>Achs&shy;garantie Schild</span><span>Ange&shy;trieben</span><span>Doppel&shy;bereift</span><span>Luft&shy;gefedert</span><span>Lift&shy;achse</span>';
     w.appendChild(h);
     for (var i = 0; i < 3; i++) {
       if (i > 0) {
@@ -1763,12 +1771,13 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         '<div class="field" id="f-ss-schild' + i + '"><div class="input-unit"><input id="ss-schild' + i + '" type="text" inputmode="numeric" autocomplete="off" aria-label="Achsgarantie ' + (i + 1) + '. Achse"><span class="unit">kg</span></div><span class="err" hidden></span></div>' +
         tog("ss-drv" + i, (i + 1) + ". Achse angetrieben") +
         tog("ss-dual" + i, (i + 1) + ". Achse doppelbereift") +
-        tog("ss-air" + i, (i + 1) + ". Achse luftgefedert");
+        tog("ss-air" + i, (i + 1) + ". Achse luftgefedert") +
+        (i > 0 ? tog("ss-lift" + i, (i + 1) + ". Achse Liftachse") : "<span></span>");
       w.appendChild(r);
     }
     var f = document.createElement("div");
     f.className = "hint"; f.style.paddingTop = "8px";
-    f.textContent = "Achse 1 = Vorderachse. Achsabstände in mm von Achsmitte zu Achsmitte.";
+    f.textContent = "Achse 1 = Vorderachse. Achsabstände in mm von Achsmitte zu Achsmitte. Liftachse nur zur Kennzeichnung, Berechnung mit abgesenkter Achse.";
     w.appendChild(f);
   })();
   function ssBind(id, def, isCheck) {
@@ -1791,7 +1800,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
   for (var q = 0; q < 3; q++) {
     ssBind("ss-leer" + q, ssDef.leer[q]); ssBind("ss-schild" + q, ssDef.schild[q]);
     ssBind("ss-drv" + q, ssDef.drv[q], true); ssBind("ss-dual" + q, ssDef.dual[q], true); ssBind("ss-air" + q, ssDef.air[q], true);
-    if (q > 0) ssBind("ss-sp" + q, ssDef.sp[q - 1]);
+    if (q > 0) { ssBind("ss-sp" + q, ssDef.sp[q - 1]); ssBind("ss-lift" + q, false, true); }
   }
   function ssSetN(n) {
     ssN = n; store("ss-n", String(n));
@@ -1851,7 +1860,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     for (var i = 0; i < n; i++) {
       var l = get("ss-leer" + i, { positive: true }), g = get("ss-schild" + i, { positive: true });
       ax.push({ leer: l.ok ? l.v : 0, schild: g.ok ? g.v : 0, load: g.ok ? g.v : 0,
-        drv: $("ss-drv" + i).checked, dual: $("ss-dual" + i).checked, air: $("ss-air" + i).checked });
+        drv: $("ss-drv" + i).checked, dual: $("ss-dual" + i).checked, air: $("ss-air" + i).checked, lift: i > 0 && $("ss-lift" + i).checked });
       if (i > 0) {
         var s = parseVal($("ss-sp" + i), { positive: true });
         if (s.ok && s.v < 10) s.v = Math.round(s.v * 1000);
@@ -1902,7 +1911,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         '</td><td class="r" title="' + why + '">' + kg(lim) + '</td><td class="' + (okk ? "ok" : "bad") + '">' + (okk ? "✓" : "über " + kg(Math.round(bel - lim))) + '</td></tr>';
     }
     rows += row("1. Achse (vorne)", ax[0].leer, S * fF, L.lim[0].v, L.lim[0].why);
-    rear.forEach(function (i) { rows += row((i + 1) + ". Achse", ax[i].leer, S * fR / rear.length, L.lim[i].v, L.lim[i].why); });
+    rear.forEach(function (i) { rows += row((i + 1) + ". Achse" + (ax[i].lift ? " (Liftachse)" : ""), ax[i].leer, S * fR / rear.length, L.lim[i].v, L.lim[i].why); });
     if (L.grp) rows += row("2.+3. Achse (Doppelachse, " + fmt(L.grp.sp / 1000, 2) + " m, " + L.grp.ref.replace("Abs. 2 ", "") + ")", leerRear, S * fR, L.grp.v,
       L.grp.v < L.grp.lim ? "Summe Einzelachsen" : "VTS Art. 95 " + L.grp.ref, "", true);
     rows += row("Gesamt", leerTot, S, L.gg.v, L.gg.why, "sum");
@@ -2035,7 +2044,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
     // Beladene Achslasten unter den Rädern
     axles.forEach(function (a, i) {
       var load = ax[i].leer + (i === 0 ? S * fF : S * fR / rear.length);
-      g.text(a, -260, kg(Math.round(load)) + " kg");
+      g.text(a, -260, kg(Math.round(load)) + " kg" + (ax[i].lift ? " · Lift" : ""));
     });
     // Masslinien: R oben, d (und x) unten
     g.line(R, 3130, R, 0, "mark");
