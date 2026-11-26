@@ -1054,7 +1054,7 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
         <ul>
           <li><b>Achse 1</b> ist die Vorderachse. Die übrigen Achsen bilden das hintere Achspaket. Bei 3 Achsen werden 2. und 3. Achse zu einer theoretischen Hinterachse zusammengefasst. Sie liegt zwischen den beiden Achsen, gewichtet nach der Lastaufteilung.</li>
           <li><b>Liftachse:</b> Bei 3 Achsen kann die 2. Achse (Vorlaufachse) oder die 3. Achse (Nachlaufachse) als Liftachse markiert werden. Die grösstmögliche Sattellast gilt mit abgesenkter Liftachse. Zusätzlich wird der Zustand mit angehobener Liftachse gerechnet.</li>
-          <li><b>Theoretische Hinterachse (3 Achsen):</b> Verhältniszahl <b>V</b> = Achsgarantie (Schild) Antriebsachse ÷ (Doppelachsgewicht − Achsgarantie Antriebsachse). Doppelachsgewicht = zulässige Doppelachslast nach VTS Art. 95 Abs. 2. Ist die Summe der Achsgarantien von 2. und 3. Achse kleiner oder gleich der Doppelachslast (oder bilden die Achsen ab 1,80 m keine Doppelachse), wird direkt geteilt: V = Achsgarantie Antriebsachse ÷ Achsgarantie der anderen Achse. Antriebsachse = die angetriebene der beiden hinteren Achsen. Sind beide oder keine angetrieben, rechnet die App mit der 2. Achse. <b>t</b> = Abstand 2.–3. Achse. Position der theoretischen Hinterachse ab Vorderachse = Abstand 1.–2. Achse + t / (V + 1). <b>R</b> = Vorderachse bis theoretische Hinterachse. <b>e</b> = hinterste Achse bis theoretische Hinterachse. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Sattelvormass = theoretische Hinterachse bis Sattelplatte = d − e (bei 2 Achsen x = d).</li>
+          <li><b>Theoretische Hinterachse (3 Achsen):</b> Verhältniszahl <b>V</b> = Achsgarantie (Schild) Antriebsachse ÷ (Doppelachsgewicht − Achsgarantie Antriebsachse). Doppelachsgewicht = zulässige Doppelachslast nach VTS Art. 95 Abs. 2. Ist die Summe der Achsgarantien von 2. und 3. Achse kleiner oder gleich der Doppelachslast (oder bilden die Achsen ab 1,80 m keine Doppelachse), wird direkt geteilt: V = Achsgarantie Antriebsachse ÷ Achsgarantie der anderen Achse. Antriebsachse = die angetriebene der beiden hinteren Achsen. Sind beide oder keine angetrieben, rechnet die App mit der 2. Achse. <b>t</b> = Abstand 2.–3. Achse. Die theoretische Hinterachse liegt um t / (V + 1) neben der Antriebsachse, in Richtung der anderen Achse, also näher an der Antriebsachse. Antrieb 2. Achse: Position ab Vorderachse = Abstand 1.–2. Achse + t / (V + 1). Antrieb 3. Achse (z. B. 2. Achse als Liftachse): Position = Abstand 1.–3. Achse − t / (V + 1). So trägt die Antriebsachse ihre volle Achsgarantie und der Rest geht auf die andere Achse. <b>R</b> = Vorderachse bis theoretische Hinterachse. <b>e</b> = hinterste Achse bis theoretische Hinterachse. <b>d</b> = eingegebener Abstand Mitte hinterste Achse bis Mitte Sattelplatte, nach vorne positiv. <b>x</b> = Sattelvormass = theoretische Hinterachse bis Sattelplatte = d − e (bei 2 Achsen x = d).</li>
           <li><b>Verteilung der Sattellast S:</b> Vorderachse S · x / R, hinteres Achspaket S · (R − x) / R. Der hintere Anteil verteilt sich nach dem Hebelgesetz aus der Lage der theoretischen Hinterachse auf 2. und 3. Achse.</li>
           <li><b>Liftachse angehoben:</b> Das Fahrzeug wird als Zweiachser mit der verbleibenden Hinterachse gerechnet (Radstand R'). a = Vorderachse bis Sattelplatte. Sattellast vorne S · (R' − a) / R', hinten S · a / R'. Die Leerlast der Liftachse G<sub>L</sub> verteilt sich nach dem Hebelgesetz: vorne G<sub>L</sub> · (R' − l) / R', hinten G<sub>L</sub> · l / R' (l = Vorderachse bis Liftachse). Bei einer Nachlaufachse wird die Vorderachse dadurch entlastet, bei einer Vorlaufachse belastet. Geprüft wird gegen die Einzelachsgrenzen (keine Doppelachse) und das Gesamtgewicht. Wird eine Grenze überschritten, muss die Liftachse abgesenkt sein.</li>
           <li><b>Zulässige Achslast</b> = kleinerer Wert aus Achsgarantie (Schild) und VTS Art. 95 Abs. 2 (nicht angetrieben 10 t, angetrieben 11,5 t). Bei 3 Achsen bilden 2. und 3. Achse unter 1,80 m Abstand eine Doppelachse nach Art. 95 Abs. 2: unter 1,00 m 11,5 t, 1,00 bis unter 1,30 m 16 t, 1,30 bis unter 1,80 m 18 t bzw. 19 t nach Bst. f. Massgebend ist der kleinere Wert aus diesem Grenzwert und der Summe der Einzelachsen. Ab 1,80 m gelten sie als Einzelachsen.</li>
@@ -1905,10 +1905,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
       if (vDir) V = ax[dA].schild / ax[3 - dA].schild;
       else if (DG - ax[dA].schild > 0) V = ax[dA].schild / (DG - ax[dA].schild);
       else { vBad = true; V = ax[dA].schild / ax[3 - dA].schild; }
-      off = sp[2] / (V + 1);                                // 2. Achse bis theoretische Hinterachse
-      kSh[2] = off / sp[2]; kSh[1] = 1 - kSh[2];            // Hebelgesetz
+      off = sp[2] / (V + 1);                                // Antriebsachse bis theoretische Hinterachse
+      kSh[2] = (dA === 1 ? off : sp[2] - off) / sp[2]; kSh[1] = 1 - kSh[2];   // Hebelgesetz
     }
-    var R = sp[1] + off;                         // Vorderachse bis theoretische Hinterachse
+    var R = n === 3 ? (dA === 1 ? sp[1] + off : sp[1] + sp[2] - off) : sp[1];   // Vorderachse bis theoretische Hinterachse
     var E = sp[1] + (n === 3 ? sp[2] : 0) - R;   // hinterste Achse bis theoretische Hinterachse
     var D = x.v;                                 // Eingabe: Mitte hinterste Achse bis Sattelplatte
     var X = D - E;                               // Sattelvormass: theoretische Hinterachse bis Sattelplatte
@@ -2071,10 +2071,10 @@ a.brand:focus-visible, .tile:focus-visible, .btn-back:focus-visible { outline: 3
             "  = " + kg(ax[dA].schild) + " / " + kg(ax[3 - dA].schild)
           : '<span class="k">Verhältniszahl V = Achsgarantie Antriebsachse (' + (dA + 1) + '. Achse) / (Doppelachsgewicht − Achsgarantie Antriebsachse)' + (li >= 0 ? " · Liftachse " + (li + 1) + ". Achse" : "") + '</span>\n' +
             "  = " + kg(ax[dA].schild) + " / (" + kg(DG) + " − " + kg(ax[dA].schild) + ")") + " = " + fmt(V, 3) + "\n" +
-        '<span class="k">2. Achsabstand / (V + 1)</span>\n' +
+        '<span class="k">Antriebsachse bis theoretische Hinterachse = 2. Achsabstand / (V + 1)</span>\n' +
         "  = " + kg(sp[2]) + " / " + fmt(V + 1, 3) + " = " + kg(Math.round(off)) + " mm\n" +
-        '<span class="k">R = Vorderachse bis theoretische Hinterachse = 1. Achsabstand + 2. Achsabstand / (V + 1)</span>\n' +
-        "  = " + kg(sp[1]) + " + " + kg(Math.round(off)) + " = " + kg(Math.round(R)) + " mm\n" +
+        '<span class="k">R = Vorderachse bis theoretische Hinterachse = ' + (dA === 1 ? "1. Achsabstand + 2. Achsabstand / (V + 1)" : "1. + 2. Achsabstand − 2. Achsabstand / (V + 1)") + '</span>\n' +
+        "  = " + (dA === 1 ? kg(sp[1]) + " + " : kg(sp[1] + sp[2]) + " − ") + kg(Math.round(off)) + " = " + kg(Math.round(R)) + " mm\n" +
         '<span class="k">e = hinterste Achse bis theoretische Hinterachse</span>\n' +
         "  = " + kg(sp[1] + sp[2]) + " − " + kg(Math.round(R)) + " = " + kg(Math.round(E)) + " mm\n"
       : '<span class="k">R = Radstand</span>\n' + "  = " + kg(sp[1]) + " mm\n") +
