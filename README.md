@@ -13,7 +13,7 @@ Rechner für Fahrzeugtechnik in der Schweiz, als Web-App im Browser – ohne Ins
 | Anhängerkupplung: Mindest-D-Wert und maximale Anhängelast | UN ECE R55 |
 | Felgen und Spur: Mindest-Einpresstiefe, Distanzscheiben, resultierende Spur (VA/HA) | höchstens 1 % Spuränderung pro Rad |
 | Achslasten LKW: zulässiges Gesamtgewicht und Einträge Ziffer 243 (2–5 Achsen) | VTS Art. 95 |
-| Sattelschlepper: Achslasten beladen, grösstmögliche Sattellast, Lenkachse/Adhäsion, höchstmögliches Gesamtzugsgewicht (2–3 Achsen) | VTS Art. 95, 39, 97; SVG Art. 9 |
+| Sattelschlepper: Achslasten beladen, grösstmögliche Sattellast, Lenkachse/Adhäsion, höchstmögliches Gesamtzugsgewicht (2–3 Achsen) | VTS Art. 95, 39; SVG Art. 9 |
 | Zentralachsanhänger: Stützlast, X-Wert der Ladefläche, Nutzlast (1–3 Achsen) | VTS Art. 184 Abs. 2 |
 
 ## Dateien
